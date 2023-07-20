@@ -17,6 +17,8 @@
       ];
       shellHook = ''
         export NPC_HOME=`readlink -f npc`
+        export NEMU_HOME=`readlink -f nemu`
+        export AM_HOME=`readlink -f abstract-machine`
       '';
     };
   };
