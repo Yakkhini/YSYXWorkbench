@@ -8,12 +8,20 @@
     self,
     pkgs,
     verilator5002pkgs,
-  }: {
+  }: let
+    stdpkgs = pkgs.legacyPackages.x86_64-linux;
+  in {
     formatter.x86_64-linux = pkgs.legacyPackages.x86_64-linux.alejandra;
     devShells.x86_64-linux.default = pkgs.legacyPackages.x86_64-linux.mkShell {
       packages = [
         verilator5002pkgs.legacyPackages.x86_64-linux.verilator
-        pkgs.legacyPackages.x86_64-linux.gtkwave
+        stdpkgs.gtkwave
+        stdpkgs.bison
+        stdpkgs.flex
+        stdpkgs.ncurses
+        stdpkgs.readline
+        stdpkgs.llvm
+        stdpkgs.gdb
       ];
       shellHook = ''
         export NPC_HOME=`readlink -f npc`
