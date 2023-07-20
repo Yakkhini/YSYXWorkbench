@@ -1,0 +1,41 @@
+{
+  "nodes": {
+    "pkgs": {
+      "locked": {
+        "lastModified": 1685865905,
+        "narHash": "sha256-XJZ/o17eOd2sEsGif+/MQBnfa2DKmndWgJyc7CWajFc=",
+        "path": "/nix/store/vcj90ksw5vk6ia960b73vpncxa9pw826-source",
+        "rev": "e7603eba51f2c7820c0a182c6bbb351181caa8e7",
+        "type": "path"
+      },
+      "original": {
+        "id": "pkgs",
+        "type": "indirect"
+      }
+    },
+    "root": {
+      "inputs": {
+        "pkgs": "pkgs",
+        "verilator5002pkgs": "verilator5002pkgs"
+      }
+    },
+    "verilator5002pkgs": {
+      "locked": {
+        "lastModified": 1673641359,
+        "narHash": "sha256-vffYAYAAG5Bhj4vjShFQWve24HyXPQAZdqn9jA5KT6U=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3c3b3ab88a34ff8026fc69cb78febb9ec9aedb16",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3c3b3ab88a34ff8026fc69cb78febb9ec9aedb16",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
