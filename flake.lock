@@ -16,22 +16,22 @@
     "root": {
       "inputs": {
         "pkgs": "pkgs",
-        "verilator5002pkgs": "verilator5002pkgs"
+        "verilator5008pkgs": "verilator5008pkgs"
       }
     },
-    "verilator5002pkgs": {
+    "verilator5008pkgs": {
       "locked": {
-        "lastModified": 1673641359,
-        "narHash": "sha256-vffYAYAAG5Bhj4vjShFQWve24HyXPQAZdqn9jA5KT6U=",
+        "lastModified": 1682674845,
+        "narHash": "sha256-HjMXEKQFWEt5P6tJ3fHnx2/rvapVQr40yNHvpGVs/xM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "3c3b3ab88a34ff8026fc69cb78febb9ec9aedb16",
+        "rev": "5e871533c4a488319b9cb98d7a525c356459d36c",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "3c3b3ab88a34ff8026fc69cb78febb9ec9aedb16",
+        "rev": "5e871533c4a488319b9cb98d7a525c356459d36c",
         "type": "github"
       }
     }
