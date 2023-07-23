@@ -27,7 +27,9 @@
       ];
 
       buildInputs = with stdpkgs; [
+        clang-tools
         gnumake
+        bear
         SDL2
         SDL2_image
         pkg-config
@@ -38,7 +40,8 @@
         export NEMU_HOME=`readlink -f nemu`
         export AM_HOME=`readlink -f abstract-machine`
         export NVBOARD_HOME=`readlink -f nvboard`
-        NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $NIX_CFLAGS_COMPILE"
+        export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
+        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//')"
       '';
     };
   };
