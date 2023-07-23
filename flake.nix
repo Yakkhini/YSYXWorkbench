@@ -41,7 +41,9 @@
         export AM_HOME=`readlink -f abstract-machine`
         export NVBOARD_HOME=`readlink -f nvboard`
         export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
-        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//')"
+        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build"
+
+        alias npcmake="make -C $NPC_HOME"
       '';
     };
   };
