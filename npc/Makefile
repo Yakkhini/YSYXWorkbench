@@ -15,7 +15,8 @@ define run-dlcobuild =
 $(VERILATOR) --cc -Mdir $(BUILD_DIR) --top-module $(subst 0,,$(notdir $(filedir))) \
 	--build -Wall $(shell find $(filedir) -name '*.cpp' -or -name '*.v' -or -name '*.sv') $(NVBOARD_ARCHIVE) \
 	-LDFLAGS -lSDL2 -LDFLAGS -lSDL2_image \
-	--exe -o $(BUILD_DIR)/bin/$(subst 0,nju,$(notdir $(filedir)));
+	--exe -o $(BUILD_DIR)/bin/$(subst 0,nju,$(notdir $(filedir)))
+
 endef
 
 njudlco: build build/bin $(DLCOLABSRC_DIR)
