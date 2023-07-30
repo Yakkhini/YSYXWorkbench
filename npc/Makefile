@@ -11,10 +11,11 @@ build build/bin:
 	mkdir -p $@
 
 define run-dlcobuild =
-@echo $(subst 0,v,$(notdir $(filedir)))
-$(VERILATOR) --cc -Mdir $(BUILD_DIR) --build -Wall $(shell find $(filedir) -name '*.cpp' -or -name '*.v' -or -name '*.sv') $(NVBOARD_ARCHIVE) \
+@echo $(subst 0,nju,$(notdir $(filedir)))
+$(VERILATOR) --cc -Mdir $(BUILD_DIR) --top-module $(subst 0,,$(notdir $(filedir))) \
+	--build -Wall $(shell find $(filedir) -name '*.cpp' -or -name '*.v' -or -name '*.sv') $(NVBOARD_ARCHIVE) \
 	-LDFLAGS -lSDL2 -LDFLAGS -lSDL2_image \
-	--exe -o $(BUILD_DIR)/bin/$(subst 0,v,$(notdir $(filedir)));
+	--exe -o $(BUILD_DIR)/bin/$(subst 0,nju,$(notdir $(filedir)));
 endef
 
 njudlco: build build/bin $(DLCOLABSRC_DIR)
