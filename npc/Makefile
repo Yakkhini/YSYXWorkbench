@@ -1,10 +1,25 @@
-BUILD_DIR := ./build
-EMBEDSRC_DIR := ./examples/embeddedtour
-EMBEDSRC := $(shell find $(SRC_DIRS) -name '0*_*.cpp' -or -name '0*_*.v' -or -name '0*_*.sv')
-VERILATOR := verilator
+BUILD_DIR=$(NPC_HOME)/build
+EMBEDSRC_DIR=$(NPC_HOME)/examples/embeddedtour
+EMBEDSRC=$(shell find $(EMBEDSRC_DIR) -name '*.cpp' -or -name '*.v' -or -name '*.sv')
+DLCOLABSRC_DIR=$(wildcard $(NPC_HOME)/examples/njudlcolab/0*)
+VERILATOR=verilator
 
 all:
 	@echo "Write this Makefile by your self."
+
+build build/bin:
+	mkdir -p $@
+
+define run-dlcobuild =
+@echo $(subst 0,v,$(notdir $(filedir)))
+$(VERILATOR) --cc -Mdir $(BUILD_DIR) --build -Wall $(shell find $(filedir) -name '*.cpp' -or -name '*.v' -or -name '*.sv') $(NVBOARD_ARCHIVE) \
+	-LDFLAGS -lSDL2 -LDFLAGS -lSDL2_image \
+	--exe -o $(BUILD_DIR)/bin/$(subst 0,v,$(notdir $(filedir)));
+endef
+
+njudlco: build build/bin $(DLCOLABSRC_DIR)
+	$(foreach filedir,$(DLCOLABSRC_DIR),$(run-dlcobuild))
+	$(call git_commit, "Build NJU DLCO LAB files.")
 
 embed: buildembed
 	$(call git_commit, "Build itsembedded tutorial codes.")
@@ -18,8 +33,9 @@ sim:
 	@echo "Write this Makefile by your self."
 	verilator --cc --exe --build -j 0 -Wall vsrc/example/01_xor_light/sim_main.cpp vsrc/example/01_xor_light/xormod.v
 
-.PHONY: sim clean embed
+.PHONY: sim clean embed njudlco
 
 clean:
 	rm -r $(BUILD_DIR)
 include ../Makefile
+include $(NVBOARD_HOME)/scripts/nvboard.mk

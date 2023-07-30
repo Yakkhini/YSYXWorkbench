@@ -10,6 +10,7 @@
     verilator5008pkgs,
   }: let
     stdpkgs = pkgs.legacyPackages.x86_64-linux;
+    npcmake = stdpkgs.writeScriptBin "npcmake" ''make -C $NPC_HOME $1'';
   in {
     formatter.x86_64-linux = pkgs.legacyPackages.x86_64-linux.alejandra;
     devShells.x86_64-linux.default = pkgs.legacyPackages.x86_64-linux.mkShell {
@@ -24,6 +25,7 @@
         stdpkgs.llvm
         stdpkgs.gdb
         stdpkgs.python3
+        npcmake
       ];
 
       buildInputs = with stdpkgs; [
@@ -41,8 +43,7 @@
         export AM_HOME=`readlink -f abstract-machine`
         export NVBOARD_HOME=`readlink -f nvboard`
         export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
-        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build"
-
+        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/include"
         alias npcmake="make -C $NPC_HOME"
       '';
     };
