@@ -7,7 +7,7 @@ VERILATOR=verilator
 all:
 	@echo "Write this Makefile by your self."
 
-build build/bin:
+build/bin:
 	mkdir -p $@
 
 define run-dlcobuild =
@@ -19,7 +19,7 @@ $(VERILATOR) --cc -Mdir $(BUILD_DIR) --top-module $(subst 0,,$(notdir $(filedir)
 
 endef
 
-njudlco: build build/bin $(DLCOLABSRC_DIR)
+njudlco: build/bin $(DLCOLABSRC_DIR)
 	$(foreach filedir,$(DLCOLABSRC_DIR),$(run-dlcobuild))
 	$(call git_commit, "Build NJU DLCO LAB files.")
 
