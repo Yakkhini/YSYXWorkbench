@@ -7,7 +7,10 @@ module afsftreg (
   output reg [7:0] hex0
 );
   always @(posedge clk) begin
-    if (rst) begin bitreg <= seed; end
+    if (rst) begin 
+      bitreg <= seed;
+      if (bitreg == 8'd0) bitreg <= 8'd1;
+    end
     else begin
       bitreg <= {bitreg[0]^bitreg[2]^bitreg[3]^bitreg[4], bitreg[7:1]};
     end
