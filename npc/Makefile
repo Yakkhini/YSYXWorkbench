@@ -2,6 +2,7 @@ BUILD_DIR=$(NPC_HOME)/build
 EMBEDSRC_DIR=$(NPC_HOME)/examples/embeddedtour
 EMBEDSRC=$(shell find $(EMBEDSRC_DIR) -name '*.cpp' -or -name '*.v' -or -name '*.sv')
 DLCOLABSRC_DIR=$(wildcard $(NPC_HOME)/examples/njudlcolab/0*)
+YSYXPRESRC_DIR=$(wildcard $(NPC_HOME)/examples/ysyxpre/0*)
 VERILATOR=verilator
 
 all:
@@ -22,6 +23,19 @@ endef
 njudlco: build/bin $(DLCOLABSRC_DIR)
 	$(foreach filedir,$(DLCOLABSRC_DIR),$(run-dlcobuild))
 	$(call git_commit, "Build NJU DLCO LAB files.")
+
+define run-ysyxprebuild =
+@echo $(subst 0,ysyxpre,$(notdir $(filedir)))
+$(VERILATOR) --cc -Mdir $(BUILD_DIR) --top-module $(subst 0,,$(notdir $(filedir))) \
+	--build -Wall $(shell find $(filedir) -name '*.cpp' -or -name '*.v' -or -name '*.sv') $(NVBOARD_ARCHIVE) \
+	-LDFLAGS -lSDL2 -LDFLAGS -lSDL2_image \
+	--exe -o $(BUILD_DIR)/bin/$(subst 0,ysyxpre,$(notdir $(filedir)))
+
+endef
+
+ysyxpre: build/bin $(YSYXPRESRC_DIR)
+	$(foreach filedir,$(YSYXPRESRC_DIR),$(run-ysyxprebuild))
+	$(call git_commit, "Build YSYX prestudy files.")
 
 embed: buildembed
 	$(call git_commit, "Build itsembedded tutorial codes.")
