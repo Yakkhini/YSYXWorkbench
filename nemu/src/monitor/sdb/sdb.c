@@ -47,6 +47,18 @@ static int cmd_c(char *args) {
   return 0;
 }
 
+static int cmd_si(char *args) {
+  char *arg = strtok(NULL, " ");
+  if (arg == NULL) {
+    printf("No step number, default to one step.\n");
+    cpu_exec(1);
+    return 0;
+  }
+  int istep = *arg - '0';
+  printf("Excute program by %i step\n", istep);
+  cpu_exec(istep);
+  return 0;
+}
 
 static int cmd_q(char *args) {
   nemu_state.state = NEMU_QUIT;
@@ -63,6 +75,7 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
+  { "si", "Execute program by step", cmd_si }
 
   /* TODO: Add more commands */
 
