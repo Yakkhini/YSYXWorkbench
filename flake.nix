@@ -44,7 +44,7 @@
         export NVBOARD_HOME=`readlink -f nvboard`
         export PATH="$NPC_HOME/build/bin:$PATH"
         export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
-        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/include:$NEMU_HOME/include"
+        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/include"
         alias npcmake="make -C $NPC_HOME"
       '';
     };
