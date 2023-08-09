@@ -17,7 +17,12 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include "common.h"
 #include "sdb.h"
+#include "utils.h"
+#include <memory/vaddr.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 static int is_batch_mode = false;
 
@@ -80,6 +85,18 @@ static int cmd_q(char *args) {
   return -1;
 }
 
+static int cmd_x(char *args) {
+  char *len = strtok(NULL, " ");
+  char *pos = strtok(NULL, " ");
+  int ilen = strtol(len, NULL, 10);
+  vaddr_t upos = strtol(pos, NULL, 16);
+  printf("Reading %i data begin at 0x%X...\n", ilen, upos);\
+  for (int i=0; i<ilen; i++) {
+    printf("0x%08X: 0x%08X\n", upos+i, vaddr_read(upos+i, 4));
+  }
+  return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -92,6 +109,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si", "Execute program by step", cmd_si },
   { "info", "Print reg or watch point info.", cmd_info},
+  { "x", "Read memory.", cmd_x },
 
   /* TODO: Add more commands */
 
