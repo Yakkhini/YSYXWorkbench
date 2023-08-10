@@ -23,6 +23,7 @@
 #include <memory/vaddr.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static int is_batch_mode = false;
 
@@ -80,6 +81,13 @@ static int cmd_info(char *args) {
   return 0;
 }
 
+static int cmd_p(char *args) {
+  bool success = true;
+  word_t result = expr(args, &success);
+  printf("Result is: %u.\n", result);
+  return 0;
+}
+
 static int cmd_q(char *args) {
   nemu_state.state = NEMU_QUIT;
   return -1;
@@ -106,6 +114,7 @@ static struct {
 } cmd_table [] = {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
+  { "p", "Caculate expression and output value.", cmd_p},
   { "q", "Exit NEMU", cmd_q },
   { "si", "Execute program by step", cmd_si },
   { "info", "Print reg or watch point info.", cmd_info},

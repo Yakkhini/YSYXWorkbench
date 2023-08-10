@@ -13,15 +13,19 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "common.h"
 #include <isa.h>
 
 /* We use the POSIX regex functions to process regular expressions.
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256, TK_EQ, TK_NUM,
 
   /* TODO: Add more token types */
 
@@ -38,6 +42,12 @@ static struct rule {
 
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
+  {"-", '-'},           // sub
+  {"\\*", '*'},         // times
+  {"/", '/'},           // div
+  {"[0-9]+", TK_NUM},   // num
+  {"\\(", '('},         // left bracket
+  {"\\)", ')'},         // right bracket
   {"==", TK_EQ},        // equal
 };
 
@@ -84,6 +94,10 @@ static bool make_token(char *e) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
 
+        Token token = {rules[i].token_type};
+        strncpy(token.str, substr_start, substr_len);
+        token.str[substr_len] = '\0';
+
         Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
             i, rules[i].regex, position, substr_len, substr_len, substr_start);
 
@@ -95,7 +109,8 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-          default: TODO();
+          case TK_NOTYPE: break;
+          default: tokens[nr_token] = token; nr_token++;
         }
 
         break;
@@ -111,6 +126,7 @@ static bool make_token(char *e) {
   return true;
 }
 
+float eval(int p, int q);
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -118,8 +134,60 @@ word_t expr(char *e, bool *success) {
     return 0;
   }
 
-  /* TODO: Insert codes to evaluate the expression. */
-  TODO();
+  word_t result = eval(0, nr_token - 1);
 
-  return 0;
+  return result;
+}
+
+bool check_parentheses(int p, int q) {
+  return (tokens[p].type == '(' && tokens[q].type == ')');
+}
+
+float eval(int p, int q) {
+  if (p > q) {
+    /* Bad expression */
+  }
+  else if (p == q) {
+    /* Single token.
+     * For now this token should be a number.
+     * Return the value of the number.
+     */
+     return strtof(tokens[p].str, NULL);
+  }
+  else if (check_parentheses(p, q) == true) {
+    /* The expression is surrounded by a matched pair of parentheses.
+     * If that is the case, just throw away the parentheses.
+     */
+    return eval(p + 1, q - 1);
+  }
+  else {
+    int op = -1; bool imux = false; int bmux = 0;
+    for (int i = p; i < q+1; i++) {
+      if ((tokens[i].type == '+' || tokens[i].type == '-') && bmux == 0) {
+        op = i;
+        imux = true;
+      } else if ((tokens[i].type == '*' || tokens[i].type == '/') && !imux && bmux == 0) {
+        op = i;
+      } else if (tokens[i].type == '(') {
+        bmux +=1;
+      } else if (tokens[i].type == ')') {
+        bmux -=1;
+      }
+    }
+    if (op == -1) {
+      return -1;
+    }
+    float val1 = eval(p, op - 1);
+    float val2 = eval(op + 1, q);
+
+    switch (tokens[op].type) {
+      case '+': return val1 + val2;
+      case '-': return val1 - val2;
+      case '*': return val1 * val2;
+      case '/': return val1 / val2;
+      default: assert(0);
+    }
+  }
+
+  return 1;
 }
