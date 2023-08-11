@@ -54,6 +54,13 @@ static int cmd_c(char *args) {
   return 0;
 }
 
+static int cmd_d(char *args) {
+  char *arg = strtok(NULL, " ");
+  int wp_no = atoi(arg);
+  free_wp(wp_no);
+  return 0;
+}
+
 static int cmd_si(char *args) {
   char *arg = strtok(NULL, " ");
   if (arg == NULL) {
@@ -92,6 +99,15 @@ static int cmd_q(char *args) {
   return -1;
 }
 
+static int cmd_w(char *args) {
+  WP *wp = new_WP();
+  wp->expression = args;
+  wp->result = expr(args, NULL);
+  Log("New watchpoint in NO.%i with expression %s equal to value %u", wp->NO,
+      wp->expression, wp->result);
+  return 0;
+}
+
 static int cmd_x(char *args) {
   char *len = strtok(NULL, " ");
   char *pos = strtok(NULL, " ");
@@ -113,11 +129,13 @@ static struct {
 } cmd_table[] = {
     {"help", "Display information about all supported commands", cmd_help},
     {"c", "Continue the execution of the program", cmd_c},
+    {"d", "Free watchpoint", cmd_d},
     {"p", "Caculate expression and output value.", cmd_p},
     {"q", "Exit NEMU", cmd_q},
     {"si", "Execute program by step", cmd_si},
     {"info", "Print reg or watch point info.", cmd_info},
     {"x", "Read memory.", cmd_x},
+    {"w", "Set new watchpoint.", cmd_w},
 
     /* TODO: Add more commands */
 

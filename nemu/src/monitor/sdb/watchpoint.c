@@ -14,20 +14,11 @@
  ***************************************************************************************/
 
 #include "common.h"
+#include "debug.h"
 #include "sdb.h"
 #include <assert.h>
 
 #define NR_WP 32
-
-typedef struct watchpoint {
-  int NO;
-  struct watchpoint *next;
-
-  /* TODO: Add more members if necessary */
-  bool idle;
-  char *expression;
-  word_t result;
-} WP;
 
 static WP wp_pool[NR_WP] = {};
 static WP *head = NULL, *free_ = NULL;
@@ -52,15 +43,20 @@ WP *new_WP() {
     if (free_[i].idle) {
       WP *using_wp = head;
       if (using_wp == NULL) {
-        using_wp = &free_[i];
+        using_wp = free_ + i;
+        head = free_ + i;
         free_[i].idle = false;
         free_[i].next = NULL;
         return using_wp;
-      }
-      while (using_wp != NULL) {
-        if (using_wp->next == NULL) {
-          using_wp->next = &free_[i];
-          free_[i].idle = false;
+      } else {
+        while (using_wp != NULL) {
+          if (using_wp->next == NULL) {
+            using_wp->next = &free_[i];
+            free_[i].idle = false;
+            break;
+          } else {
+            using_wp = using_wp->next;
+          }
         }
       }
       free_[i].next = NULL;
@@ -69,18 +65,31 @@ WP *new_WP() {
   }
   assert(0);
 }
-void free_wp(WP *wp) {
-  WP *using_wp = head;
-  if (wp == head) {
+
+void free_wp(int wp_no) {
+  Log("Enter free_wp func with int %i, head: %p", wp_no, head);
+  WP *wp = head;
+  if (wp->NO == wp_no) {
     head = wp->next;
-  }
-  while (using_wp != wp) {
-    if (using_wp->next == wp) {
-      using_wp->next = wp->next;
-      break;
+  } else {
+    while (wp != NULL && wp->NO != wp_no) {
+      if (wp->next->NO == wp_no) {
+        WP *temp = wp->next;
+        wp->next = wp->next->next;
+        wp = temp;
+        break;
+      }
+      wp = wp->next;
+      if (wp == NULL) {
+        Log("Watchpoint not found, maybe in idle...");
+        break;
+      }
     }
-    using_wp = using_wp->next;
   }
+  Log("Watchpoint found.");
   wp->idle = true;
-  wp->next = &free_[wp->NO + 1];
+  wp->expression = "0";
+  wp->result = 0;
+  wp->next = &free_[wp_no + 1];
+  Log("Free watchpoint NO.%i", wp->NO);
 }
