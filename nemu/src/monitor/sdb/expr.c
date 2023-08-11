@@ -20,12 +20,13 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_NUM,
+  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_AND, TK_REG, TK_HEXNUM, TK_NUM,
 
   /* TODO: Add more token types */
 
@@ -45,10 +46,14 @@ static struct rule {
   {"-", '-'},           // sub
   {"\\*", '*'},         // times
   {"/", '/'},           // div
+  {"\\$[a-z|0-9]+", TK_REG},        //registers
+  {"0x[0-9]+", TK_HEXNUM},     // hex-num
   {"[0-9]+", TK_NUM},   // num
   {"\\(", '('},         // left bracket
   {"\\)", ')'},         // right bracket
   {"==", TK_EQ},        // equal
+  {"!=", TK_NEQ},       // not equal
+  {"&&", TK_AND},       // and
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -126,7 +131,7 @@ static bool make_token(char *e) {
   return true;
 }
 
-float eval(int p, int q);
+uint32_t eval(int p, int q);
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -143,7 +148,7 @@ bool check_parentheses(int p, int q) {
   return (tokens[p].type == '(' && tokens[q].type == ')');
 }
 
-float eval(int p, int q) {
+uint32_t eval(int p, int q) {
   if (p > q) {
     /* Bad expression */
   }
@@ -152,7 +157,12 @@ float eval(int p, int q) {
      * For now this token should be a number.
      * Return the value of the number.
      */
-     return strtof(tokens[p].str, NULL);
+     bool success = false;
+     switch (tokens[p].type) {
+      case TK_REG: return isa_reg_str2val(tokens[p].str, &success);
+      case TK_HEXNUM: return strtol(tokens[p].str, NULL, 16);
+      case TK_NUM: return strtof(tokens[p].str, NULL);
+     }
   }
   else if (check_parentheses(p, q) == true) {
     /* The expression is surrounded by a matched pair of parentheses.
@@ -161,12 +171,15 @@ float eval(int p, int q) {
     return eval(p + 1, q - 1);
   }
   else {
-    int op = -1; bool imux = false; int bmux = 0;
+    int op = -1; bool imux = false; int bmux = 0; int lmux = false;
     for (int i = p; i < q+1; i++) {
-      if ((tokens[i].type == '+' || tokens[i].type == '-') && bmux == 0) {
+      if ((tokens[i].type == TK_EQ || tokens[i].type == TK_NEQ || tokens[i].type == TK_AND) && bmux == 0) {
+        op = i;
+        lmux = true;
+      } else if ((tokens[i].type == '+' || tokens[i].type == '-') && bmux == 0 && !lmux) {
         op = i;
         imux = true;
-      } else if ((tokens[i].type == '*' || tokens[i].type == '/') && !imux && bmux == 0) {
+      } else if ((tokens[i].type == '*' || tokens[i].type == '/') && !imux && !lmux && bmux == 0) {
         op = i;
       } else if (tokens[i].type == '(') {
         bmux +=1;
@@ -185,6 +198,9 @@ float eval(int p, int q) {
       case '-': return val1 - val2;
       case '*': return val1 * val2;
       case '/': return val1 / val2;
+      case TK_EQ: return val1 == val2;
+      case TK_NEQ: return val1 != val2;
+      case TK_AND: return val1 && val2;
       default: assert(0);
     }
   }

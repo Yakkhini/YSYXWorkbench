@@ -14,6 +14,9 @@
 ***************************************************************************************/
 
 #include <isa.h>
+#include <stdio.h>
+#include <string.h>
+#include "debug.h"
 #include "local-include/reg.h"
 
 const char *regs[] = {
@@ -40,5 +43,19 @@ void isa_reg_display() {
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
-  return 0;
+  Log("Entered isa reg str2val func...\n");
+  if ((strcmp(s, "$0") == 0) || strcmp(s, "$zero") == 0) {
+    Log("REG Zero...\n");
+    *success = true;
+    return 0;
+  }
+  s += 1;
+  for (int i = 1; i < 30; i++) {
+    if (strcmp(s, regs[i]) == 0) {
+      *success = true;
+      Log("Get value %u at %s...\n", cpu.gpr[i], s);
+      return cpu.gpr[i];
+    }
+  }
+  return -1;
 }
