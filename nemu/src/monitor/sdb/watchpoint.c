@@ -13,6 +13,7 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
+#include "common.h"
 #include "sdb.h"
 #include <assert.h>
 
@@ -24,6 +25,8 @@ typedef struct watchpoint {
 
   /* TODO: Add more members if necessary */
   bool idle;
+  char *expression;
+  word_t result;
 } WP;
 
 static WP wp_pool[NR_WP] = {};
@@ -35,6 +38,8 @@ void init_wp_pool() {
     wp_pool[i].NO = i;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
     wp_pool[i].idle = true;
+    wp_pool[i].expression = "0";
+    wp_pool[i].result = 0;
   }
 
   head = NULL;
@@ -68,14 +73,14 @@ void free_wp(WP *wp) {
   WP *using_wp = head;
   if (wp == head) {
     head = wp->next;
-    wp->next = NULL;
   }
   while (using_wp != wp) {
     if (using_wp->next == wp) {
       using_wp->next = wp->next;
+      break;
     }
     using_wp = using_wp->next;
   }
-  wp->idle = false;
+  wp->idle = true;
   wp->next = &free_[wp->NO + 1];
 }
