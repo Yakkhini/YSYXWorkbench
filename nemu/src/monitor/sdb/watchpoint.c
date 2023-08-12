@@ -15,7 +15,7 @@
 
 #include "common.h"
 #include "debug.h"
-#include "sdb.h"
+#include <sdb.h>
 #include <assert.h>
 #include <stdio.h>
 
@@ -105,6 +105,23 @@ void read_wp() {
     while (wp != NULL) {
       printf("Watchpoint NO.%i: expression %s = value %u\n", wp->NO,
              wp->expression, wp->result);
+      wp = wp->next;
+    }
+  }
+}
+
+void check_wp() {
+  WP *wp = head;
+  if (wp == NULL) {
+    return;
+  } else {
+    while (wp != NULL) {
+      int result = expr(wp->expression, NULL);
+      if (wp->result != result) {
+        Log("Watchpoint NO.%i: expression %s value %u changed to %u", wp->NO,
+             wp->expression, wp->result, result);
+        wp->result = result;
+      }
       wp = wp->next;
     }
   }
