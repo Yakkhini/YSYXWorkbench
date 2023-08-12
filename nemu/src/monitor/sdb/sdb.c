@@ -13,7 +13,7 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
-#include "sdb.h"
+#include <sdb.h>
 #include "common.h"
 #include "debug.h"
 #include "utils.h"
@@ -109,9 +109,7 @@ static int cmd_q(char *args) {
 static int cmd_w(char *args) {
   WP *wp = new_WP();
   bool success = true;
-  Log("Copy args...");
   strcpy(wp->expression, args);
-  printf("%s", wp->expression);
   wp->result = expr(wp->expression, &success);
   if (success) {
     Log("New watchpoint in NO.%i with expression %s equal to value %u", wp->NO,

@@ -49,19 +49,19 @@ static struct rule {
      * Pay attention to the precedence level of different rules.
      */
 
-    {" +", TK_NOTYPE},         // spaces
-    {"\\+", '+'},              // plus
-    {"-", '-'},                // sub
-    {"\\*", '*'},              // times
-    {"/", '/'},                // div
-    {"\\$[a-z|0-9]+", TK_REG}, // registers
-    {"0x[0-9]+", TK_HEXNUM},   // hex-num
-    {"[0-9]+", TK_NUM},        // num
-    {"\\(", '('},              // left bracket
-    {"\\)", ')'},              // right bracket
-    {"==", TK_EQ},             // equal
-    {"!=", TK_NEQ},            // not equal
-    {"&&", TK_AND},            // and
+    {" +", TK_NOTYPE},           // spaces
+    {"\\+", '+'},                // plus
+    {"-", '-'},                  // sub
+    {"\\*", '*'},                // times
+    {"/", '/'},                  // div
+    {"\\$[a-z|0-9]+", TK_REG},   // registers
+    {"0x[0-9|A-F]+", TK_HEXNUM}, // hex-num
+    {"[0-9]+", TK_NUM},          // num
+    {"\\(", '('},                // left bracket
+    {"\\)", ')'},                // right bracket
+    {"==", TK_EQ},               // equal
+    {"!=", TK_NEQ},              // not equal
+    {"&&", TK_AND},              // and
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -112,8 +112,8 @@ static bool make_token(char *e) {
         strncpy(token.str, substr_start, substr_len);
         token.str[substr_len] = '\0';
 
-        Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i,
-            rules[i].regex, position, substr_len, substr_len, substr_start);
+        // Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i,
+        //     rules[i].regex, position, substr_len, substr_len, substr_start);
 
         position += substr_len;
 
@@ -190,11 +190,10 @@ uint32_t eval(int p, int q) {
      * If that is the case, just throw away the parentheses.
      */
     return eval(p + 1, q - 1);
-  } else if (tokens[p].type == TK_DEREF && q == p+1) {
-    vaddr_t  upos = strtol(tokens[q].str, NULL, 16);
+  } else if (tokens[p].type == TK_DEREF && q == p + 1) {
+    vaddr_t upos = strtol(tokens[q].str, NULL, 16);
     return vaddr_read(upos, 4);
-  }
-  else {
+  } else {
     int op = -1;
     bool imux = false;
     int bmux = 0;
