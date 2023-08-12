@@ -15,6 +15,7 @@
 
 #include "sdb.h"
 #include "common.h"
+#include "debug.h"
 #include "utils.h"
 #include <cpu/cpu.h>
 #include <isa.h>
@@ -80,6 +81,8 @@ static int cmd_info(char *args) {
     printf("Please give info subcommand.\n");
   } else if (strcmp(arg, "r") == 0) {
     isa_reg_display();
+  } else if (strcmp(arg, "w") == 0) {
+    read_wp();
   } else {
     printf("Incorrect info subcommand.\n");
   }
@@ -90,7 +93,11 @@ static int cmd_info(char *args) {
 static int cmd_p(char *args) {
   bool success = true;
   word_t result = expr(args, &success);
-  printf("Result is: %u.\n", result);
+  if (success) {
+    printf("Result is: %u.\n", result);
+  } else {
+    printf("Parse expression failed.");
+  }
   return 0;
 }
 
@@ -101,10 +108,18 @@ static int cmd_q(char *args) {
 
 static int cmd_w(char *args) {
   WP *wp = new_WP();
-  wp->expression = args;
-  wp->result = expr(args, NULL);
-  Log("New watchpoint in NO.%i with expression %s equal to value %u", wp->NO,
-      wp->expression, wp->result);
+  bool success = true;
+  Log("Copy args...");
+  strcpy(wp->expression, args);
+  printf("%s", wp->expression);
+  wp->result = expr(wp->expression, &success);
+  if (success) {
+    Log("New watchpoint in NO.%i with expression %s equal to value %u", wp->NO,
+        wp->expression, wp->result);
+  } else {
+    Log("Expression error, delete watchpoint.");
+    free_wp(wp->NO);
+  }
   return 0;
 }
 

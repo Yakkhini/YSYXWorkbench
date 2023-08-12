@@ -17,6 +17,7 @@
 #include "debug.h"
 #include "sdb.h"
 #include <assert.h>
+#include <stdio.h>
 
 #define NR_WP 32
 
@@ -29,7 +30,7 @@ void init_wp_pool() {
     wp_pool[i].NO = i;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
     wp_pool[i].idle = true;
-    wp_pool[i].expression = "0";
+    wp_pool[i].expression[0] = '\0';
     wp_pool[i].result = 0;
   }
 
@@ -88,8 +89,21 @@ void free_wp(int wp_no) {
   }
   Log("Watchpoint found.");
   wp->idle = true;
-  wp->expression = "0";
+  wp->expression[0] = '\0';
   wp->result = 0;
   wp->next = &free_[wp_no + 1];
   Log("Free watchpoint NO.%i", wp->NO);
+}
+
+void read_wp() {
+  WP *wp = head;
+  if (wp == NULL) {
+    printf("No watchpoint set.\n");
+  } else {
+    while (wp != NULL) {
+      printf("Watchpoint NO.%i: expression %s = value %u\n", wp->NO,
+             wp->expression, wp->result);
+      wp = wp->next;
+    }
+  }
 }
