@@ -70,21 +70,23 @@ WP *new_WP() {
 void free_wp(int wp_no) {
   Log("Enter free_wp func with int %i, head: %p", wp_no, head);
   WP *wp = head;
-  if (wp->NO == wp_no) {
+  if (head == NULL) {
+    Log("Not fount: All watchpoints in idle.");
+    return;
+  } else if (wp->NO == wp_no) {
     head = wp->next;
   } else {
     while (wp != NULL && wp->NO != wp_no) {
-      if (wp->next->NO == wp_no) {
+      if (wp->next == NULL) {
+        Log("Watchpoint not found, maybe in idle...");
+        return;
+      } else if (wp->next->NO == wp_no) {
         WP *temp = wp->next;
         wp->next = wp->next->next;
         wp = temp;
         break;
       }
       wp = wp->next;
-      if (wp == NULL) {
-        Log("Watchpoint not found, maybe in idle...");
-        break;
-      }
     }
   }
   Log("Watchpoint found.");
