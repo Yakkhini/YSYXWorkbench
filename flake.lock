@@ -2,10 +2,10 @@
   "nodes": {
     "pkgs": {
       "locked": {
-        "lastModified": 1685865905,
-        "narHash": "sha256-XJZ/o17eOd2sEsGif+/MQBnfa2DKmndWgJyc7CWajFc=",
-        "path": "/nix/store/vcj90ksw5vk6ia960b73vpncxa9pw826-source",
-        "rev": "e7603eba51f2c7820c0a182c6bbb351181caa8e7",
+        "lastModified": 1691155011,
+        "narHash": "sha256-O15tC0ysw+fcacEbOzrDrkVNIR+SgtArSGvpgsEqpvA=",
+        "path": "/nix/store/czsr53xg884rhcwp47ccqg813872cksh-source",
+        "rev": "9652a97d9738d3e65cf33c0bc24429e495a7868f",
         "type": "path"
       },
       "original": {
@@ -16,7 +16,8 @@
     "root": {
       "inputs": {
         "pkgs": "pkgs",
-        "verilator5008pkgs": "verilator5008pkgs"
+        "verilator5008pkgs": "verilator5008pkgs",
+        "yamlcpp06pkgs": "yamlcpp06pkgs"
       }
     },
     "verilator5008pkgs": {
@@ -32,6 +33,22 @@
         "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "5e871533c4a488319b9cb98d7a525c356459d36c",
+        "type": "github"
+      }
+    },
+    "yamlcpp06pkgs": {
+      "locked": {
+        "lastModified": 1611285062,
+        "narHash": "sha256-3ikcnbmiIPASfSk6UaVmc/tQ8K+EwXZSUahC3gRgklQ=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "66e44425c6dfecbea68a5d6dc221ccd56561d4f1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "66e44425c6dfecbea68a5d6dc221ccd56561d4f1",
         "type": "github"
       }
     }
