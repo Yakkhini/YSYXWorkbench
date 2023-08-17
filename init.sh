@@ -69,6 +69,9 @@ case $1 in
   npc)
     addenv NPC_HOME npc
     ;;
+  yosys-sta)
+    init OSCPU/yosys-sta master yosys-sta false YOSYS_STA_HOME
+    ;;
   *)
     echo "Invalid input..."
     exit
