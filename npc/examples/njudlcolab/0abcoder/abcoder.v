@@ -1,4 +1,5 @@
 module abcoder(
+  input clk,
   input [7:0] sw,
   output reg pointld,
   output reg [7:0] hex,

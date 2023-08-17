@@ -1,5 +1,6 @@
 /* verilator lint_off UNUSEDSIGNAL */
 module acalu(
+  input clk,
   input [3:0] x0,
   input [3:0] x1,
   input [2:0] ctr,

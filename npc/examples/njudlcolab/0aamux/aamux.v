@@ -1,4 +1,5 @@
 module aamux(
+  input clk,
   input [1:0] x0,
   input [1:0] x1,
   input [1:0] x2,
