@@ -13,3 +13,4 @@
 !flake.lock
 /fceux-am
 /nvboard
+/yosys-sta
