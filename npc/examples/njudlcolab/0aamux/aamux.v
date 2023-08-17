@@ -1,3 +1,4 @@
+/* verilator lint_off UNUSEDSIGNAL */
 module aamux(
   input clk,
   input [1:0] x0,

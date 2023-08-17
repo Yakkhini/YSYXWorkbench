@@ -1,3 +1,4 @@
+/* verilator lint_off UNUSEDSIGNAL */
 module afsftreg (
   input [7:0] seed,
   input clk,

@@ -63,6 +63,7 @@
         stdpkgs.gdb
         stdpkgs.python3
         stdpkgs.perl
+        stdpkgs.libunwind
         stdpkgs.yosys
         packages.x86_64-linux.ista-bin
         npcmake
@@ -82,6 +83,7 @@
         export NEMU_HOME=`readlink -f nemu`
         export AM_HOME=`readlink -f abstract-machine`
         export NVBOARD_HOME=`readlink -f nvboard`
+        export YOSYS_STA_HOME=`readlink -f yosys-sta`
         export PATH="$NPC_HOME/build/bin:$PATH"
         export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
         export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/include"

@@ -17,11 +17,15 @@ $(VERILATOR) --cc -Mdir $(BUILD_DIR) --top-module $(subst 0,,$(notdir $(filedir)
 	--build -Wall $(shell find $(filedir) -name '*.cpp' -or -name '*.v' -or -name '*.sv') $(NVBOARD_ARCHIVE) \
 	-LDFLAGS -lSDL2 -LDFLAGS -lSDL2_image \
 	--exe -o $(BUILD_DIR)/bin/$(subst 0,nju,$(notdir $(filedir)))
+cd $(YOSYS_STA_HOME)
+make -C $(YOSYS_STA_HOME) sta DESIGN=$(subst 0,,$(notdir $(filedir))) RTL_FILES="$(shell find $(filedir) -name '*.v')" CLK_FREQ_MHZ=100
+cd $(NPC_HOME)
 
 endef
 
 njudlco: build/bin $(DLCOLABSRC_DIR)
 	$(foreach filedir,$(DLCOLABSRC_DIR),$(run-dlcobuild))
+	cp -r $(YOSYS_STA_HOME)/result $(NPC_HOME)/build/result
 	$(call git_commit, "Build NJU DLCO LAB files.")
 
 define run-ysyxprebuild =
@@ -53,5 +57,6 @@ sim:
 
 clean:
 	rm -r $(BUILD_DIR)
+	rm -r $(YOSYS_STA_HOME)/result
 include ../Makefile
 include $(NVBOARD_HOME)/scripts/nvboard.mk

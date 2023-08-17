@@ -1,3 +1,4 @@
+/* verilator lint_off UNUSEDSIGNAL */
 module abcoder(
   input clk,
   input [7:0] sw,
