@@ -236,7 +236,7 @@ uint32_t eval(int p, int q) {
       }
     }
     if (op == -1) {
-      return 77777;
+      return 77777; // Magic number 77777 for debug.
     }
     uint32_t val1 = eval(p, op - 1);
     uint32_t val2 = eval(op + 1, q);
@@ -249,7 +249,11 @@ uint32_t eval(int p, int q) {
     case '*':
       return val1 * val2;
     case '/':
-      return val1 / val2;
+      if (val2 == 0) {
+        return 77777; // Magic number 77777 for debug.
+      } else {
+        return val1 / val2;
+      }
     case TK_EQ:
       return val1 == val2;
     case TK_NEQ:
@@ -279,10 +283,8 @@ void expr_check() {
     uint32_t expr_result = expr(expr_sp, NULL);
 
     if (result != expr_result) {
-      // Log("One check failed. Calculate to %u but result is %u\nExpressionis:
-      // "
-      //     "%s",
-      //     expr_result, result, expr_sp);
+      Log("One check failed. Calculate to %u but result is %u", expr_result,
+          result);
       failed_count++;
     }
   }
