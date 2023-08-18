@@ -14,6 +14,7 @@
  ***************************************************************************************/
 
 #include "common.h"
+#include "debug.h"
 #include <isa.h>
 #include <memory/vaddr.h>
 
@@ -49,7 +50,7 @@ static struct rule {
      * Pay attention to the precedence level of different rules.
      */
 
-    {" +", TK_NOTYPE},           // spaces
+    {"[[:space:]]+", TK_NOTYPE}, // space
     {"\\+", '+'},                // plus
     {"-", '-'},                  // sub
     {"\\*", '*'},                // times
@@ -90,7 +91,7 @@ typedef struct token {
   char str[32];
 } Token;
 
-static Token tokens[32] __attribute__((used)) = {};
+static Token tokens[128] __attribute__((used)) = {};
 static int nr_token __attribute__((used)) = 0;
 
 static bool make_token(char *e) {
@@ -113,7 +114,8 @@ static bool make_token(char *e) {
         token.str[substr_len] = '\0';
 
         // Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i,
-        //     rules[i].regex, position, substr_len, substr_len, substr_start);
+        //       rules[i].regex, position, substr_len, substr_len,
+        //       substr_start);
 
         position += substr_len;
 
@@ -152,9 +154,10 @@ word_t expr(char *e, bool *success) {
   }
 
   for (int i = 0; i < nr_token; i++) {
-    if (tokens[i].type == '*' && (i == 0 || (tokens[i - 1].type != TK_NUM &&
-                                             tokens[i - 1].type != TK_HEXNUM &&
-                                             tokens[i - 1].type != TK_REG))) {
+    if (tokens[i].type == '*' &&
+        (i == 0 ||
+         (tokens[i - 1].type != TK_NUM && tokens[i - 1].type != TK_HEXNUM &&
+          tokens[i - 1].type != TK_REG && tokens[i - 1].type != ')'))) {
       tokens[i].type = TK_DEREF;
     }
   }
@@ -165,7 +168,22 @@ word_t expr(char *e, bool *success) {
 }
 
 bool check_parentheses(int p, int q) {
-  return (tokens[p].type == '(' && tokens[q].type == ')');
+  int check_stack = 0;
+  for (int i = p; i < q + 1; i++) {
+    if (tokens[i].type == '(') {
+      check_stack++;
+    } else if (tokens[i].type == ')') {
+      check_stack--;
+    }
+
+    if (check_stack == 0 && i != q) {
+      return false;
+    }
+  }
+  if (check_stack != 0) {
+    Log("Parentheses error.");
+  }
+  return true;
 }
 
 uint32_t eval(int p, int q) {
@@ -181,9 +199,9 @@ uint32_t eval(int p, int q) {
     case TK_REG:
       return isa_reg_str2val(tokens[p].str, &success);
     case TK_HEXNUM:
-      return strtol(tokens[p].str, NULL, 16);
+      return strtoul(tokens[p].str, NULL, 16);
     case TK_NUM:
-      return strtof(tokens[p].str, NULL);
+      return strtoul(tokens[p].str, NULL, 10);
     }
   } else if (check_parentheses(p, q) == true) {
     /* The expression is surrounded by a matched pair of parentheses.
@@ -197,7 +215,7 @@ uint32_t eval(int p, int q) {
     int op = -1;
     bool imux = false;
     int bmux = 0;
-    int lmux = false;
+    bool lmux = false;
     for (int i = p; i < q + 1; i++) {
       if ((tokens[i].type == TK_EQ || tokens[i].type == TK_NEQ ||
            tokens[i].type == TK_AND) &&
@@ -218,10 +236,10 @@ uint32_t eval(int p, int q) {
       }
     }
     if (op == -1) {
-      return -1;
+      return 77777;
     }
-    float val1 = eval(p, op - 1);
-    float val2 = eval(op + 1, q);
+    uint32_t val1 = eval(p, op - 1);
+    uint32_t val2 = eval(op + 1, q);
 
     switch (tokens[op].type) {
     case '+':
