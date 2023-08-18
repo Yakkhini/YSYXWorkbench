@@ -34,5 +34,6 @@ WP *new_WP();
 void free_wp(int wp_no);
 void read_wp();
 void check_wp();
+void expr_check();
 
 #endif

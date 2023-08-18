@@ -245,3 +245,31 @@ uint32_t eval(int p, int q) {
 
   return 1;
 }
+
+void expr_check() {
+  FILE *input = fopen("./tools/gen-expr/input", "r");
+  char *line = NULL;
+  size_t len = 0;
+  double failed_count = 0;
+
+  while ((getline(&line, &len, input)) != -1) {
+    char *expr_sp = strchr(line, ' ');
+    expr_sp++;
+    char *result_s = strtok(line, " ");
+
+    uint32_t result = atoi(result_s);
+    uint32_t expr_result = expr(expr_sp, NULL);
+
+    if (result != expr_result) {
+      Log("One check failed. Calculate to %u but result is %u\nExpressionis: "
+          "%s",
+          expr_result, result, expr_sp);
+      failed_count++;
+    }
+  }
+  free(line);
+
+  fclose(input);
+
+  Log("Pass Rate: %f", (1 - failed_count / 1000));
+}

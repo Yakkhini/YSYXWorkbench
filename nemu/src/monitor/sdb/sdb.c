@@ -228,6 +228,9 @@ void init_sdb() {
   /* Compile the regular expressions. */
   init_regex();
 
+  /* Check the robust of expr() function.*/
+  expr_check();
+
   /* Initialize the watchpoint pool. */
   init_wp_pool();
 }
