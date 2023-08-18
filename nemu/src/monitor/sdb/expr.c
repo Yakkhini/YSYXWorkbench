@@ -279,9 +279,10 @@ void expr_check() {
     uint32_t expr_result = expr(expr_sp, NULL);
 
     if (result != expr_result) {
-      Log("One check failed. Calculate to %u but result is %u\nExpressionis: "
-          "%s",
-          expr_result, result, expr_sp);
+      // Log("One check failed. Calculate to %u but result is %u\nExpressionis:
+      // "
+      //     "%s",
+      //     expr_result, result, expr_sp);
       failed_count++;
     }
   }
