@@ -15,8 +15,9 @@
 
 #include "common.h"
 #include "debug.h"
-#include <sdb.h>
+#include "utils.h"
 #include <assert.h>
+#include <sdb.h>
 #include <stdio.h>
 
 #define NR_WP 32
@@ -115,14 +116,20 @@ void check_wp() {
   if (wp == NULL) {
     return;
   } else {
+    bool pass = true;
     while (wp != NULL) {
       int result = expr(wp->expression, NULL);
       if (wp->result != result) {
         Log("Watchpoint NO.%i: expression %s value %u changed to %u", wp->NO,
-             wp->expression, wp->result, result);
+            wp->expression, wp->result, result);
         wp->result = result;
+        pass = false;
       }
       wp = wp->next;
+    }
+
+    if (!pass) {
+      nemu_state.state = NEMU_STOP;
     }
   }
 }
