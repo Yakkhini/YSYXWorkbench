@@ -43,7 +43,6 @@ void isa_reg_display() {
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
-  Log("Entered isa reg str2val func...\n");
   if ((strcmp(s, "$0") == 0) || strcmp(s, "$zero") == 0) {
     Log("REG Zero...\n");
     *success = true;
@@ -53,7 +52,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
   for (int i = 1; i < 30; i++) {
     if (strcmp(s, regs[i]) == 0) {
       *success = true;
-      Log("Get value %u at %s...\n", cpu.gpr[i], s);
+      Log("Get value %u at %s...", cpu.gpr[i], s);
       return cpu.gpr[i];
     }
   }
