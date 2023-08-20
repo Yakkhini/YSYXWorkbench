@@ -3,11 +3,13 @@
   inputs = {
     verilator5008pkgs.url = "github:NixOS/nixpkgs/5e871533c4a488319b9cb98d7a525c356459d36c";
     yamlcpp06pkgs.url = "github:NixOS/nixpkgs/66e44425c6dfecbea68a5d6dc221ccd56561d4f1";
+    pkgsunstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     pkgs.url = "pkgs";
   };
   outputs = {
     self,
     pkgs,
+    pkgsunstable,
     verilator5008pkgs,
     yamlcpp06pkgs,
   }: let
@@ -69,13 +71,15 @@
         npcmake
       ];
 
-      buildInputs = with stdpkgs; [
-        clang-tools
-        gnumake
-        bear
-        SDL2
-        SDL2_image
-        pkg-config
+      buildInputs = [
+        stdpkgs.clang-tools
+        stdpkgs.gnumake
+        stdpkgs.bear
+        pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv64-embedded.buildPackages.gcc
+        pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv32-embedded.libcCross
+        stdpkgs.SDL2
+        stdpkgs.SDL2_image
+        stdpkgs.pkg-config
       ];
 
       shellHook = ''
