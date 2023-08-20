@@ -534,3 +534,9 @@ M[5] = 16; M[6] = 33; # Didn't change in execution.
 ```
 
 注意，最后一个状态 `(6, 98, 33, 8d49)` 是将 M[5] 处的数值当作指令执行的结果，也就是不想要的一个状态。
+
+## 参考资料
+
+[*StackOverflow - Why are RISC-V S-B and U-J instruction types encoded in this way?*](https://stackoverflow.com/questions/58414772/why-are-risc-v-s-b-and-u-j-instruction-types-encoded-in-this-way)
+
+[*StackOverflow - RISC-V: Why set least significant bit to zero in JALR*](https://stackoverflow.com/questions/40453719/risc-v-why-set-least-significant-bit-to-zero-in-jalr)
