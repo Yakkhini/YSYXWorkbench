@@ -1,8 +1,13 @@
+NPC_NAME=sriz
 BUILD_DIR=$(NPC_HOME)/build
 EMBEDSRC_DIR=$(NPC_HOME)/examples/embeddedtour
 EMBEDSRC=$(shell find $(EMBEDSRC_DIR) -name '*.cpp' -or -name '*.v' -or -name '*.sv')
 DLCOLABSRC_DIR=$(wildcard $(NPC_HOME)/examples/njudlcolab/0*)
 YSYXPRESRC_DIR=$(wildcard $(NPC_HOME)/examples/ysyxpre/0*)
+CSRC_DIR=$(NPC_HOME)/csrc
+VSRC_DIR=$(NPC_HOME)/vsrc
+CSRC=$(shell find $(CSRC_DIR) -name '*.cpp')
+VSRC=$(shell find $(VSRC_DIR) -name '*.v')
 VERILATOR=verilator
 
 all:
@@ -48,15 +53,18 @@ embed: buildembed
 buildembed: $(EMBEDSRC)
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) $(EMBEDSRC)
 
-sim:
+sim: build/bin $(CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	@echo "Write this Makefile by your self."
-	verilator --cc --exe --build -j 0 -Wall vsrc/example/01_xor_light/sim_main.cpp vsrc/example/01_xor_light/xormod.v
-
-.PHONY: sim clean embed njudlco
+	@echo "New Processor Core Sim RTL."
+	$(VERILATOR) --cc --Mdir $(BUILD_DIR) --top-module $(NPC_NAME) \
+	    --build -Wall $(CSRC) $(VSRC) \
+		--exe -o $(BUILD_DIR)/bin/$(NPC_NAME)
 
 clean:
 	rm -r $(BUILD_DIR)
 	rm -r $(YOSYS_STA_HOME)/result
+
+.PHONY: sim clean embed njudlco ysyxpre
+
 include ../Makefile
 include $(NVBOARD_HOME)/scripts/nvboard.mk
