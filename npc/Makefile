@@ -7,7 +7,7 @@ YSYXPRESRC_DIR=$(wildcard $(NPC_HOME)/examples/ysyxpre/0*)
 CSRC_DIR=$(NPC_HOME)/csrc
 VSRC_DIR=$(NPC_HOME)/vsrc
 CSRC=$(shell find $(CSRC_DIR) -name '*.cpp')
-VSRC=$(shell find $(VSRC_DIR) -name '*.v')
+VSRC=$(shell find $(VSRC_DIR) -name '*.sv')
 VERILATOR=verilator
 
 all:
@@ -58,7 +58,7 @@ sim: build/bin $(CSRC) $(VSRC)
 	@echo "New Processor Core Sim RTL."
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) --top-module $(NPC_NAME) \
 	    --build -Wall $(CSRC) $(VSRC) \
-		--exe -o $(BUILD_DIR)/bin/$(NPC_NAME)
+		--trace --exe -o $(BUILD_DIR)/bin/$(NPC_NAME)
 
 clean:
 	rm -r $(BUILD_DIR)
