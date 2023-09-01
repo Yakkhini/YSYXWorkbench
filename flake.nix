@@ -67,6 +67,7 @@
         stdpkgs.perl
         stdpkgs.libunwind
         stdpkgs.yosys
+        stdpkgs.verible
         packages.x86_64-linux.ista-bin
         npcmake
       ];
