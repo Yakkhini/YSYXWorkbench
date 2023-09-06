@@ -23,5 +23,20 @@ module sriz (
       .inst(inst)
   );
 
+  wire [ 6:0] opcode;
+  wire [ 2:0] func3;
+  wire [11:0] imm12;
+  wire [4:0] rs1, rs2, rd;
+
+  ysyx_23060042_IDU IDU (
+      .inst(inst),
+      .opcode(opcode),
+      .func3(func3),
+      .imm12(imm12),
+      .rs1(rs1),
+      .rs2(rs2),
+      .rd(rd)
+  );
+
 endmodule
 

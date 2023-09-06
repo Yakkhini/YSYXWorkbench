@@ -7,13 +7,19 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
-static uint32_t MEM[] = {0x3e800093, 0x7d008113, 0xc1810193,
-                         0x83018213, 0x3e820293, 0x00430313};
+static uint32_t MEM[] = {
+    0x3e800093, 0x7d008113, 0xc1810193, 0x83018213, 0x3e820293, 0x00430313,
+    0x3e800093, 0x7d008113, 0xc1810193, 0x83018213, 0x3e820293, 0x00430313,
+    0x3e800093, 0x7d008113, 0xc1810193, 0x83018213, 0x3e820293, 0x00430313,
+    0x3e800093, 0x7d008113, 0xc1810193, 0x83018213, 0x3e820293, 0x00430313,
+    0x3e800093, 0x7d008113, 0xc1810193, 0x83018213, 0x3e820293, 0x00430313,
+    0x3e800093, 0x7d008113, 0xc1810193, 0x83018213, 0x3e820293, 0x00430313,
+    0x3e800093, 0x7d008113, 0xc1810193, 0x83018213, 0x3e820293, 0x00430313,
+    0x3e800093, 0x7d008113, 0xc1810193, 0x83018213, 0x3e820293, 0x00430313};
 
 static char *NPC_HOME = getenv("NPC_HOME");
 
 int pmem_read(int pc) {
-  printf("Enter pmem_read function with %i.", pc);
   if (pc == 0) {
     return 0;
   }
@@ -24,7 +30,25 @@ int pmem_read(int pc) {
   return MEM[mem_posi];
 }
 
-void reset() {}
+void single_clock(Vsriz *top, VerilatedContext *contextp, VerilatedVcdC *tfp) {
+  contextp->timeInc(1);
+  top->clk = 1;
+  top->eval();
+  tfp->dump(contextp->time());
+  contextp->timeInc(1);
+  top->clk = 0;
+  top->eval();
+  tfp->dump(contextp->time());
+}
+
+void reset(Vsriz *top, VerilatedContext *contextp, VerilatedVcdC *tfp) {
+  top->rst = 1;
+  contextp->timeInc(1);
+  top->eval();
+  tfp->dump(contextp->time());
+  single_clock(top, contextp, tfp);
+  top->rst = 0;
+}
 
 int main(int argc, char **argv) {
   VerilatedContext *contextp = new VerilatedContext;
@@ -43,30 +67,12 @@ int main(int argc, char **argv) {
   top->trace(tfp, 5);
 
   tfp->open(wavefile_name);
-  int sim_time = 10000000;
+  int sim_time = 100;
 
-  contextp->timeInc(1);
-  top->eval();
-  tfp->dump(contextp->time());
-  contextp->timeInc(1);
-  top->rst = 1;
-  top->clk = 1;
-  top->eval();
-  tfp->dump(contextp->time());
-  contextp->timeInc(1);
-  top->rst = 0;
-  top->clk = 0;
-  top->eval();
+  reset(top, contextp, tfp);
 
   while (contextp->time() < sim_time && !contextp->gotFinish()) {
-    contextp->timeInc(1);
-    top->clk = 1;
-    top->eval();
-    tfp->dump(contextp->time());
-    contextp->timeInc(1);
-    top->clk = 0;
-    top->eval();
-    tfp->dump(contextp->time());
+    single_clock(top, contextp, tfp);
   }
 
   tfp->close();
