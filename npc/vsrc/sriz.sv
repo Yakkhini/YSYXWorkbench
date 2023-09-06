@@ -15,5 +15,13 @@ module sriz (
 
   assign pc_next = pc + 4;
 
+  reg [31:0] inst;
+
+  ysyx_23060042_IFU IFU (
+      .clk (clk),
+      .pc  (pc),
+      .inst(inst)
+  );
+
 endmodule
 

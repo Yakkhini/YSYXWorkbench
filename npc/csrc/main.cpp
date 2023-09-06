@@ -13,11 +13,18 @@ static uint32_t MEM[] = {0x3e800093, 0x7d008113, 0xc1810193,
 static char *NPC_HOME = getenv("NPC_HOME");
 
 int pmem_read(int pc) {
-  printf("Enter pmem_read function.");
-  return 0;
+  printf("Enter pmem_read function with %i.", pc);
+  if (pc == 0) {
+    return 0;
+  }
+  uint32_t mem_posi = (pc - 0x80000000) / 0x4;
+  if (mem_posi > 32) {
+    return 0;
+  }
+  return MEM[mem_posi];
 }
 
-void mem_init() {}
+void reset() {}
 
 int main(int argc, char **argv) {
   VerilatedContext *contextp = new VerilatedContext;
