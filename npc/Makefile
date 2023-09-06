@@ -57,14 +57,20 @@ sim: build/bin $(CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "New Processor Core Sim RTL."
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) --top-module $(NPC_NAME) \
-	    --build -Wall $(CSRC) $(VSRC) \
+	    --build -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL -Wno-UNDRIVEN $(CSRC) $(VSRC) \
 		--trace --exe -o $(BUILD_DIR)/bin/$(NPC_NAME)
+
+wave: build/waveform.vcd
+	gtkwave $(NPC_HOME)/build/waveform.vcd
+
+waveform.vcd: sim
+	$(NPC_HOME)/build/bin/sriz
 
 clean:
 	rm -r $(BUILD_DIR)
 	rm -r $(YOSYS_STA_HOME)/result
 
-.PHONY: sim clean embed njudlco ysyxpre
+.PHONY: sim wave clean embed njudlco ysyxpre
 
 include ../Makefile
 include $(NVBOARD_HOME)/scripts/nvboard.mk
