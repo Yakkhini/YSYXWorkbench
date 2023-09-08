@@ -59,18 +59,23 @@ sim: build/bin $(CSRC) $(VSRC)
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) --top-module $(NPC_NAME) \
 	    --build -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL -Wno-UNDRIVEN $(CSRC) $(VSRC) \
 		--trace --exe -o $(BUILD_DIR)/bin/$(NPC_NAME)
+	sriz
 
 wave: build/waveform.vcd
 	gtkwave $(NPC_HOME)/build/waveform.vcd
 
-waveform.vcd: sim
+build/waveform.vcd: sim
 	$(NPC_HOME)/build/bin/sriz
+
+fmt: $(CSRC) $(VSRC)
+	clang-format -i $(CSRC)
+	verible-verilog-format --inplace $(VSRC)
 
 clean:
 	rm -r $(BUILD_DIR)
 	rm -r $(YOSYS_STA_HOME)/result
 
-.PHONY: sim wave clean embed njudlco ysyxpre
+.PHONY: sim wave fmt clean embed njudlco ysyxpre
 
 include ../Makefile
 include $(NVBOARD_HOME)/scripts/nvboard.mk
