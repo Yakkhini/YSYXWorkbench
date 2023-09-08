@@ -1,11 +1,12 @@
 #include <Vsriz.h>
 #include <Vsriz__Dpi.h>
-#include <cstdint>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <verilated.h>
 #include <verilated_vcd_c.h>
+
+#include <cstdint>
 
 static uint32_t MEM[] = {
     0x3e800093, 0x3e810093, 0x3e810193, 0x7d018213, 0x3e820293,
@@ -16,6 +17,8 @@ static uint32_t MEM[] = {
 
 static char *NPC_HOME = getenv("NPC_HOME");
 
+static bool HALT = false;
+
 int pmem_read(int pc) {
   if (pc == 0) {
     return 0;
@@ -23,6 +26,11 @@ int pmem_read(int pc) {
   uint32_t mem_posi = (pc - 0x80000000) / 0x4;
   if (mem_posi > 32) {
     return 0;
+  }
+
+  int result = MEM[mem_posi];
+  if (result == 0x00100073) {
+    HALT = true;
   }
   return MEM[mem_posi];
 }
@@ -68,7 +76,8 @@ int main(int argc, char **argv) {
 
   reset(top, contextp, tfp);
 
-  while (contextp->time() < sim_time && !contextp->gotFinish()) {
+  while (contextp->time() < sim_time && !contextp->gotFinish() &&
+         HALT == false) {
     single_clock(top, contextp, tfp);
   }
 
