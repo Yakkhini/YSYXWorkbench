@@ -5,8 +5,6 @@ module ysyx_23060042_IFU (
 );
 
   import "DPI-C" function int pmem_read(int pc);
-  always @(posedge clk) begin // Maybe risk
-    inst <= pmem_read(pc);
-  end
+  assign inst = pmem_read(pc);
 
 endmodule
