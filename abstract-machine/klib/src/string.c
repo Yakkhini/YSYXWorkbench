@@ -48,7 +48,7 @@ int strcmp(const char *s1, const char *s2) {
     if (s1[i] == s2[i]) {
       i++;
 
-      if (s1[i] == '\0' || s2[i] == '\0') {
+      if (s1[i] == '\0' && s2[i] == '\0') {
         break;
       }
       continue;
@@ -57,10 +57,6 @@ int strcmp(const char *s1, const char *s2) {
       break;
     } else {
       result = 1;
-      break;
-    }
-
-    if (s1[i] == '\0' || s2[i] == '\0') {
       break;
     }
   }
@@ -91,13 +87,13 @@ int memcmp(const void *s1, const void *s2, size_t n) {
   int i = 0;
   int result = 0;
   const char *s1_char = s1;
-  const unsigned char *s2_char = s2;
+  const char *s2_char = s2;
 
   while (true) {
     if (s1_char[i] == s2_char[i]) {
       i++;
 
-      if (s1_char[i] == '\0' || s2_char[i] == '\0') {
+      if (s1_char[i] == '\0' && s2_char[i] == '\0') {
         break;
       }
       continue;
@@ -106,10 +102,6 @@ int memcmp(const void *s1, const void *s2, size_t n) {
       break;
     } else {
       result = 1;
-      break;
-    }
-
-    if (s1_char[i] == '\0' || s2_char[i] == '\0') {
       break;
     }
   }
