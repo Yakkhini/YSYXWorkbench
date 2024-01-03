@@ -16,8 +16,9 @@
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
-#include <sdb.h>
+#include <cpu/iringbuf.h>
 #include <locale.h>
+#include <sdb.h>
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -73,6 +74,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
               MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc),
               (uint8_t *)&s->isa.inst.val, ilen);
+  IFDEF(CONFIG_IRINGBUF, iringbuf_insert(p));
 #else
   p[0] = '\0'; // the upstream llvm does not support loongarch32r
 #endif
@@ -107,6 +109,7 @@ static void statistic() {
 void assert_fail_msg() {
   isa_reg_display();
   statistic();
+  IFDEF(CONFIG_IRINGBUF, iringbuf_print());
 }
 
 /* Simulate how the CPU works. */

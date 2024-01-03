@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "cpu/iringbuf.h"
 #include <isa.h>
 #include <memory/paddr.h>
 
@@ -123,6 +124,9 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Initialize differential testing. */
   init_difftest(diff_so_file, img_size, difftest_port);
+
+  /* Initialize instruction ring buffer. */
+  IFDEF(CONFIG_IRINGBUF,init_iringbuf();)
 
   /* Initialize the simple debugger. */
   init_sdb();
