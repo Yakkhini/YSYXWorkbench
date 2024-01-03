@@ -1,8 +1,9 @@
 #ifndef __CPU_IRINGBUF_H__
 #define IRINGBUF_NR 20
+#define IRINGBUF_LEN 128
 
 typedef struct Iringbuf {
-  char *store[IRINGBUF_NR];
+  char store[IRINGBUF_NR][IRINGBUF_LEN];
   int current;
 } Iringbuf;
 
