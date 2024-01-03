@@ -1,10 +1,5 @@
+#include <cpu/iringbuf.h>
 #include <string.h>
-#define IRINGBUF_NR 20
-
-typedef struct Iringbuf {
-  char *store[IRINGBUF_NR];
-  int current;
-} Iringbuf;
 
 static Iringbuf iringbuf;
 
