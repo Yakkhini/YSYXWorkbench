@@ -13,8 +13,23 @@ typedef struct FunctionNode {
   struct FunctionNode *next;
 } FunctionNode;
 
+enum FUNCCALLMODE { FTRACE_CALL, FTRACE_RET };
+
+typedef struct FunctionCallNode {
+  vaddr_t source;
+  vaddr_t target;
+  char *funcname;
+  enum FUNCCALLMODE mode;
+
+  struct FunctionCallNode *next;
+} FunctionCallNode;
+
 static int ftrace_is_enabled = false;
-static FunctionNode *head = NULL;
+static FunctionNode *function_head = NULL;
+static FunctionCallNode *function_call_head = NULL;
+
+void function_call_link_table_insert(vaddr_t source, vaddr_t target,
+                                     char *funcname, enum FUNCCALLMODE mode);
 
 void function_link_table_insert(char *name, vaddr_t pos);
 void function_link_table_print();
@@ -82,15 +97,15 @@ void enable_ftrace(char *path) {
 
 void function_link_table_insert(char *name, vaddr_t pos) {
 
-  if (head == NULL) {
-    head = (FunctionNode *)malloc(sizeof(FunctionNode));
-    head->name = name;
-    head->pos = pos;
-    head->next = NULL;
+  if (function_head == NULL) {
+    function_head = (FunctionNode *)malloc(sizeof(FunctionNode));
+    function_head->name = name;
+    function_head->pos = pos;
+    function_head->next = NULL;
     return;
   }
 
-  FunctionNode *current = head;
+  FunctionNode *current = function_head;
   while (current->next != NULL) {
     current = current->next;
   }
@@ -104,9 +119,68 @@ void function_link_table_insert(char *name, vaddr_t pos) {
 }
 
 void function_link_table_print() {
-  FunctionNode *current = head;
+  FunctionNode *current = function_head;
   while (current != NULL) {
     printf("Function name in link table: %s\n", current->name);
     current = current->next;
   }
+}
+
+void ftrace_check(vaddr_t source_addr, vaddr_t target_addr) {
+  FunctionNode *current = function_head;
+
+  while (current != NULL) {
+    if (current->pos == target_addr) {
+      function_call_link_table_insert(source_addr, target_addr, current->name,
+                                      FTRACE_CALL);
+      printf("0x%X: Call function %s@0x%X, return in 0x%X.\n", source_addr,
+             current->name, target_addr, source_addr + 4);
+      return;
+    }
+    current = current->next;
+  }
+
+  FunctionCallNode *call_current = function_call_head;
+
+  while (call_current != NULL) {
+
+    if (call_current->source + 4 == target_addr) {
+      function_call_link_table_insert(source_addr, target_addr,
+                                      call_current->funcname, FTRACE_RET);
+      printf("0x%X: Return from function %s@0x%X.\n", source_addr,
+             call_current->funcname, call_current->target);
+      return;
+    }
+
+    call_current = call_current->next;
+  }
+
+  return;
+}
+
+void function_call_link_table_insert(vaddr_t source, vaddr_t target,
+                                     char *funcname, enum FUNCCALLMODE mode) {
+
+  if (function_call_head == NULL) {
+    function_call_head = (FunctionCallNode *)malloc(sizeof(FunctionCallNode));
+    function_call_head->source = source;
+    function_call_head->target = target;
+    function_call_head->funcname = funcname;
+    function_call_head->mode = mode;
+    function_call_head->next = NULL;
+    return;
+  }
+
+  FunctionCallNode *current = function_call_head;
+  while (current->next != NULL) {
+    current = current->next;
+  }
+
+  current->next = (FunctionCallNode *)malloc(sizeof(FunctionCallNode));
+  current->next->source = source;
+  current->next->target = target;
+  current->next->funcname = funcname;
+  current->next->mode = mode;
+  current->next->next = NULL;
+  return;
 }
