@@ -43,7 +43,23 @@ void enable_ftrace(char *path) {
       strtab_shdr = section_hdrs[i];
     }
   }
-  printf("%i, %i", symtab_shdr.sh_name, strtab_shdr.sh_name);
+
+  int symnum = symtab_shdr.sh_size / sizeof(Elf32_Sym);
+  Elf32_Sym syms[symnum];
+  fseek(elf_file, symtab_shdr.sh_offset, SEEK_SET);
+  check = fread(syms, symtab_shdr.sh_size, 1, elf_file);
+  assert(check == 1);
+
+  char *strtab = malloc(strtab_shdr.sh_size);
+  fseek(elf_file, strtab_shdr.sh_offset, SEEK_SET);
+  check = fread(strtab, strtab_shdr.sh_size, 1, elf_file);
+  assert(check == 1);
+
+  for (int i = 0; i < symnum; i++) {
+    if (ELF32_ST_TYPE(syms[i].st_info) == STT_FUNC) {
+      printf("Found function symbol: %s.\n", strtab + syms[i].st_name);
+    }
+  }
 
   fclose(elf_file);
 
