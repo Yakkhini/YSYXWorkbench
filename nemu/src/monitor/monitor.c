@@ -15,6 +15,7 @@
 
 #include "cpu/ftrace/ftrace.h"
 #include "cpu/iringbuf.h"
+#include "macro.h"
 #include <isa.h>
 #include <memory/paddr.h>
 
@@ -107,6 +108,8 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Parse arguments. */
   parse_args(argc, argv);
+
+  IFDEF(CONFIG_BATCHMODE, sdb_set_batch_mode());
 
   /* Set random seed. */
   init_rand();
