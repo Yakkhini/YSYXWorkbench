@@ -58,6 +58,7 @@
         verilator5008pkgs.legacyPackages.x86_64-linux.verilator
         stdpkgs.gtkwave
         stdpkgs.bison
+        stdpkgs.dtc
         stdpkgs.flex
         stdpkgs.ncurses
         stdpkgs.readline
