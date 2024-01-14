@@ -76,8 +76,6 @@ void *memset(void *s, int c, size_t n) {
     i++;
   }
 
-  dst[i] = '\0';
-
   return s;
 }
 
@@ -93,13 +91,9 @@ int memcmp(const void *s1, const void *s2, size_t n) {
   const char *s1_char = s1;
   const char *s2_char = s2;
 
-  while (true) {
+  while (i < n) {
     if (s1_char[i] == s2_char[i]) {
       i++;
-
-      if (s1_char[i] == '\0' && s2_char[i] == '\0') {
-        break;
-      }
       continue;
     } else if (s1_char[i] < s2_char[i]) {
       result = -1;
