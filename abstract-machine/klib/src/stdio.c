@@ -5,7 +5,50 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
-int printf(const char *fmt, ...) { panic("Not implemented"); }
+int printf(const char *fmt, ...) {
+  va_list vl;
+  va_start(vl, fmt);
+  int j = 0;
+  char c;
+  int d;
+  char *s;
+  while (fmt[j] != '\0') {
+    char src_char = fmt[j];
+    if (src_char != '%') {
+      putch(fmt[j]);
+      j++;
+      continue;
+    }
+
+    switch (fmt[j + 1]) {
+    case 's':
+      s = va_arg(vl, char *);
+      while (*s != '\0') {
+        putch(*s);
+        s++;
+      }
+      break;
+    case 'd':
+      d = va_arg(vl, int);
+      char sd[256];
+      sprintf(sd, "%d", d);
+      int i = 0;
+      while (sd[i] != '\0') {
+        putch(sd[i]);
+        i++;
+      }
+      break;
+    case 'c':
+      c = va_arg(vl, int);
+      putch(c);
+      break;
+    }
+
+    j += 2;
+  }
+
+  return 0;
+}
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
   panic("Not implemented");
