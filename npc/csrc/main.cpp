@@ -1,38 +1,67 @@
+#include "../include/memory/paddr.h"
 #include <Vsriz.h>
 #include <Vsriz__Dpi.h>
+#include <getopt.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
-#include <cstdint>
-
-static uint32_t MEM[] = {
-    0x3e800093, 0x3e810093, 0x3e810193, 0x7d018213, 0x3e820293,
-    0x3e828313, 0x7d008113, 0x00430313, 0x3e800093, 0x3e810093,
-    0x3e810193, 0x7d018213, 0x3e820293, 0x3e828313, 0x7d008113,
-    0x00430313, 0x3e800093, 0x3e810093, 0x3e810193, 0x7d018213,
-    0x3e820293, 0x3e828313, 0x7d008113, 0x00430313, 0x00100073};
-
 static char *NPC_HOME = getenv("NPC_HOME");
-
+static char *img_file = NULL;
 static bool HALT = false;
 
-int pmem_read(int pc) {
-  if (pc == 0) {
-    return 0;
-  }
-  uint32_t mem_posi = (pc - 0x80000000) / 0x4;
-  if (mem_posi > 32) {
-    return 0;
+int inst_fetch(int pc) {
+  uint32_t inst = paddr_read(pc, 4);
+  printf("Fetch instruction 0x%08X\n", inst);
+  return inst;
+};
+
+static long load_img() {
+  if (img_file == NULL) {
+    printf("No image is given. Use the default build-in image.");
+    return 4096; // built-in image size
   }
 
-  int result = MEM[mem_posi];
-  if (result == 0x00100073) {
-    HALT = true;
+  FILE *fp = fopen(img_file, "rb");
+
+  fseek(fp, 0, SEEK_END);
+  long size = ftell(fp);
+
+  printf("The image is %s, size = %ld\n", img_file, size);
+
+  fseek(fp, 0, SEEK_SET);
+  int ret = fread(guest_to_host(0x80000000), size, 1, fp);
+  assert(ret == 1);
+
+  fclose(fp);
+  return size;
+}
+
+static int parse_args(int argc, char *argv[]) {
+  const struct option table[] = {
+      {0, 0, NULL, 0},
+  };
+  int o;
+  while ((o = getopt_long(argc, argv, "-h:", table, NULL)) != -1) {
+    switch (o) {
+    case 1:
+      img_file = optarg;
+      return 0;
+    default:
+      printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
+      printf("\t-b,--batch              run with batch mode\n");
+      printf("\t-f,--ftrace=FILE        trace functions with elf file.\n");
+      printf("\t-l,--log=FILE           output log to FILE\n");
+      printf("\t-d,--diff=REF_SO        run DiffTest with reference REF_SO\n");
+      printf("\t-p,--port=PORT          run DiffTest with port PORT\n");
+      printf("\n");
+      exit(0);
+    }
   }
-  return MEM[mem_posi];
+  return 0;
 }
 
 void single_clock(Vsriz *top, VerilatedContext *contextp, VerilatedVcdC *tfp) {
@@ -56,6 +85,10 @@ void reset(Vsriz *top, VerilatedContext *contextp, VerilatedVcdC *tfp) {
 }
 
 int main(int argc, char **argv) {
+
+  parse_args(argc, argv);
+  load_img();
+
   VerilatedContext *contextp = new VerilatedContext;
   contextp->commandArgs(argc, argv);
 
