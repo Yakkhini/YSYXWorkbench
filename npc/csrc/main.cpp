@@ -15,7 +15,12 @@ static bool HALT = false;
 
 int inst_fetch(int pc) {
   uint32_t inst = paddr_read(pc, 4);
+  if (inst == 0x00100073) {
+    HALT = true;
+  }
+
   printf("Fetch instruction 0x%08X\n", inst);
+
   return inst;
 };
 
