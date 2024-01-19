@@ -5,6 +5,10 @@ module ysyx_23060042_EXU (
     output [31:0] wdata
 );
 
-  assign wdata = rdata1 + {20'b0, imm12};
+  ysyx_23060042_ALU ALU (
+      .data1(rdata1),
+      .data2({20'b0, imm12}),
+      .out  (wdata)
+  );
 
 endmodule

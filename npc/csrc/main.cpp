@@ -13,6 +13,13 @@ static char *NPC_HOME = getenv("NPC_HOME");
 static char *img_file = NULL;
 static bool HALT = false;
 
+static uint32_t DEFAULT_MEM[] = {
+    0x3e800093, 0x3e810093, 0x3e810193, 0x7d018213, 0x3e820293,
+    0x3e828313, 0x7d008113, 0x00430313, 0x3e800093, 0x3e810093,
+    0x3e810193, 0x7d018213, 0x3e820293, 0x3e828313, 0x7d008113,
+    0x00430313, 0x3e800093, 0x3e810093, 0x3e810193, 0x7d018213,
+    0x3e820293, 0x3e828313, 0x7d008113, 0x00430313, 0x00100073};
+
 int inst_fetch(int pc) {
   uint32_t inst = paddr_read(pc, 4);
   if (inst == 0x00100073) {
@@ -27,6 +34,7 @@ int inst_fetch(int pc) {
 static long load_img() {
   if (img_file == NULL) {
     printf("No image is given. Use the default build-in image.");
+    memcpy(guest_to_host(0x80000000), DEFAULT_MEM, sizeof(uint32_t) * 25);
     return 4096; // built-in image size
   }
 
