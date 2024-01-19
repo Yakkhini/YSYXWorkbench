@@ -535,6 +535,26 @@ M[5] = 16; M[6] = 33; # Didn't change in execution.
 
 注意，最后一个状态 `(6, 98, 33, 8d49)` 是将 M[5] 处的数值当作指令执行的结果，也就是不想要的一个状态。
 
+#### 立即数背后的故事（不太确定）
+
+由于 NEMU 天生的用途与性质，其在维护开发与使用中往往涉及两种甚至多种不同的 ISA。因此我认为要想解决立即数中的端序问题乃至更多特定的 ISA 问题，首先需要理解的是在 NEMU 及 相关测试代码框架中不同的功能部分、模块里是按照何种 ISA 编译、运行或是写入、模拟的。
+
+至少以 cpu-test 测试的过程为例。测例中的代码会在交叉编译后生成 `$(ARCH)` 的可执行文件，也遵从 ISA 的端序；而 NEMU 及其相关数据的计算都是遵从本机的架构与端序。
+
+这样来看，其中不同端序转换出现的「误解」问题应当出现在 `vaddr_` 相关函数中。因为我们知道，在运行时整个可执行文件以特定方式加载到内存中，包括指令及相关数据等。显然的，目标 ISA 的端序格式及内存格式应当在整个模拟过程中持续维护。所以可以利用预处理命令为 `memory` 增添一个端序改变的开关，在读写时按需改变端序，达到正常运行的效果。
+
+当然这只是一个较为粗略的思路。不同 ISA 格式有差异，其在实际实现中会有各样的具体问题。比如 32 位指令集下无法将 32 位常数编码到一条指令中。
+
+至少在 `riscv32` 指令集中，对 32 位常数的处理被切分位两条指令。
+
+> LUI (load upper immediate) is used to build 32-bit constants and uses the U-type format. LUI places the U-immediate value in the top 20 bits of the destination register rd, filling in the lowest 12 bits with zeros. 
+> 
+> AUIPC (add upper immediate to pc) is used to build pc-relative addresses and uses the U-type format. AUIPC forms a 32-bit offset from the 20-bit U-immediate, filling in the lowest 12 bits with zeros, adds this offset to the address of the AUIPC instruction, then places the result in register rd.
+> 
+> *——The RISC-V Instruction Set Manual Volume I: Unprivileged ISA*
+
+
+
 ## 参考资料
 
 [*StackOverflow - Why are RISC-V S-B and U-J instruction types encoded in this way?*](https://stackoverflow.com/questions/58414772/why-are-risc-v-s-b-and-u-j-instruction-types-encoded-in-this-way)
