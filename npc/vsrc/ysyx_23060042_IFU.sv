@@ -4,7 +4,7 @@ module ysyx_23060042_IFU (
     output reg [31:0] inst
 );
 
-  import "DPI-C" function int pmem_read(int pc);
-  assign inst = pmem_read(pc);
+  import "DPI-C" function int inst_fetch(int pc);
+  assign inst = inst_fetch(pc);
 
 endmodule
