@@ -1,7 +1,7 @@
 #ifndef __MEMORY_PADDR_H__
 #define __MEMORY_PADDR_H__
 
-#include "../common.h"
+#include <common.h>
 
 #define MBASE 0x80000000
 #define MSISE 0x8000000

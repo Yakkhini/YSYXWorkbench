@@ -1,8 +1,8 @@
 #ifndef __MEMORY_HOST_H__
 #define __MEMORY_HOST_H__
 
-#include "../common.h"
 #include <assert.h>
+#include <common.h>
 static inline word_t host_read(void *addr, int len) {
   switch (len) {
   case 1:

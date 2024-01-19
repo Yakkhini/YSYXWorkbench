@@ -6,9 +6,12 @@ DLCOLABSRC_DIR=$(wildcard $(NPC_HOME)/examples/njudlcolab/0*)
 YSYXPRESRC_DIR=$(wildcard $(NPC_HOME)/examples/ysyxpre/0*)
 CSRC_DIR=$(NPC_HOME)/csrc
 VSRC_DIR=$(NPC_HOME)/vsrc
+INC_PATH=$(NPC_HOME)/include
 CSRC=$(shell find $(CSRC_DIR) -name '*.cpp')
 VSRC=$(shell find $(VSRC_DIR) -name '*.sv')
 VERILATOR=verilator
+
+export CPATH := $(INC_PATH):$(CPATH)
 
 all:
 	@echo "Write this Makefile by your self."
@@ -53,13 +56,17 @@ embed: buildembed
 buildembed: $(EMBEDSRC)
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) $(EMBEDSRC)
 
-sim: build/bin $(CSRC) $(VSRC)
+compile: build/bin $(CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "New Processor Core Sim RTL."
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) --top-module $(NPC_NAME) \
 	    --build -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL -Wno-UNDRIVEN $(CSRC) $(VSRC) \
 		--trace --exe -o $(BUILD_DIR)/bin/$(NPC_NAME)
-	sriz
+
+sim: compile
+	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
+	@echo "New Processor Core Sim RTL."
+	sriz $(IMG)
 
 wave: build/waveform.vcd
 	gtkwave $(NPC_HOME)/build/waveform.vcd
@@ -68,7 +75,7 @@ build/waveform.vcd: sim
 	$(NPC_HOME)/build/bin/sriz
 
 fmt: $(CSRC) $(VSRC)
-	clang-format -i $(CSRC)
+	clang-format -i $(CSRC) $(shell find $(INC_PATH) -name '*.h')
 	verible-verilog-format --inplace $(VSRC)
 
 clean:

@@ -1,5 +1,5 @@
-#include "../../include/memory/paddr.h"
-#include "../../include/memory/host.h"
+#include <memory/host.h>
+#include <memory/paddr.h>
 
 static uint8_t MEM[MSISE] __attribute((aligned(4096))) = {};
 

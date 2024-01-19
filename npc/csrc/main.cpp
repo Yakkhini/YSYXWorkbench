@@ -1,7 +1,7 @@
-#include "../include/memory/paddr.h"
 #include <Vsriz.h>
 #include <Vsriz__Dpi.h>
 #include <getopt.h>
+#include <memory/paddr.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
