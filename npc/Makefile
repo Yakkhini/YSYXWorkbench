@@ -75,14 +75,14 @@ build/waveform.vcd: sim
 	$(NPC_HOME)/build/bin/sriz
 
 fmt: $(CSRC) $(VSRC)
-	clang-format -i $(CSRC) $(shell find $(INC_PATH) -name '*.h')
+	clang-format -i $(CSRC) $(shell find $(NPC_HOME)/include -name '*.h')
 	verible-verilog-format --inplace $(VSRC)
 
 clean:
 	rm -r $(BUILD_DIR)
 	rm -r $(YOSYS_STA_HOME)/result
 
-.PHONY: sim wave fmt clean embed njudlco ysyxpre
+.PHONY: compile sim wave fmt clean embed njudlco ysyxpre
 
 include ../Makefile
 include $(NVBOARD_HOME)/scripts/nvboard.mk
