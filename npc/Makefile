@@ -79,8 +79,8 @@ fmt: $(CSRC) $(VSRC)
 	verible-verilog-format --inplace $(VSRC)
 
 clean:
-	rm -r $(BUILD_DIR)
-	rm -r $(YOSYS_STA_HOME)/result
+	rm -rf $(BUILD_DIR)
+	rm -rf $(YOSYS_STA_HOME)/result
 
 .PHONY: compile sim wave fmt clean embed njudlco ysyxpre
 
