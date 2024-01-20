@@ -25,6 +25,7 @@ module sriz (
 
   wire [ 6:0] opcode;
   wire [ 2:0] func3;
+  wire [20:0] j_imm;
   wire [12:0] b_imm;
   wire [19:0] u_imm;
   wire [11:0] i_imm;
@@ -37,6 +38,7 @@ module sriz (
       .b_imm(b_imm),
       .u_imm(u_imm),
       .i_imm(i_imm),
+      .j_imm(j_imm),
       .rs1(rs1),
       .rs2(rs2),
       .rd(rd)
