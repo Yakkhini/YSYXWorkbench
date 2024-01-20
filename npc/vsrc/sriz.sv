@@ -25,14 +25,18 @@ module sriz (
 
   wire [ 6:0] opcode;
   wire [ 2:0] func3;
-  wire [11:0] imm12;
+  wire [12:0] b_imm;
+  wire [19:0] u_imm;
+  wire [11:0] i_imm;
   wire [4:0] rs1, rs2, rd;
 
   ysyx_23060042_IDU IDU (
       .inst(inst),
       .opcode(opcode),
       .func3(func3),
-      .imm12(imm12),
+      .b_imm(b_imm),
+      .u_imm(u_imm),
+      .i_imm(i_imm),
       .rs1(rs1),
       .rs2(rs2),
       .rd(rd)
@@ -56,7 +60,7 @@ module sriz (
   );
 
   ysyx_23060042_EXU EXU (
-      .imm12 (imm12),
+      .i_imm (i_imm),
       .rdata1(rdata1),
       .rdata2(rdata2),
       .wdata (wdata)
