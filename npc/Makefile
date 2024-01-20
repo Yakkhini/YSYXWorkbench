@@ -71,7 +71,7 @@ sim: compile
 wave: build/waveform.vcd
 	gtkwave $(NPC_HOME)/build/waveform.vcd
 
-build/waveform.vcd: sim
+build/waveform.vcd: compile
 	$(NPC_HOME)/build/bin/sriz
 
 fmt: $(CSRC) $(VSRC)
