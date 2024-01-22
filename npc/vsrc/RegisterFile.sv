@@ -5,6 +5,8 @@ module RegisterFile #(
 ) (
     input clk,
     input wen,
+    input Jalen,
+    input [31:0] pc,
     input [DATA_WIDTH-1:0] wdata,
     input [ADDR_WIDTH-1:0] waddr,
     input [ADDR_WIDTH-1:0] raddr1,
@@ -17,8 +19,16 @@ module RegisterFile #(
   assign rdata1 = rf[raddr1];
   assign rdata2 = rf[raddr2];
 
+  wire [31:0] regin;
+  MuxKeyWithDefault #(2, 1, 32) regin_mux (
+      .out(regin),
+      .key(Jalen),
+      .default_out(32'h00000000),
+      .lut({1'b0, wdata, 1'b1, pc + 4})
+  );
+
   always @(posedge clk) begin
-    if (wen) rf[waddr] <= wdata;
+    if (wen) rf[waddr] <= regin;
   end
 
 endmodule

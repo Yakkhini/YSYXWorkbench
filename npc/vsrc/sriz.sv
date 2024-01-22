@@ -6,16 +6,16 @@ module sriz (
 );
   wire [31:0] pc, pc_next;
   wire Pcjen;
+  wire Jalen;
+  wire [31:0] wdata;
   Pc #(32, 32'h80000000) pc_reg (
       .clk  (clk),
       .rst  (rst),
-      .din  (pc_next),
+      .din  (wdata),
       .dout (pc),
       .wen  (1'b1),
       .Pcjen(Pcjen)
   );
-
-  assign pc_next = pc + 4;
 
   reg [31:0] inst;
 
@@ -42,11 +42,11 @@ module sriz (
       .rd(rd),
       .Regen(Regen),
       .Pcren(Pcren),
-      .Pcjen(Pcjen)
+      .Pcjen(Pcjen),
+      .Jalen(Jalen)
   );
 
   wire Regen;
-  wire [31:0] wdata;
   wire [31:0] rdata1;
   wire [31:0] rdata2;
 
@@ -58,7 +58,9 @@ module sriz (
       .raddr1(rs1),
       .raddr2(rs2),
       .rdata1(rdata1),
-      .rdata2(rdata2)
+      .rdata2(rdata2),
+      .Jalen(Jalen),
+      .pc(pc)
   );
 
   ysyx_23060042_EXU EXU (
