@@ -6,6 +6,9 @@ static Vsriz *top;
 static VerilatedVcdC *tfp;
 static VerilatedContext *contextp;
 
+static bool HALT = false;
+void halt() { HALT = true; }
+
 void single_clock() {
   contextp->timeInc(1);
   top->clk = 1;
@@ -46,6 +49,21 @@ void cpu_init(int argc, char **argv) {
   int sim_time = 100;
 
   reset();
+}
+
+void cpu_exec(int n) {
+  switch (n) {
+  case -1:
+    while (HALT == false) {
+      single_clock();
+    }
+    break;
+  default:
+    for (int i = 0; i < n; i++) {
+      single_clock();
+    }
+    break;
+  }
 }
 
 void cpu_exit() {
