@@ -13,7 +13,6 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
-#include <sdb.h>
 #include "common.h"
 #include "debug.h"
 #include "utils.h"
@@ -22,6 +21,7 @@
 #include <memory/vaddr.h>
 #include <readline/history.h>
 #include <readline/readline.h>
+#include <sdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,7 +69,7 @@ static int cmd_si(char *args) {
     cpu_exec(1);
     return 0;
   }
-  int istep = *arg - '0';
+  int istep = atoi(arg);
   printf("Excute program by %i step\n", istep);
   cpu_exec(istep);
   return 0;
