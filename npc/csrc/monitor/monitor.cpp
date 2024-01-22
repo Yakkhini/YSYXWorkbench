@@ -58,15 +58,19 @@ void parse_args(int argc, char *argv[]) {
   return;
 }
 
-void monitor_init(int argc, char **argv) {
-  Log("\n\
+void welcome() {
+  printf(ANSI_FG_BLUE "\
    _   _      _ _          ___________ _____ _______ \n\
   | | | |    | | |        /  ___| ___ \\_   _|___  / |\n\
   | |_| | ___| | | ___    \\ `--.| |_/ / | |    / /| |\n\
   |  _  |/ _ \\ | |/ _ \\    `--. \\    /  | |   / / | |\n\
   | | | |  __/ | | (_) |  /\\__/ / |\\ \\ _| |_./ /__|_|\n\
   \\_| |_/\\___|_|_|\\___( ) \\____/\\_| \\_|\\___/\\_____(_)\n\
-                      |/\n");
+                      |/\n\n" ANSI_NONE);
+}
+
+void monitor_init(int argc, char **argv) {
+  welcome();
 
   parse_args(argc, argv);
   load_img();
