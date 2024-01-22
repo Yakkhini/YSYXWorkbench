@@ -14,7 +14,7 @@ static uint32_t DEFAULT_MEM[] = {
 
 void load_img() {
   if (img_file == NULL) {
-    printf("No image is given. Use the default build-in image.");
+    Log("No image is given. Use the default build-in image.");
     memcpy(guest_to_host(0x80000000), DEFAULT_MEM, sizeof(uint32_t) * 25);
     return; // built-in image size
   }
