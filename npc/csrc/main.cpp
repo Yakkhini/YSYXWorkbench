@@ -14,16 +14,14 @@ int inst_fetch(int pc) {
     HALT = true;
   }
 
-  printf("0x%08X: Fetch instruction 0x%08X\n", pc, inst);
+  Log("0x%08X: Fetch instruction 0x%08X", pc, inst);
 
   return inst;
 }
 
 int main(int argc, char **argv) {
 
-  parse_args(argc, argv);
-  load_img();
-
+  monitor_init(argc, argv);
   cpu_init(argc, argv);
 
   while (HALT == false) {

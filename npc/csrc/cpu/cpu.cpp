@@ -35,8 +35,8 @@ void cpu_init(int argc, char **argv) {
   char wavefile_name[80];
   strcpy(wavefile_name, NPC_HOME);
   strcat(wavefile_name, "/build/waveform.vcd");
-  printf("Hello, SuanChou Processor Core!\n");
-  printf("Wave Path: %s\n", wavefile_name);
+  Log("Welcome to SuanChou Processor Core Verilating Model.");
+  Log("Wave Path: %s.", wavefile_name);
 
   Verilated::traceEverOn(true);
   tfp = new VerilatedVcdC;

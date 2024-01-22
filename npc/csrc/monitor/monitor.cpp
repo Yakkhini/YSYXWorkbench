@@ -24,7 +24,7 @@ void load_img() {
   fseek(fp, 0, SEEK_END);
   long size = ftell(fp);
 
-  printf("The image is %s, size = %ld\n", img_file, size);
+  Log("The image is %s, size = %ld", img_file, size);
 
   fseek(fp, 0, SEEK_SET);
   int ret = fread(guest_to_host(0x80000000), size, 1, fp);
@@ -56,4 +56,18 @@ void parse_args(int argc, char *argv[]) {
     }
   }
   return;
+}
+
+void monitor_init(int argc, char **argv) {
+  Log("\n\
+   _   _      _ _          ___________ _____ _______ \n\
+  | | | |    | | |        /  ___| ___ \\_   _|___  / |\n\
+  | |_| | ___| | | ___    \\ `--.| |_/ / | |    / /| |\n\
+  |  _  |/ _ \\ | |/ _ \\    `--. \\    /  | |   / / | |\n\
+  | | | |  __/ | | (_) |  /\\__/ / |\\ \\ _| |_./ /__|_|\n\
+  \\_| |_/\\___|_|_|\\___( ) \\____/\\_| \\_|\\___/\\_____(_)\n\
+                      |/\n");
+
+  parse_args(argc, argv);
+  load_img();
 }
