@@ -20,11 +20,11 @@ module ysyx_23060042_IDU (
   wire [31:0] b_imm;
   wire [31:0] u_imm;
   wire [31:0] j_imm;
-  assign i_imm = {inst[31], 20'b0, inst[30:20]};
-  assign s_imm = {inst[31], 20'b0, inst[30:25], inst[11:7]};
-  assign b_imm = {inst[31], 19'b0, inst[7], inst[30:25], inst[11:8], 1'b0};
+  assign i_imm = {inst[31], {20{inst[31]}}, inst[30:20]};
+  assign s_imm = {inst[31], {20{inst[31]}}, inst[30:25], inst[11:7]};
+  assign b_imm = {inst[31], {19{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0};
   assign u_imm = {inst[31], inst[30:12], 12'b0};
-  assign j_imm = {inst[31], 11'b0, u_imm[19:12], i_imm[0], i_imm[10:1], 1'b0};
+  assign j_imm = {inst[31], {11{inst[31]}}, u_imm[19:12], i_imm[0], i_imm[10:1], 1'b0};
 
   assign rs1 = inst[19:15];
   assign rs2 = inst[24:20];
