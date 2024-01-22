@@ -1,13 +1,8 @@
-#include <Vsriz.h>
-#include <Vsriz__Dpi.h>
+#include <common.h>
 #include <getopt.h>
 #include <memory/paddr.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <verilated.h>
-#include <verilated_vcd_c.h>
 
 static char *NPC_HOME = getenv("NPC_HOME");
 static char *img_file = NULL;
