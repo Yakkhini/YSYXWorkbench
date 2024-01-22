@@ -26,7 +26,7 @@ int inst_fetch(int pc) {
     HALT = true;
   }
 
-  printf("Fetch instruction 0x%08X\n", inst);
+  printf("0x%08X: Fetch instruction 0x%08X\n", pc, inst);
 
   return inst;
 };
