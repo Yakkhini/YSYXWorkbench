@@ -10,7 +10,8 @@ module ysyx_23060042_IDU (
     output Regen,
     output Pcjen,
     output Pcren,
-    output Jalen
+    output Jalen,
+    output Brken
 );
 
   assign opcode = inst[6:0];
@@ -41,7 +42,7 @@ module ysyx_23060042_IDU (
   MuxKeyWithDefault #(3, 3, 6) ctr00_mux (
       .out(Ctr00),
       .key(opcode[4:2]),
-      .default_out(6'b000010),
+      .default_out(6'b100000),
       .lut({3'b000, 6'b100001, 3'b100, 6'b100001, 3'b101, 6'b101110})
   );
 
@@ -52,19 +53,19 @@ module ysyx_23060042_IDU (
   //    .lut({})
   //);
 
-  assign Ctr01 = 6'b000010;
+  assign Ctr01 = 6'b100000;
 
-  MuxKeyWithDefault #(2, 3, 6) ctr11_mux (
+  MuxKeyWithDefault #(3, 3, 6) ctr11_mux (
       .out(Ctr11),
       .key(inst[4:2]),
-      .default_out(6'b000010),
-      .lut({3'b001, 6'b110001, 3'b011, 6'b111111})
+      .default_out(6'b100000),
+      .lut({3'b001, 6'b110001, 3'b011, 6'b111111, 3'b100, 6'b000000})
   );
 
   MuxKeyWithDefault #(3, 2, 6) ctr_mux (
       .out(Ctr),
       .key(opcode[6:5]),
-      .default_out(6'b000000),
+      .default_out(6'b100000),
       .lut({2'b00, Ctr00, 2'b01, Ctr01, 2'b11, Ctr11})
   );
 
@@ -72,6 +73,7 @@ module ysyx_23060042_IDU (
   assign Pcjen = Ctr[4];
   assign Pcren = Ctr[3];
   assign Jalen = Regen & Pcjen;
+  assign Brken = !(Regen | Pcjen);
 
   //imm_type: 000 for R, 001 for I, 010 for S, 011 for SB, 110 for U, 111 for UJ
   MuxKeyWithDefault #(6, 3, 32) imm_mux (

@@ -2,9 +2,11 @@ module ysyx_23060042_EXU (
     input [31:0] pc,
     input [31:0] rdata1,
     input [31:0] rdata2,
+    output [31:0] wdata,
     input [31:0] imm,
     input Pcren,
-    output [31:0] wdata
+    input Brken,
+    input [31:0] a0
 );
 
   wire [31:0] src1;
@@ -21,5 +23,14 @@ module ysyx_23060042_EXU (
       .data2(imm),
       .out  (wdata)
   );
+
+
+  import "DPI-C" function void halt(input int code);
+
+  always_comb begin
+    if (Brken) begin
+      halt(a0);
+    end
+  end
 
 endmodule

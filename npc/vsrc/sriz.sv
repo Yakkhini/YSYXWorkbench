@@ -29,7 +29,9 @@ module sriz (
   wire [2:0] func3;
   wire Pcren;
   wire Regen;
+  wire Brken;
   wire [31:0] imm;
+  wire [31:0] a0;
   wire [4:0] rs1, rs2, rd;
 
   ysyx_23060042_IDU IDU (
@@ -43,7 +45,8 @@ module sriz (
       .Regen(Regen),
       .Pcren(Pcren),
       .Pcjen(Pcjen),
-      .Jalen(Jalen)
+      .Jalen(Jalen),
+      .Brken(Brken)
   );
 
   wire Regen;
@@ -60,10 +63,13 @@ module sriz (
       .rdata1(rdata1),
       .rdata2(rdata2),
       .Jalen(Jalen),
-      .pc(pc)
+      .pc(pc),
+      .a0(a0)
   );
 
   ysyx_23060042_EXU EXU (
+      .Brken(Brken),
+      .a0(a0),
       .imm(imm),
       .Pcren(Pcren),
       .pc(pc),
