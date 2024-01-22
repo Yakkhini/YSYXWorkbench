@@ -9,11 +9,14 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef uint32_t word_t;
 typedef word_t vaddr_t;
 typedef uint32_t paddr_t;
+
+#define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
 
 #define Log(format, ...)                                                       \
   _Log(ANSI_FMT("[%s] " format, ANSI_FG_BLUE) "\n", __func__, ##__VA_ARGS__)

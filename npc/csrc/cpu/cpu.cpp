@@ -52,6 +52,10 @@ void cpu_init(int argc, char **argv) {
 }
 
 void cpu_exec(int n) {
+  if (HALT) {
+    Log("Program already finished!");
+    return;
+  }
   switch (n) {
   case -1:
     while (HALT == false) {
@@ -60,6 +64,9 @@ void cpu_exec(int n) {
     break;
   default:
     for (int i = 0; i < n; i++) {
+      if (HALT) {
+        break;
+      }
       single_clock();
     }
     break;
