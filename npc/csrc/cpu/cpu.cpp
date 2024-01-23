@@ -1,3 +1,4 @@
+#include "cpu/disasm.h"
 #include <common.h>
 #include <cpu/cpu.h>
 #include <memory/paddr.h>
@@ -41,6 +42,8 @@ void reset() {
 }
 
 void cpu_init(int argc, char **argv) {
+  disasm_init();
+
   contextp = new VerilatedContext;
   contextp->commandArgs(argc, argv);
 
@@ -89,6 +92,7 @@ int inst_fetch(int pc) {
   uint32_t inst = paddr_read(pc, 4);
 
   Log("0x%08X: Fetch instruction 0x%08X", pc, inst);
+  disassembler(pc, inst);
 
   return inst;
 }
@@ -110,4 +114,6 @@ void cpu_exit() {
   tfp->close();
   top->final();
   delete top;
+
+  disasm_exit();
 }
