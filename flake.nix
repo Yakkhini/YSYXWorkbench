@@ -52,6 +52,38 @@
         platforms = ["x86_64-linux"];
       };
     };
+
+    packages.x86_64-linux.capstone = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation rec {
+      pname = "capstone";
+      version = "5.0.1";
+
+      src = stdpkgs.fetchFromGitHub {
+        owner = "capstone-engine";
+        repo = "capstone";
+        rev = version;
+        sha256 = "sha256-kKmL5sae9ruWGu1gas1mel9qM52qQOD+zLj8cRE3isg=";
+      };
+
+      nativeBuildInputs =
+        [
+          stdpkgs.cmake
+        ]
+        ++ stdpkgs.lib.optionals stdpkgs.stdenv.isDarwin [
+          stdpkgs.lib.fixDarwinDylibNames
+        ];
+
+      doCheck = true;
+
+      meta = with stdpkgs.lib; {
+        description = "Advanced disassembly library";
+        homepage = "http://www.capstone-engine.org";
+        license = licenses.bsd3;
+        maintainers = with stdenv.lib.maintainers; [thoughtpolice ris];
+        mainProgram = "cstool";
+        platforms = ["x86_64-linux"];
+      };
+    };
+
     devShells.x86_64-linux.default = pkgs.legacyPackages.x86_64-linux.mkShell {
       name = "ysyx-shell";
       packages = [
@@ -70,6 +102,7 @@
         stdpkgs.yosys
         stdpkgs.verible
         packages.x86_64-linux.ista-bin
+        packages.x86_64-linux.capstone
         npcmake
       ];
 
