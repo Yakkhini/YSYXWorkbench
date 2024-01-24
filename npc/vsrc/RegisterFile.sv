@@ -15,7 +15,8 @@ module RegisterFile #(
     output [DATA_WIDTH-1:0] rdata2,
     output [DATA_WIDTH-1:0] a0
 );
-  reg [DATA_WIDTH-1:0] rf[ADDR_COUNT-1:0];
+
+  reg [DATA_WIDTH-1:0] rf[ADDR_COUNT-1:0]  /*verilator public*/;
 
   assign rdata1 = rf[raddr1];
   assign rdata2 = rf[raddr2];

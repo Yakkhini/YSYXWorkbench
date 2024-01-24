@@ -1,13 +1,12 @@
-#include "cpu/disasm.h"
+#include "Vsriz__Syms.h"
 #include <common.h>
 #include <cpu/cpu.h>
+#include <cpu/disasm.h>
 #include <memory/paddr.h>
 
 static char *NPC_HOME = getenv("NPC_HOME");
-static Vsriz *top;
 static VerilatedVcdC *tfp;
 static VerilatedContext *contextp;
-static int current_pc;
 
 static bool HALT = false;
 static bool ABORT = false;
@@ -21,24 +20,27 @@ void halt(int code) {
   finish();
 }
 
+void cpu_sync();
 void single_clock() {
   contextp->timeInc(1);
-  top->clk = 1;
-  top->eval();
+  cpu.top->clk = 1;
+  cpu.top->eval();
   tfp->dump(contextp->time());
   contextp->timeInc(1);
-  top->clk = 0;
-  top->eval();
+  cpu.top->clk = 0;
+  cpu.top->eval();
   tfp->dump(contextp->time());
+
+  cpu_sync();
 }
 
 void reset() {
-  top->rst = 1;
+  cpu.top->rst = 1;
   contextp->timeInc(1);
-  top->eval();
+  cpu.top->eval();
   tfp->dump(contextp->time());
   single_clock();
-  top->rst = 0;
+  cpu.top->rst = 0;
 }
 
 void cpu_init(int argc, char **argv) {
@@ -47,7 +49,7 @@ void cpu_init(int argc, char **argv) {
   contextp = new VerilatedContext;
   contextp->commandArgs(argc, argv);
 
-  top = new Vsriz(contextp);
+  cpu.top = new Vsriz(contextp);
 
   char wavefile_name[80];
   strcpy(wavefile_name, NPC_HOME);
@@ -57,7 +59,7 @@ void cpu_init(int argc, char **argv) {
 
   Verilated::traceEverOn(true);
   tfp = new VerilatedVcdC;
-  top->trace(tfp, 5);
+  cpu.top->trace(tfp, 5);
 
   tfp->open(wavefile_name);
   int sim_time = 100;
@@ -88,10 +90,9 @@ void cpu_exec(int n) {
 }
 
 int inst_fetch(int pc) {
-  current_pc = pc;
+  cpu.pc = pc;
   uint32_t inst = paddr_read(pc, 4);
 
-  Log("0x%08X: Fetch instruction 0x%08X", pc, inst);
   disassembler(pc, inst);
 
   return inst;
@@ -101,19 +102,19 @@ void finish() {
   if (ABORT) {
     Log("SRIZ: " ANSI_FMT("ABORT", ANSI_FG_RED) ANSI_FG_BLUE
         " at pc = 0x%08X " ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED),
-        current_pc);
+        cpu.pc);
     return;
   }
 
   Log("SRIZ: " ANSI_FMT("QUIT", ANSI_FG_GREEN) ANSI_FG_BLUE
       " at pc = 0x%08X " ANSI_FMT("HIT BAD TRAP", ANSI_FG_GREEN),
-      current_pc);
+      cpu.pc);
 }
 
 void cpu_exit() {
   tfp->close();
-  top->final();
-  delete top;
+  cpu.top->final();
+  delete cpu.top;
 
   disasm_exit();
 }

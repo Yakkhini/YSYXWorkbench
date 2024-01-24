@@ -10,7 +10,7 @@ module Pc #(
     input Pcjen
 );
 
-  wire [31:0] pcin;
+  wire [31:0] pcin  /*verilator public*/;
 
   MuxKeyWithDefault #(2, 1, 32) pcin_mux (
       .out(pcin),
