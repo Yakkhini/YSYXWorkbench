@@ -4,6 +4,8 @@
 #include <cpu/disasm.h>
 #include <memory/paddr.h>
 
+CPU cpu;
+
 static char *NPC_HOME = getenv("NPC_HOME");
 static VerilatedVcdC *tfp;
 static VerilatedContext *contextp;

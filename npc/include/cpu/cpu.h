@@ -10,7 +10,7 @@ typedef struct cpu {
   word_t next_pc;
 } CPU;
 
-static CPU cpu;
+extern CPU cpu;
 
 void single_clock();
 void reset();
