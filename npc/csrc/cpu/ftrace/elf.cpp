@@ -29,6 +29,8 @@ void parse_symtab();
 void parse_strtab();
 
 void elf_parse(char *path) {
+  Log("Parsing ELF file...");
+
   FILE *file = fopen(path, "rb");
   fseek(file, 0, SEEK_END);
   int fsize = ftell(file);
@@ -47,6 +49,7 @@ void elf_parse(char *path) {
   parse_symtab();
   parse_strtab();
 
+  Log("Parsing ELF done.");
   return;
 }
 

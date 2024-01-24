@@ -5,7 +5,7 @@
 // Public
 
 void ftrace_init(char *path);
-void ftrace_check(int rd, vaddr_t dnpc, word_t src1);
+void ftrace_check();
 
 // Internal
 bool get_ftrace_enable();

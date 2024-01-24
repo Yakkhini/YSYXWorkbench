@@ -41,17 +41,15 @@ void ftrace_link_table_build() {
     node->name = strtab + symtab[i].st_name;
     node->pos = symtab[i].st_value;
     node->next = NULL;
-    if (function_head == NULL) {
-      printf("still null");
-    }
 
+    Log("Find function %s@0x%X", node->name, node->pos);
     function_link_table_insert(node);
   }
 
   return;
 }
 
-void ftrace_check(word_t inst) {
+void ftrace_check() {
   if (get_ftrace_enable() != true) {
     return;
   }
@@ -68,8 +66,6 @@ void ftrace_check(word_t inst) {
 }
 
 void function_link_table_insert(FunctionNode *node) {
-
-  printf("Insert function %s@0x%X\n", node->name, node->pos);
 
   if (function_head == NULL) {
     function_head = node;

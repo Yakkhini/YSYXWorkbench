@@ -2,6 +2,7 @@
 #include <common.h>
 #include <cpu/cpu.h>
 #include <cpu/disasm.h>
+#include <cpu/ftrace.h>
 #include <memory/paddr.h>
 
 CPU cpu;
@@ -34,6 +35,7 @@ void single_clock() {
   tfp->dump(contextp->time());
 
   cpu_sync();
+  ftrace_check();
 }
 
 void reset() {

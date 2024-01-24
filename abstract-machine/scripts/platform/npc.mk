@@ -22,4 +22,4 @@ image: $(IMAGE).elf
 
 run: image
 	@make -C $(NPC_HOME) compile
-	@sriz $(IMAGE).bin
+	@sriz -f $(IMAGE).elf $(IMAGE).bin
