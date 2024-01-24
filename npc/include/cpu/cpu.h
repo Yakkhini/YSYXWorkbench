@@ -6,8 +6,9 @@
 typedef struct cpu {
   Vsriz *top;
   word_t regs[32];
-  word_t pc;
-  word_t next_pc;
+  word_t pc = 0x80000000;
+  word_t pc_prev;
+  word_t inst;
 } CPU;
 
 extern CPU cpu;

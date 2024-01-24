@@ -56,12 +56,14 @@ void ftrace_check(word_t inst) {
     return;
   }
 
+  word_t inst = cpu.inst;
+
   if (inst == 0x00008067) { // ret: 0x00008067 jalr zero, (0)ra
-    ftrace_return(cpu.next_pc);
+    ftrace_return(cpu.pc);
   } else if ((inst & 0x00000fff) == 0x000000ef) { // jal ra, imm
-    ftrace_new_call(cpu.next_pc);
+    ftrace_new_call(cpu.pc);
   } else if ((inst & 0x00000fff) == 0x000000e7) { // jalr ra, imm(..)
-    ftrace_new_call(cpu.next_pc);
+    ftrace_new_call(cpu.pc);
   }
 }
 
@@ -93,15 +95,15 @@ void ftrace_new_call(vaddr_t dnpc) {
   while (current != NULL) {
     if (current->pos == dnpc) {
       node->funcname = current->name;
-      node->ra = cpu.pc + 4;
+      node->ra = cpu.pc_prev + 4;
       node->next = NULL;
 
       break;
     }
     current = current->next;
   }
-  Log("0x%X: Call function %s@0x%X, return in 0x%X.", cpu.pc, node->funcname,
-      dnpc, cpu.pc + 4);
+  Log("0x%X: Call function %s@0x%X, return in 0x%X.", cpu.pc_prev,
+      node->funcname, dnpc, cpu.pc_prev + 4);
 
   if (function_call_head == NULL) {
     function_call_head = node;
