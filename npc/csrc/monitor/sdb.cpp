@@ -29,7 +29,6 @@ static int cmd_c(char *args) {
 static int cmd_si(char *args) {
   char *arg = strtok(NULL, " ");
   if (arg == NULL) {
-    printf("No step number, default to one step.\n");
     cpu_exec(1);
     return 0;
   }
