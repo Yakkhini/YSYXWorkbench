@@ -19,4 +19,6 @@ void cpu_init(int argc, char **argv);
 void cpu_exec(int n);
 void cpu_exit();
 
+void isa_reg_display();
+
 #endif

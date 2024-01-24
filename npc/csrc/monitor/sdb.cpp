@@ -38,6 +38,19 @@ static int cmd_si(char *args) {
   return 0;
 }
 
+static int cmd_info(char *args) {
+  char *arg = strtok(NULL, " ");
+  if (arg == NULL) {
+    printf("Please give info subcommand.\n");
+  } else if (strcmp(arg, "r") == 0) {
+    isa_reg_display();
+  } else {
+    printf("Incorrect info subcommand.\n");
+  }
+
+  return 0;
+}
+
 static int cmd_q(char *args) { return -1; }
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -47,8 +60,9 @@ static struct {
   int (*handler)(char *);
 } cmd_table[] = {
     {"c", "Continue the execution of the program", cmd_c},
-    {"q", "Exit NEMU", cmd_q},
+    {"q", "Exit SRIZ Simulator", cmd_q},
     {"si", "Execute program by step", cmd_si},
+    {"info", "Print register info", cmd_info},
 
 };
 
