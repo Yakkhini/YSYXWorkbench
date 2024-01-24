@@ -89,6 +89,11 @@ void cpu_exec(int n) {
   }
 }
 
+void cpu_sync() {
+  memcpy(cpu.regs, cpu.top->sriz->resgister_file->rf.m_storage, 32 * 4);
+  cpu.next_pc = cpu.top->sriz->pc_reg->pcin;
+}
+
 int inst_fetch(int pc) {
   cpu.pc = pc;
   uint32_t inst = paddr_read(pc, 4);
