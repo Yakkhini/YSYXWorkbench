@@ -1,6 +1,7 @@
 #include "Vsriz__Syms.h"
 #include <common.h>
 #include <cpu/cpu.h>
+#include <cpu/difftest.h>
 #include <cpu/disasm.h>
 #include <cpu/ftrace.h>
 #include <memory/paddr.h>
@@ -40,6 +41,7 @@ void single_clock() {
 
   cpu_sync();
   ftrace_check();
+  difftest_step(cpu.pc_prev, cpu.pc);
 }
 
 void reset() {

@@ -72,14 +72,13 @@ void difftest_init(char *ref_so_file, long img_size, int port) {
   Log("Differential testing: %s", ANSI_FMT("ON", ANSI_FG_GREEN));
   Log("The result of every instruction will be compared with %s. "
       "This will help you a lot for debugging, but also significantly reduce "
-      "the performance. "
-      "If it is not necessary, you can turn it off in menuconfig.",
+      "the performance.",
       ref_so_file);
 
   ref_difftest_init(port);
   ref_difftest_memcpy(RESET_VECTOR, guest_to_host(RESET_VECTOR), img_size,
                       DIFFTEST_TO_REF);
-  ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+  ref_difftest_regcpy(&cpu.regs, DIFFTEST_TO_REF);
 }
 
 bool isa_difftest_checkregs(CPU *ref_r, vaddr_t pc) {
@@ -91,8 +90,16 @@ bool isa_difftest_checkregs(CPU *ref_r, vaddr_t pc) {
   return true;
 }
 
-static void checkregs(CPU *ref, vaddr_t pc) {
+static void diff_check(CPU *ref, vaddr_t pc) {
   if (!isa_difftest_checkregs(ref, pc)) {
+    Log(ANSI_FG_RED "Warning: " ANSI_FG_BLUE "DiffTest ERROR.");
+    for (int i = 0; i < 32; i++) {
+      if (cpu.regs[i] != ref->regs[i]) {
+        Log("x%i: " ANSI_FG_RED "0x%08X " ANSI_FG_BLUE
+            "in CPU while " ANSI_FG_RED "0x%08X " ANSI_FG_BLUE "in REF.",
+            i, cpu.regs[i], ref->regs[i]);
+      }
+    }
     halt(1);
   }
 }
@@ -104,7 +111,7 @@ void difftest_step(vaddr_t pc, vaddr_t npc) {
     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
     if (ref_r.pc == npc) {
       skip_dut_nr_inst = 0;
-      checkregs(&ref_r, npc);
+      diff_check(&ref_r, npc);
       return;
     }
     skip_dut_nr_inst--;
@@ -123,7 +130,7 @@ void difftest_step(vaddr_t pc, vaddr_t npc) {
   }
 
   ref_difftest_exec(1);
-  ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
+  ref_difftest_regcpy(&ref_r.regs, DIFFTEST_TO_DUT);
 
-  checkregs(&ref_r, pc);
+  diff_check(&ref_r, pc);
 }
