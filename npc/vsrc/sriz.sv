@@ -4,7 +4,9 @@ module sriz (
     input clk,
     input rst
 );
-  wire [31:0] pc, pc_next;
+  wire [31:0] pc;
+  wire [31:0] pc_next;
+
   wire Pcjen;
   wire Jalen;
   wire [31:0] wdata;

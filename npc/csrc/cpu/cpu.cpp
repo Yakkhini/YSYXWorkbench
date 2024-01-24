@@ -34,6 +34,10 @@ void single_clock() {
   cpu.top->eval();
   tfp->dump(contextp->time());
 
+  if (cpu.top->rst == 1) {
+    cpu.top->rst = 0;
+  }
+
   cpu_sync();
   ftrace_check();
 }
@@ -43,8 +47,6 @@ void reset() {
   contextp->timeInc(1);
   cpu.top->eval();
   tfp->dump(contextp->time());
-  single_clock();
-  cpu.top->rst = 0;
 }
 
 void cpu_init(int argc, char **argv) {
@@ -66,7 +68,6 @@ void cpu_init(int argc, char **argv) {
   cpu.top->trace(tfp, 5);
 
   tfp->open(wavefile_name);
-  int sim_time = 100;
 
   reset();
 }
