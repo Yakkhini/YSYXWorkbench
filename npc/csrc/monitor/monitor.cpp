@@ -1,9 +1,11 @@
 #include <common.h>
+#include <cpu/difftest.h>
 #include <cpu/ftrace.h>
 #include <getopt.h>
 #include <memory/paddr.h>
 
-static char *NPC_HOME = getenv("NPC_HOME");
+static char *diff_so_file =
+    strcat(getenv("NEMU_HOME"), "/build/riscv32-nemu-interpreter-so");
 static char *img_file = NULL;
 
 static uint32_t DEFAULT_MEM[] = {
@@ -13,11 +15,11 @@ static uint32_t DEFAULT_MEM[] = {
     0x00430313, 0x3e800093, 0x3e810093, 0x3e810193, 0x7d018213,
     0x3e820293, 0x3e828313, 0x7d008113, 0x00430313, 0x00100073};
 
-void load_img() {
+long load_img() {
   if (img_file == NULL) {
     Log("No image is given. Use the default build-in image.");
     memcpy(guest_to_host(0x80000000), DEFAULT_MEM, sizeof(uint32_t) * 25);
-    return; // built-in image size
+    return 4096; // built-in image size
   }
 
   FILE *fp = fopen(img_file, "rb");
@@ -32,7 +34,7 @@ void load_img() {
   assert(ret == 1);
 
   fclose(fp);
-  return;
+  return size;
 }
 
 void parse_args(int argc, char *argv[]) {
@@ -78,5 +80,6 @@ void monitor_init(int argc, char **argv) {
   welcome();
 
   parse_args(argc, argv);
-  load_img();
+  long img_size = load_img();
+  difftest_init(diff_so_file, img_size, 1234);
 }
