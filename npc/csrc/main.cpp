@@ -12,5 +12,5 @@ int main(int argc, char **argv) {
 
   cpu_exit();
 
-  return 0;
+  return return_status();
 }

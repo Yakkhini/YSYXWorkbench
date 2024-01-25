@@ -24,6 +24,8 @@ void halt(int code) {
   finish();
 }
 
+bool return_status() { return ABORT; }
+
 void cpu_sync();
 void single_clock() {
   contextp->timeInc(1);
