@@ -22,3 +22,18 @@ void isa_reg_display() {
     printf("\t%s 0x%X;\n", regs_name[i + 3], cpu.regs[i + 3]);
   }
 }
+
+word_t isa_reg_str2val(const char *s, bool *success) {
+  if ((strcmp(s, "$0") == 0) || strcmp(s, "$zero") == 0) {
+    *success = true;
+    return 0;
+  }
+  s += 1;
+  for (int i = 1; i < 30; i++) {
+    if (strcmp(s, regs_name[i]) == 0) {
+      *success = true;
+      return cpu.regs[i];
+    }
+  }
+  return -1;
+}

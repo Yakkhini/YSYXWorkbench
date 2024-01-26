@@ -3,6 +3,7 @@
 #include <cpu/ftrace.h>
 #include <getopt.h>
 #include <memory/paddr.h>
+#include <sdb.h>
 
 static char *diff_so_file =
     strcat(getenv("NEMU_HOME"), "/build/riscv32-nemu-interpreter-so");
@@ -82,4 +83,7 @@ void monitor_init(int argc, char **argv) {
   parse_args(argc, argv);
   long img_size = load_img();
   difftest_init(diff_so_file, img_size, 1234);
+
+  init_regex();
+  init_wp_pool();
 }

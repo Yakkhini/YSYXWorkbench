@@ -1,4 +1,5 @@
 #include "Vsriz__Syms.h"
+#include "sdb.h"
 #include <common.h>
 #include <cpu/cpu.h>
 #include <cpu/difftest.h>
@@ -52,6 +53,7 @@ void single_clock() {
   cpu_sync();
   ftrace_check();
   difftest_step(cpu.pc_prev, cpu.pc);
+  check_wp();
   finish();
 }
 
