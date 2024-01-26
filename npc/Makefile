@@ -60,7 +60,7 @@ compile: build/bin $(CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "New Processor Core Sim RTL."
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) --top-module $(NPC_NAME) \
-	    --build -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL -Wno-UNDRIVEN $(CSRC) $(VSRC) \
+	    --build -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL -Wno-UNUSEDPARAM -Wno-UNDRIVEN $(CSRC) $(VSRC) \
 		--trace -LDFLAGS -lreadline -LDFLAGS -lcapstone --exe -o $(BUILD_DIR)/bin/$(NPC_NAME)
 
 sim: compile

@@ -9,8 +9,9 @@ module ysyx_23060042_IDU (
 
     output Regen,
     output Pcjen,
-    output Mwen,
     output Pcren,
+    output [1:0] Mwen,
+    output [1:0] Mren,
     output Jalen,
     output Brken
 );
@@ -33,21 +34,22 @@ module ysyx_23060042_IDU (
   assign rs2 = inst[24:20];
   assign rd = inst[11:7];
 
-  //Ctr: Regen[1], Pcjen[1], Mwen[1], Pcren[1], imm_type[3]
-  //imm_type: 000 for R, 001 for I, 010 for S, 011 for SB, 110 for U, 111 for UJ
-  parameter int unsigned MICRO_LEN = 7;
+  // Micro command format: Regen[1], Pcjen[1], Pcren[1], Mwen[2], Mren[2], imm_type[3]
+  // IMM Type: 000 for R, 001 for I, 010 for S, 011 for SB, 110 for U, 111 for UJ
+  parameter int unsigned MICRO_LEN = 10;
   wire [MICRO_LEN-1:0] micro_cmd;
   LookUPTable lut (
       .inst({inst[14:12], inst[6:2]}),
       .micro_cmd(micro_cmd)
   );
 
-  assign Regen = micro_cmd[6];
-  assign Pcjen = micro_cmd[5];
-  assign Mwen  = micro_cmd[4];
-  assign Pcren = micro_cmd[3];
+  assign Regen = micro_cmd[9];
+  assign Pcjen = micro_cmd[8];
+  assign Pcren = micro_cmd[7];
+  assign Mwen  = micro_cmd[6:5];
+  assign Mren  = micro_cmd[4:3];
   assign Jalen = Regen & Pcjen;
-  assign Brken = !(Regen | Pcjen | Mwen);
+  assign Brken = !(Regen | Pcjen | Mwen[1] | Mwen[0]);
 
   //imm_type: 000 for R, 001 for I, 010 for S, 011 for SB, 110 for U, 111 for UJ
   MuxKeyWithDefault #(6, 3, 32) imm_mux (

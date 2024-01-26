@@ -4,7 +4,7 @@
 #include <cpu/difftest.h>
 #include <cpu/disasm.h>
 #include <cpu/ftrace.h>
-#include <memory/paddr.h>
+#include <memory/vaddr.h>
 
 CPU cpu;
 
@@ -108,7 +108,7 @@ void cpu_sync() {
 }
 
 int inst_fetch(int pc) {
-  uint32_t inst = paddr_read(pc, 4);
+  uint32_t inst = vaddr_ifetch(pc);
   cpu.inst = inst;
 
   disassembler(inst);

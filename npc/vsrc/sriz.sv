@@ -4,12 +4,12 @@ module sriz (
     input clk,
     input rst
 );
-  wire [31:0] pc;
-  wire [31:0] pc_next;
+  bit [31:0] pc;
+  bit [31:0] pc_next;
 
-  wire Pcjen;
-  wire Jalen;
-  wire [31:0] wdata;
+  bit Pcjen;
+  bit Jalen;
+  bit [31:0] wdata;
   Pc #(32, 32'h80000000) pc_reg (
       .clk  (clk),
       .rst  (rst),
@@ -27,15 +27,16 @@ module sriz (
       .inst(inst)
   );
 
-  wire [6:0] opcode;
-  wire [2:0] func3;
-  wire Pcren;
-  wire Regen;
-  wire Mwen;
-  wire Brken;
-  wire [31:0] imm;
-  wire [31:0] a0;
-  wire [4:0] rs1, rs2, rd;
+  bit [6:0] opcode;
+  bit [2:0] func3;
+  bit Pcren;
+  bit Regen;
+  bit [1:0] Mwen;
+  bit [1:0] Mren;
+  bit Brken;
+  bit [31:0] imm;
+  bit [31:0] a0;
+  bit [4:0] rs1, rs2, rd;
 
   ysyx_23060042_IDU IDU (
       .inst(inst),
@@ -49,13 +50,13 @@ module sriz (
       .Pcjen(Pcjen),
       .Mwen(Mwen),
       .Pcren(Pcren),
+      .Mren(Mren),
       .Jalen(Jalen),
       .Brken(Brken)
   );
 
-  wire Regen;
-  wire [31:0] rdata1;
-  wire [31:0] rdata2;
+  bit [31:0] rdata1;
+  bit [31:0] rdata2;
 
   RegisterFile #(5, 32, 32) resgister_file (
       .clk(clk),
@@ -71,6 +72,11 @@ module sriz (
       .a0(a0)
   );
 
+  bit [31:0] mwaddr;
+  bit [31:0] mwdata;
+  bit [31:0] mraddr;
+  bit [31:0] mrdata;
+
   ysyx_23060042_EXU EXU (
       .rst(rst),
       .Brken(Brken),
@@ -81,6 +87,15 @@ module sriz (
       .rdata1(rdata1),
       .rdata2(rdata2),
       .wdata(wdata)
+  );
+
+  Memory mem (
+      .Mwen (Mwen),
+      .Mren (Mren),
+      .waddr(rdata1 + imm),
+      .raddr(rdata1 + imm),
+      .wdata(rdata2),
+      .rdata(mrdata)
   );
 
 endmodule
