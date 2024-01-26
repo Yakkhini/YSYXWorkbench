@@ -3,6 +3,8 @@
 
 #include <common.h>
 
+enum NPCState { SRIZ_INIT, SRIZ_RUNNING, SRIZ_PAUSE, SRIZ_HALT, SRIZ_ABORT };
+
 typedef struct cpu {
   Vsriz *top;
   word_t regs[32];
@@ -11,6 +13,7 @@ typedef struct cpu {
   word_t inst;
 } CPU;
 
+extern NPCState npc_state;
 extern CPU cpu;
 
 void single_clock();
@@ -20,6 +23,7 @@ void cpu_exec(int n);
 void cpu_exit();
 
 void isa_reg_display();
-bool return_status();
+word_t isa_reg_str2val(const char *s, bool *success);
+int return_status();
 
 #endif

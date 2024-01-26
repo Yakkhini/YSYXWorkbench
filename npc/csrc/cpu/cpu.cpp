@@ -7,22 +7,32 @@
 #include <memory/vaddr.h>
 
 CPU cpu;
+NPCState npc_state = SRIZ_INIT;
 
 static char *NPC_HOME = getenv("NPC_HOME");
 static VerilatedVcdC *tfp;
 static VerilatedContext *contextp;
 
-static bool HALT = false;
-static bool ABORT = false;
 void finish();
 void halt(int code) {
   if (code) {
-    ABORT = true;
+    npc_state = SRIZ_ABORT;
+    return;
   }
-  HALT = true;
+
+  npc_state = SRIZ_HALT;
 }
 
-bool return_status() { return ABORT; }
+int return_status() {
+  switch (npc_state) {
+  case SRIZ_HALT:
+    return 0;
+  case SRIZ_ABORT:
+    return 1;
+  default:
+    return 2;
+  }
+}
 
 void cpu_sync();
 void single_clock() {
@@ -76,19 +86,28 @@ void cpu_init(int argc, char **argv) {
 }
 
 void cpu_exec(int n) {
-  if (HALT) {
+  switch (npc_state) {
+  case SRIZ_HALT:
     Log("Program already finished!");
     return;
+  case SRIZ_ABORT:
+    Log("Program already aborted!");
+    return;
+  default:
+    break;
   }
+
+  npc_state = SRIZ_RUNNING;
+
   switch (n) {
   case -1:
-    while (HALT == false) {
+    while (npc_state == SRIZ_RUNNING) {
       single_clock();
     }
     break;
   default:
     for (int i = 0; i < n; i++) {
-      if (HALT) {
+      if (npc_state != SRIZ_RUNNING) {
         break;
       }
       single_clock();
@@ -117,20 +136,20 @@ int inst_fetch(int pc) {
 }
 
 void finish() {
-  if (!HALT) {
-    return;
-  }
-
-  if (ABORT) {
+  switch (npc_state) {
+  case SRIZ_ABORT:
     Log("SRIZ: " ANSI_FMT("ABORT", ANSI_FG_RED) ANSI_FG_BLUE
         " at pc = 0x%08X " ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED),
         cpu.pc);
     return;
+  case SRIZ_HALT:
+    Log("SRIZ: " ANSI_FMT("QUIT", ANSI_FG_GREEN) ANSI_FG_BLUE
+        " at pc = 0x%08X " ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN),
+        cpu.pc);
+    return;
+  default:
+    return;
   }
-
-  Log("SRIZ: " ANSI_FMT("QUIT", ANSI_FG_GREEN) ANSI_FG_BLUE
-      " at pc = 0x%08X " ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN),
-      cpu.pc);
 }
 
 void cpu_exit() {
