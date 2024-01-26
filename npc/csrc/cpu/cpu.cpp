@@ -20,8 +20,6 @@ void halt(int code) {
     ABORT = true;
   }
   HALT = true;
-
-  finish();
 }
 
 bool return_status() { return ABORT; }
@@ -44,6 +42,7 @@ void single_clock() {
   cpu_sync();
   ftrace_check();
   difftest_step(cpu.pc_prev, cpu.pc);
+  finish();
 }
 
 void reset() {
@@ -118,6 +117,10 @@ int inst_fetch(int pc) {
 }
 
 void finish() {
+  if (!HALT) {
+    return;
+  }
+
   if (ABORT) {
     Log("SRIZ: " ANSI_FMT("ABORT", ANSI_FG_RED) ANSI_FG_BLUE
         " at pc = 0x%08X " ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED),
@@ -126,7 +129,7 @@ void finish() {
   }
 
   Log("SRIZ: " ANSI_FMT("QUIT", ANSI_FG_GREEN) ANSI_FG_BLUE
-      " at pc = 0x%08X " ANSI_FMT("HIT BAD TRAP", ANSI_FG_GREEN),
+      " at pc = 0x%08X " ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN),
       cpu.pc);
 }
 

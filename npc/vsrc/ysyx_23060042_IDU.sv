@@ -9,6 +9,7 @@ module ysyx_23060042_IDU (
 
     output Regen,
     output Pcjen,
+    output Mwen,
     output Pcren,
     output Jalen,
     output Brken
@@ -32,53 +33,26 @@ module ysyx_23060042_IDU (
   assign rs2 = inst[24:20];
   assign rd = inst[11:7];
 
-  //Ctr: Regen[1], Pcjen[1], Pcren[1], imm_type[3]
+  //Ctr: Regen[1], Pcjen[1], Mwen[1], Pcren[1], imm_type[3]
   //imm_type: 000 for R, 001 for I, 010 for S, 011 for SB, 110 for U, 111 for UJ
-  wire [5:0] Ctr00;
-  wire [5:0] Ctr01;
-  wire [5:0] Ctr11;
-  wire [5:0] Ctr;
-
-  MuxKeyWithDefault #(3, 3, 6) ctr00_mux (
-      .out(Ctr00),
-      .key(opcode[4:2]),
-      .default_out(6'b100000),
-      .lut({3'b000, 6'b100001, 3'b100, 6'b100001, 3'b101, 6'b101110})
+  parameter int unsigned MICRO_LEN = 7;
+  wire [MICRO_LEN-1:0] micro_cmd;
+  LookUPTable lut (
+      .inst({inst[14:12], inst[6:2]}),
+      .micro_cmd(micro_cmd)
   );
 
-  //MuxKeyWithDefault #(2, 3, 1) ctr01_mux (
-  //    .out(Ctr01),
-  //    .key(inst[4:2]),
-  //    .default_out(1'b0),
-  //    .lut({})
-  //);
-
-  assign Ctr01 = 6'b100000;
-
-  MuxKeyWithDefault #(3, 3, 6) ctr11_mux (
-      .out(Ctr11),
-      .key(inst[4:2]),
-      .default_out(6'b100000),
-      .lut({3'b001, 6'b110001, 3'b011, 6'b111111, 3'b100, 6'b000000})
-  );
-
-  MuxKeyWithDefault #(3, 2, 6) ctr_mux (
-      .out(Ctr),
-      .key(opcode[6:5]),
-      .default_out(6'b100000),
-      .lut({2'b00, Ctr00, 2'b01, Ctr01, 2'b11, Ctr11})
-  );
-
-  assign Regen = Ctr[5];
-  assign Pcjen = Ctr[4];
-  assign Pcren = Ctr[3];
+  assign Regen = micro_cmd[6];
+  assign Pcjen = micro_cmd[5];
+  assign Mwen  = micro_cmd[4];
+  assign Pcren = micro_cmd[3];
   assign Jalen = Regen & Pcjen;
-  assign Brken = !(Regen | Pcjen);
+  assign Brken = !(Regen | Pcjen | Mwen);
 
   //imm_type: 000 for R, 001 for I, 010 for S, 011 for SB, 110 for U, 111 for UJ
   MuxKeyWithDefault #(6, 3, 32) imm_mux (
       .out(imm),
-      .key(Ctr[2:0]),
+      .key(micro_cmd[2:0]),
       .default_out(32'h00000000),
       .lut({
         3'b000,

@@ -1,4 +1,5 @@
 module ysyx_23060042_EXU (
+    input rst,
     input [31:0] pc,
     input [31:0] rdata1,
     input [31:0] rdata2,
@@ -28,7 +29,7 @@ module ysyx_23060042_EXU (
   import "DPI-C" function void halt(input int code);
 
   always_comb begin
-    if (Brken) begin
+    if (Brken & !rst) begin
       halt(a0);
     end
   end
