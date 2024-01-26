@@ -72,9 +72,7 @@ module sriz (
       .a0(a0)
   );
 
-  bit [31:0] mwaddr;
   bit [31:0] mwdata;
-  bit [31:0] mraddr;
   bit [31:0] mrdata;
 
   ysyx_23060042_EXU EXU (
@@ -83,9 +81,11 @@ module sriz (
       .a0(a0),
       .imm(imm),
       .Pcren(Pcren),
+      .Mren(Mren),
       .pc(pc),
       .rdata1(rdata1),
       .rdata2(rdata2),
+      .mrdata(mrdata),
       .wdata(wdata)
   );
 

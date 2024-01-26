@@ -4,7 +4,7 @@ module LookUPTable (
 );
   parameter int unsigned PATTERN_LEN = 8;
   parameter int unsigned MICRO_LEN = 10;
-  parameter int unsigned INST_NR = 6;
+  parameter int unsigned INST_NR = 9;
 
   parameter bit REGEN_TRUE = 1'b1;
   parameter bit REGEN_FALSE = 1'b0;
@@ -41,6 +41,18 @@ module LookUPTable (
   localparam bit [MICRO_LEN-1:0] JALRMicro = {
     REGEN_TRUE, PCJEN_TRUE, PCREN_FALSE, MWEN_NONE, MREN_NONE, IMM_TYPE_I
   };
+  localparam bit [PATTERN_LEN-1:0] LBPattern = {3'b000, 5'b00000};
+  localparam bit [MICRO_LEN-1:0] LBMicro = {
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_BYTE, IMM_TYPE_I
+  };
+  localparam bit [PATTERN_LEN-1:0] LHPattern = {3'b001, 5'b00000};
+  localparam bit [MICRO_LEN-1:0] LHMicro = {
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_HALF, IMM_TYPE_I
+  };
+  localparam bit [PATTERN_LEN-1:0] LWPattern = {3'b010, 5'b00000};
+  localparam bit [MICRO_LEN-1:0] LWMicro = {
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_WORD, IMM_TYPE_I
+  };
   localparam bit [PATTERN_LEN-1:0] SWPattern = {3'b010, 5'b01000};
   localparam bit [MICRO_LEN-1:0] SWMicro = {
     REGEN_FALSE, PCJEN_FALSE, PCREN_FALSE, MWEN_WORD, MREN_NONE, IMM_TYPE_S
@@ -62,12 +74,18 @@ module LookUPTable (
   assign micro_list[1]   = JALMicro;
   assign pattern_list[2] = JALRPattern;
   assign micro_list[2]   = JALRMicro;
-  assign pattern_list[3] = SWPattern;
-  assign micro_list[3]   = SWMicro;
-  assign pattern_list[4] = ADDIPattern;
-  assign micro_list[4]   = ADDIMicro;
-  assign pattern_list[5] = EBREAKPattern;
-  assign micro_list[5]   = EBREAKMicro;
+  assign pattern_list[3] = LBPattern;
+  assign micro_list[3]   = LBMicro;
+  assign pattern_list[4] = LHPattern;
+  assign micro_list[4]   = LHMicro;
+  assign pattern_list[5] = LWPattern;
+  assign micro_list[5]   = LWMicro;
+  assign pattern_list[6] = SWPattern;
+  assign micro_list[6]   = SWMicro;
+  assign pattern_list[7] = ADDIPattern;
+  assign micro_list[7]   = ADDIMicro;
+  assign pattern_list[8] = EBREAKPattern;
+  assign micro_list[8]   = EBREAKMicro;
 
   reg hit;
   reg [2:0] func3;
