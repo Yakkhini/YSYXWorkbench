@@ -26,7 +26,7 @@ module RegisterFile #(
       .out(regin),
       .key(Jalen),
       .default_out(32'h00000000),
-      .lut({1'b0, wdata, 1'b1, pc + 4})
+      .lut({1'b0, wdata & {DATA_WIDTH{waddr != 0}}, 1'b1, pc + 4 & {DATA_WIDTH{waddr != 0}}})
   );
 
   always @(posedge clk) begin
