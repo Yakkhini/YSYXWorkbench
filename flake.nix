@@ -1,7 +1,6 @@
 {
   description = "Flake for ysyx";
   inputs = {
-    verilator5008pkgs.url = "github:NixOS/nixpkgs/5e871533c4a488319b9cb98d7a525c356459d36c";
     yamlcpp06pkgs.url = "github:NixOS/nixpkgs/66e44425c6dfecbea68a5d6dc221ccd56561d4f1";
     pkgsunstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     pkgs.url = "pkgs";
@@ -10,7 +9,6 @@
     self,
     pkgs,
     pkgsunstable,
-    verilator5008pkgs,
     yamlcpp06pkgs,
   }: let
     stdpkgs = pkgs.legacyPackages.x86_64-linux;
@@ -87,7 +85,7 @@
     devShells.x86_64-linux.default = pkgs.legacyPackages.x86_64-linux.mkShell {
       name = "ysyx-shell";
       packages = [
-        verilator5008pkgs.legacyPackages.x86_64-linux.verilator
+        stdpkgs.verilator
         stdpkgs.gtkwave
         stdpkgs.bison
         stdpkgs.dtc

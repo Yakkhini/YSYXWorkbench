@@ -33,24 +33,7 @@
       "inputs": {
         "pkgs": "pkgs",
         "pkgsunstable": "pkgsunstable",
-        "verilator5008pkgs": "verilator5008pkgs",
         "yamlcpp06pkgs": "yamlcpp06pkgs"
-      }
-    },
-    "verilator5008pkgs": {
-      "locked": {
-        "lastModified": 1682674845,
-        "narHash": "sha256-HjMXEKQFWEt5P6tJ3fHnx2/rvapVQr40yNHvpGVs/xM=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "5e871533c4a488319b9cb98d7a525c356459d36c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "5e871533c4a488319b9cb98d7a525c356459d36c",
-        "type": "github"
       }
     },
     "yamlcpp06pkgs": {
