@@ -16,12 +16,16 @@ static VerilatedContext *contextp;
 
 void finish();
 void halt(int code) {
-  if (code) {
-    npc_state = SRIZ_ABORT;
-    return;
+  if (npc_state == SRIZ_RUNNING || npc_state == SRIZ_PAUSE) {
+    switch (code) {
+    case 0:
+      npc_state = SRIZ_HALT;
+      break;
+    default:
+      npc_state = SRIZ_ABORT;
+      break;
+    }
   }
-
-  npc_state = SRIZ_HALT;
 }
 
 int return_status() {
