@@ -29,15 +29,15 @@ module LookUPTable (
 
   // Micro command format: Regen[1], Pcjen[1], Pcren[1], Mwen[2], Mren[2], imm_type[3]
   // localparam bit [9:0]  LUIPattern = 9'b0000110111;
-  localparam bit [PATTERN_LEN-1:0] AUIPCPattern = {3'b000, 5'b00101};
+  localparam bit [PATTERN_LEN-1:0] AUIPCPattern = {3'b111, 5'b00101};
   localparam bit [MICRO_LEN-1:0] AUIPCMicro = {
     REGEN_TRUE, PCJEN_FALSE, PCREN_TRUE, MWEN_NONE, MREN_NONE, IMM_TYPE_U
   };
-  localparam bit [PATTERN_LEN-1:0] JALPattern = {3'b000, 5'b11011};
+  localparam bit [PATTERN_LEN-1:0] JALPattern = {3'b111, 5'b11011};
   localparam bit [MICRO_LEN-1:0] JALMicro = {
     REGEN_TRUE, PCJEN_TRUE, PCREN_TRUE, MWEN_NONE, MREN_NONE, IMM_TYPE_UJ
   };
-  localparam bit [PATTERN_LEN-1:0] JALRPattern = {3'b000, 5'b11001};
+  localparam bit [PATTERN_LEN-1:0] JALRPattern = {3'b111, 5'b11001};
   localparam bit [MICRO_LEN-1:0] JALRMicro = {
     REGEN_TRUE, PCJEN_TRUE, PCREN_FALSE, MWEN_NONE, MREN_NONE, IMM_TYPE_I
   };
@@ -87,22 +87,25 @@ module LookUPTable (
   assign pattern_list[8] = EBREAKPattern;
   assign micro_list[8]   = EBREAKMicro;
 
+  import "DPI-C" function void halt(int code);
+
   reg hit;
   reg [2:0] func3;
   reg [PATTERN_LEN-1:0] lut_inst;
   always_comb begin : lookup_micro
-    micro_cmd = 'b0000000;
+    micro_cmd = 0;
     hit = 0;
     for (integer i = 0; i < INST_NR; i = i + 1) begin
-      func3 = {3{pattern_list[i][7] | pattern_list[i][6] | pattern_list[i][5]}};
-      lut_inst = {inst[7:5] & func3, inst[4:0]};
+      func3 = {3{pattern_list[i][0]}};
+      lut_inst = {inst[7:5] | func3, inst[4:0]};
       micro_cmd = micro_cmd | ({MICRO_LEN{lut_inst == pattern_list[i]}} & micro_list[i]);
       hit = hit | (lut_inst == pattern_list[i]);
     end
     if (!hit) begin
       $display("Error: No micro command found for inst: %b", inst);
+      micro_cmd = {REGEN_FALSE, PCJEN_FALSE, PCREN_FALSE, MWEN_WORD, MREN_NONE, IMM_TYPE_NONE};
+      halt(1);
     end
-    // $display("inst: %b, micro_cmd: %b, hit: %b", inst, micro_cmd, hit);
   end
 
 endmodule
