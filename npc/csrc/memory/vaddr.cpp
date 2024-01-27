@@ -119,3 +119,5 @@ void mtrace() {
 
   mtrace_record.trace_on = false;
 }
+
+void mtrace_reset() { mtrace_record.trace_on = false; }

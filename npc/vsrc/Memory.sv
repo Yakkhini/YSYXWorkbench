@@ -1,5 +1,6 @@
 module Memory (
     input rst,
+    input clk,
     input [1:0] Mwen,
     input [1:0] Mren,
     input [31:0] waddr,
@@ -18,13 +19,20 @@ module Memory (
     int data
   );
 
+  import "DPI-C" function void mtrace_reset();
+
+  always @(posedge clk) begin
+    if ((Mwen[1] | Mwen[0]) & !rst) begin
+      vaddr_write(waddr, Mwen, wdata);
+    end
+  end
+
   always_comb begin
     rdata = 0;
     if ((Mren[1] | Mren[0]) & !rst) begin
       rdata = vaddr_read(raddr, Mren);
-    end
-    if ((Mwen[1] | Mwen[0]) & !rst) begin
-      vaddr_write(waddr, Mwen, wdata);
+    end else begin
+      mtrace_reset();
     end
   end
 

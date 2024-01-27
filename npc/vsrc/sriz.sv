@@ -92,6 +92,7 @@ module sriz (
 
   Memory mem (
       .rst  (rst),
+      .clk  (clk),
       .Mwen (Mwen),
       .Mren (Mren),
       .waddr(rdata1 + imm),
