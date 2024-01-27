@@ -22,6 +22,7 @@ module sriz (
   reg [31:0] inst;
 
   ysyx_23060042_IFU IFU (
+      .rst (rst),
       .clk (clk),
       .pc  (pc),
       .inst(inst)
@@ -90,6 +91,7 @@ module sriz (
   );
 
   Memory mem (
+      .rst  (rst),
       .Mwen (Mwen),
       .Mren (Mren),
       .waddr(rdata1 + imm),

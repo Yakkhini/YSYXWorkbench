@@ -1,4 +1,5 @@
 module Memory (
+    input rst,
     input [1:0] Mwen,
     input [1:0] Mren,
     input [31:0] waddr,
@@ -19,10 +20,10 @@ module Memory (
 
   always_comb begin
     rdata = 0;
-    if (Mren[1] | Mren[0]) begin
+    if ((Mren[1] | Mren[0]) & !rst) begin
       rdata = vaddr_read(raddr, Mren);
     end
-    if (Mwen[1] | Mwen[0]) begin
+    if ((Mwen[1] | Mwen[0]) & !rst) begin
       vaddr_write(waddr, Mwen, wdata);
     end
   end
