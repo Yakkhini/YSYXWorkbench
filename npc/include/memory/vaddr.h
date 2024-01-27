@@ -4,5 +4,6 @@
 #include <common.h>
 
 word_t vaddr_ifetch(vaddr_t addr);
+void mtrace();
 
 #endif

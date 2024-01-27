@@ -53,6 +53,7 @@ void single_clock() {
   cpu_sync();
   disassembler();
   ftrace_check();
+  mtrace();
   difftest_step(cpu.pc_prev, cpu.pc);
   check_wp();
   finish();
@@ -137,12 +138,7 @@ void cpu_sync() {
   cpu.inst = cpu.top->sriz->inst;
 }
 
-int inst_fetch(int pc) {
-  uint32_t inst = vaddr_ifetch(pc);
-  cpu.inst = inst;
-
-  return inst;
-}
+int inst_fetch(int pc) { return vaddr_ifetch(pc); }
 
 void finish() {
   switch (npc_state) {
