@@ -99,8 +99,6 @@ static bool make_token(char *e) {
 
   nr_token = 0;
 
-  Log("Matching expression \"%s\"...", e);
-
   while (e[position] != '\0') {
     /* Try all rules one by one. */
     for (i = 0; i < NR_REGEX; i++) {
