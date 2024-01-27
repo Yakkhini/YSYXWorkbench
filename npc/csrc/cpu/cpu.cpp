@@ -50,10 +50,6 @@ void single_clock() {
   cpu.top->eval();
   tfp->dump(contextp->time());
 
-  if (cpu.top->rst == 1) {
-    cpu.top->rst = 0;
-  }
-
   cpu_sync();
   ftrace_check();
   difftest_step(cpu.pc_prev, cpu.pc);
@@ -66,6 +62,13 @@ void reset() {
   contextp->timeInc(1);
   cpu.top->eval();
   tfp->dump(contextp->time());
+  contextp->timeInc(1);
+  cpu.top->clk = 1;
+  cpu.top->eval();
+  tfp->dump(contextp->time());
+
+  cpu.top->rst = 0;
+  Log("SRIZ reset done.");
 }
 
 void cpu_init(int argc, char **argv) {
