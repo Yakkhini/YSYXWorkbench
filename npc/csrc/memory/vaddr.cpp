@@ -5,12 +5,24 @@
 word_t vaddr_ifetch(vaddr_t addr) { return paddr_read(addr, 4); }
 
 int vaddr_read(int addr, const svBitVecVal *len) {
-  if (len[0] == 1 && len[1] == 0) {
-    return paddr_read(addr, 1);
-  } else if (len[0] == 0 && len[1] == 1) {
-    return paddr_read(addr, 2);
-  } else {
-    return paddr_read(addr, 4);
+
+  switch (*len) {
+    int ret;
+  case 1:
+    ret = paddr_read(addr, 1);
+    Log("MTRACE: addr 0x%08x read byte 0x%08x", addr, ret);
+    return ret;
+  case 2:
+    ret = paddr_read(addr, 2);
+    Log("MTARCE: addr 0x%08x read half word 0x%08x", addr, ret);
+    return ret;
+  case 3:
+    ret = paddr_read(addr, 4);
+    Log("MTRACE: addr 0x%08x read word 0x%08x", addr, ret);
+    return ret;
+  default:
+    Log("Invalid memory access type");
+    return 0;
   }
 }
 
