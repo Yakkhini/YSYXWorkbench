@@ -19,7 +19,7 @@ module sriz (
       .Pcjen(Pcjen)
   );
 
-  reg [31:0] inst;
+  reg [31:0] inst  /*verilator public*/;
 
   ysyx_23060042_IFU IFU (
       .rst (rst),

@@ -7,14 +7,15 @@ static csh hadler;
 
 void disasm_init() { cs_open(CS_ARCH_RISCV, CS_MODE_RISCV32, &hadler); }
 
-void disassembler(word_t code) {
+void disassembler() {
   cs_insn *insn;
-  int count = cs_disasm(hadler, (uint8_t *)&code, sizeof(word_t), 0, 1, &insn);
+  int count =
+      cs_disasm(hadler, (uint8_t *)&cpu.inst, sizeof(word_t), 0, 1, &insn);
 
-  uint8_t byte1 = (code >> 24) & 0xFF;
-  uint8_t byte2 = (code >> 16) & 0xFF;
-  uint8_t byte3 = (code >> 8) & 0xFF;
-  uint8_t byte4 = code & 0xFF;
+  uint8_t byte1 = (cpu.inst >> 24) & 0xFF;
+  uint8_t byte2 = (cpu.inst >> 16) & 0xFF;
+  uint8_t byte3 = (cpu.inst >> 8) & 0xFF;
+  uint8_t byte4 = cpu.inst & 0xFF;
 
   if (count) {
     printf("[0x%08X]: %02x %02x %02x %02x %s\t%s\n", cpu.pc, byte1, byte2,

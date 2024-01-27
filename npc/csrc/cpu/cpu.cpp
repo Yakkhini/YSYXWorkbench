@@ -51,6 +51,7 @@ void single_clock() {
   tfp->dump(contextp->time());
 
   cpu_sync();
+  disassembler();
   ftrace_check();
   difftest_step(cpu.pc_prev, cpu.pc);
   check_wp();
@@ -133,13 +134,12 @@ void cpu_sync() {
   }
   cpu.pc_prev = cpu.pc;
   cpu.pc = cpu.top->sriz->pc_reg->pcin;
+  cpu.inst = cpu.top->sriz->inst;
 }
 
 int inst_fetch(int pc) {
   uint32_t inst = vaddr_ifetch(pc);
   cpu.inst = inst;
-
-  disassembler(inst);
 
   return inst;
 }
