@@ -5,7 +5,6 @@ module sriz (
     input rst
 );
   bit [31:0] pc;
-  bit [31:0] pc_next;
 
   bit Pcjen;
   bit Jalen;
@@ -23,7 +22,6 @@ module sriz (
 
   ysyx_23060042_IFU IFU (
       .rst (rst),
-      .clk (clk),
       .pc  (pc),
       .inst(inst)
   );

@@ -102,7 +102,7 @@ module LookUPTable (
       hit = hit | (lut_inst == pattern_list[i]);
     end
     if (!hit) begin
-      $display("Error: No micro command found for inst: %b", inst);
+      // $display("Error: No micro command found for inst: %b", inst);
       micro_cmd = {REGEN_FALSE, PCJEN_FALSE, PCREN_FALSE, MWEN_WORD, MREN_NONE, IMM_TYPE_NONE};
       halt(1);
     end

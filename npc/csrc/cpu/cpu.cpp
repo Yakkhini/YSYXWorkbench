@@ -40,6 +40,7 @@ int return_status() {
 }
 
 void cpu_sync();
+void cpu_check();
 void single_clock() {
   contextp->timeInc(1);
   cpu.top->clk = 1;
@@ -51,25 +52,32 @@ void single_clock() {
   tfp->dump(contextp->time());
 
   cpu_sync();
-  disassembler();
-  ftrace_check();
-  mtrace();
-  difftest_step(cpu.pc_prev, cpu.pc);
-  check_wp();
-  finish();
+  cpu_check();
 }
 
 void reset() {
-  cpu.top->rst = 1;
   contextp->timeInc(1);
+  cpu.top->rst = 1;
+  cpu.top->clk = 1;
+  cpu.top->eval();
+  tfp->dump(contextp->time());
+  contextp->timeInc(1);
+  cpu.top->clk = 0;
   cpu.top->eval();
   tfp->dump(contextp->time());
   contextp->timeInc(1);
   cpu.top->clk = 1;
   cpu.top->eval();
   tfp->dump(contextp->time());
-
+  contextp->timeInc(1);
   cpu.top->rst = 0;
+  cpu.top->clk = 0;
+  cpu.top->eval();
+  tfp->dump(contextp->time());
+
+  cpu_sync();
+  cpu_check();
+
   Log("SRIZ reset done.");
 }
 
@@ -92,12 +100,14 @@ void cpu_init(int argc, char **argv) {
   cpu.top->trace(tfp, 5);
 
   tfp->open(wavefile_name);
-
-  reset();
 }
 
 void cpu_exec(int n) {
   switch (npc_state) {
+  case SRIZ_INIT:
+    reset();
+    npc_state = SRIZ_RUNNING;
+    return;
   case SRIZ_HALT:
     Log("Program already finished!");
     return;
@@ -136,6 +146,15 @@ void cpu_sync() {
   cpu.pc_prev = cpu.pc;
   cpu.pc = cpu.top->sriz->pc_reg->pcin;
   cpu.inst = cpu.top->sriz->inst;
+}
+
+void cpu_check() {
+  disassembler();
+  ftrace_check();
+  mtrace();
+  difftest_step(cpu.pc_prev, cpu.pc);
+  check_wp();
+  finish();
 }
 
 int inst_fetch(int pc) { return vaddr_ifetch(pc); }
