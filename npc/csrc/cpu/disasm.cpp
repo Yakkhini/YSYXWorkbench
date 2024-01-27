@@ -18,7 +18,7 @@ void disassembler() {
   uint8_t byte4 = cpu.inst & 0xFF;
 
   if (count) {
-    printf("[0x%08X]: %02x %02x %02x %02x %s\t%s\n", cpu.pc, byte1, byte2,
+    printf("[0x%08X]: %02x %02x %02x %02x %s\t%s\n", cpu.pc_prev, byte1, byte2,
            byte3, byte4, insn->mnemonic, insn->op_str);
     free(insn);
   }
