@@ -38,13 +38,13 @@ module ysyx_23060042_EXU (
       .default_out(1'b0),
       .lut({
         3'b000,
-        rdata1 == rdata2,
+        (rdata1 == rdata2) & BrchOP,
         3'b001,
-        rdata1 != rdata2,
+        (rdata1 != rdata2) & BrchOP,
         3'b010,
-        rdata1 < rdata2,
+        (rdata1 < rdata2) & BrchOP,
         3'b011,
-        rdata1 >= rdata2
+        (rdata1 >= rdata2) & BrchOP
       })
   );
 

@@ -8,14 +8,15 @@ module Pc #(
     output reg [WIDTH-1:0] dout,
     input wen,
     input Pcjen,
-    input Brken
+    input BrchOP,
+    input Brchen
 );
 
   wire [31:0] pcin  /*verilator public*/;
 
   MuxKeyWithDefault #(2, 1, 32) pcin_mux (
       .out(pcin),
-      .key(Pcjen | Brken),
+      .key((Pcjen & !BrchOP) | Brchen),
       .default_out(32'h00000000),
       .lut({1'b0, dout + 4, 1'b1, din})
   );

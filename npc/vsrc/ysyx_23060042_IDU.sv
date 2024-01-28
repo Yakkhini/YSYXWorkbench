@@ -75,7 +75,7 @@ module ysyx_23060042_IDU (
       })
   );
 
-  MuxKeyWithDefault #(1, 3, 1) Brchen_mux (
+  MuxKeyWithDefault #(1, 3, 1) BrchOP_mux (
       .out(BrchOP),
       .key(micro_cmd[2:0]),  // Only B type instruction has branch condition
       .default_out(1'b0),

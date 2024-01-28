@@ -10,13 +10,14 @@ module sriz (
   bit Jalen;
   bit [31:0] wdata;
   Pc #(32, 32'h80000000) pc_reg (
-      .clk  (clk),
-      .rst  (rst),
-      .din  (wdata),
-      .dout (pc),
-      .wen  (1'b1),
+      .clk(clk),
+      .rst(rst),
+      .din(wdata),
+      .dout(pc),
+      .wen(1'b1),
       .Pcjen(Pcjen),
-      .Brken(Brken)
+      .BrchOP(BrchOP),
+      .Brchen(Brchen)
   );
 
   reg [31:0] inst  /*verilator public*/;
