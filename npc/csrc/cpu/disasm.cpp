@@ -1,3 +1,4 @@
+#include "Vsriz__Dpi.h"
 #include <capstone/capstone.h>
 #include <common.h>
 #include <cpu/cpu.h>
@@ -21,6 +22,10 @@ void disassembler() {
     printf("[0x%08X]: %02x %02x %02x %02x %s\t%s\n", cpu.pc_prev, byte1, byte2,
            byte3, byte4, insn->mnemonic, insn->op_str);
     free(insn);
+  } else {
+    Log("pc at 0x%08X: " ANSI_FMT("INST INVALID ERROR", ANSI_FG_RED),
+        cpu.pc_prev);
+    halt(1);
   }
 }
 
