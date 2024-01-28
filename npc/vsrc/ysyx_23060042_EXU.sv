@@ -9,15 +9,17 @@ module ysyx_23060042_EXU (
     input [31:0] imm,
     input Pcren,
     input Brken,
+    input BrchOP,
     input [1:0] Mren,
-    input [31:0] a0
+    input [31:0] a0,
+    output Brchen
 );
 
-  bit [31:0] src1;
+  bit [31:0] data1;
   bit [31:0] alu_result;
 
-  MuxKeyWithDefault #(2, 1, 32) src1_mux (
-      .out(src1),
+  MuxKeyWithDefault #(2, 1, 32) data1_mux (
+      .out(data1),
       .key(Pcren),
       .default_out(32'h00000000),
       .lut({1'b0, rdata1, 1'b1, pc})
@@ -25,16 +27,32 @@ module ysyx_23060042_EXU (
 
   ysyx_23060042_ALU ALU (
       .AluOp(AluOp),
-      .data1(src1),
+      .data1(data1),
       .data2(imm),
       .out  (alu_result)
   );
 
-  MuxKeyWithDefault #(2, 1, 32) wdata_mux (
+  MuxKeyWithDefault #(4, 3, 1) brch_mux (
+      .out(Brchen),
+      .key(AluOp),
+      .default_out(1'b0),
+      .lut({
+        3'b000,
+        rdata1 == rdata2,
+        3'b001,
+        rdata1 != rdata2,
+        3'b010,
+        rdata1 < rdata2,
+        3'b011,
+        rdata1 >= rdata2
+      })
+  );
+
+  MuxKeyWithDefault #(3, 2, 32) wdata_mux (
       .out(wdata),
-      .key(Mren[1] | Mren[0]),
+      .key({Mren[1] | Mren[0], BrchOP}),
       .default_out(32'h00000000),
-      .lut({1'b0, alu_result, 1'b1, mrdata})
+      .lut({2'b00, alu_result, 2'b10, mrdata, 2'b01, pc + imm})
   );
 
 

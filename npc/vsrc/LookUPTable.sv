@@ -4,7 +4,7 @@ module LookUPTable (
 );
   parameter int unsigned PATTERN_LEN = 15;
   parameter int unsigned MICRO_LEN = 13;
-  parameter int unsigned INST_NR = 15;
+  parameter int unsigned INST_NR = 16;
 
   parameter bit REGEN_TRUE = 1'b1;
   parameter bit REGEN_FALSE = 1'b0;
@@ -35,7 +35,7 @@ module LookUPTable (
   parameter bit [2:0] IMM_TYPE_U = 3'b110;
   parameter bit [2:0] IMM_TYPE_UJ = 3'b111;
 
-  // Micro command format: [12]REGEN [11]PCJEN [10]PCREN [9:8]MWEN [7:6]MREN [5:3]ALUOP [2:0]IMM_TYPE
+  // Micro command format: [12]REGEN [11]PCJEN [10]PCREN [9:8]MWEN [7:6]MREN [5:3]ALUOP(BRCHCONDI) [2:0]IMM_TYPE
   localparam bit [PATTERN_LEN-1:0] LUIPattern = {7'b0000000, 3'b000, 5'b01101};
   localparam bit [MICRO_LEN-1:0] LUIMicro = {
     REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_ADD_BEQ, IMM_TYPE_U
@@ -51,6 +51,10 @@ module LookUPTable (
   localparam bit [PATTERN_LEN-1:0] JALRPattern = {7'b0000000, 3'b000, 5'b11001};
   localparam bit [MICRO_LEN-1:0] JALRMicro = {
     REGEN_TRUE, PCJEN_TRUE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_ADD_BEQ, IMM_TYPE_I
+  };
+  localparam bit [PATTERN_LEN-1:0] BEQPattern = {7'b0000000, 3'b000, 5'b11000};
+  localparam bit [MICRO_LEN-1:0] BEQMicro = {
+    REGEN_FALSE, PCJEN_TRUE, PCREN_TRUE, MWEN_NONE, MREN_NONE, ALUOP_ADD_BEQ, IMM_TYPE_SB
   };
   localparam bit [PATTERN_LEN-1:0] LBPattern = {7'b0000000, 3'b000, 5'b00000};
   localparam bit [MICRO_LEN-1:0] LBMicro = {
@@ -101,36 +105,37 @@ module LookUPTable (
   bit [  MICRO_LEN-1:0] micro_list  [INST_NR];
   initial begin
     pattern_list[0] = LUIPattern;
-    pattern_list[1] = AUIPCPattern;
-    pattern_list[2] = JALPattern;
-    pattern_list[3] = JALRPattern;
-    pattern_list[4] = LBPattern;
-    pattern_list[5] = LHPattern;
-    pattern_list[6] = LWPattern;
-    pattern_list[7] = SBPattern;
-    pattern_list[8] = SHPattern;
-    pattern_list[9] = SWPattern;
-    pattern_list[10] = ADDIPattern;
-    pattern_list[11] = SLTIPattern;
-    pattern_list[12] = SLTIUPattern;
-    pattern_list[13] = SUBPattern;
-    pattern_list[14] = EBREAKPattern;
-
     micro_list[0] = LUIMicro;
+    pattern_list[1] = AUIPCPattern;
     micro_list[1] = AUIPCMicro;
+    pattern_list[2] = JALPattern;
     micro_list[2] = JALMicro;
+    pattern_list[3] = JALRPattern;
     micro_list[3] = JALRMicro;
-    micro_list[4] = LBMicro;
-    micro_list[5] = LHMicro;
-    micro_list[6] = LWMicro;
-    micro_list[7] = SBMicro;
-    micro_list[8] = SHMicro;
-    micro_list[9] = SWMicro;
-    micro_list[10] = ADDIMicro;
-    micro_list[11] = SLTIMicro;
-    micro_list[12] = SLTIUMicro;
-    micro_list[13] = SUBMicro;
-    micro_list[14] = EBREAKMicro;
+    pattern_list[4] = BEQPattern;
+    micro_list[4] = BEQMicro;
+    pattern_list[5] = LBPattern;
+    micro_list[5] = LBMicro;
+    pattern_list[6] = LHPattern;
+    micro_list[6] = LHMicro;
+    pattern_list[7] = LWPattern;
+    micro_list[7] = LWMicro;
+    pattern_list[8] = SBPattern;
+    micro_list[8] = SBMicro;
+    pattern_list[9] = SHPattern;
+    micro_list[9] = SHMicro;
+    pattern_list[10] = SWPattern;
+    micro_list[10] = SWMicro;
+    pattern_list[11] = ADDIPattern;
+    micro_list[11] = ADDIMicro;
+    pattern_list[12] = SLTIPattern;
+    micro_list[12] = SLTIMicro;
+    pattern_list[13] = SLTIUPattern;
+    micro_list[13] = SLTIUMicro;
+    pattern_list[14] = SUBPattern;
+    micro_list[14] = SUBMicro;
+    pattern_list[15] = EBREAKPattern;
+    micro_list[15] = EBREAKMicro;
   end
 
   import "DPI-C" function void halt(int code);
@@ -148,9 +153,9 @@ module LookUPTable (
       lut_inst = {inst[14:8] & func7, inst[7:5] & func3, inst[4:0]};
       micro_cmd = micro_cmd | ({MICRO_LEN{lut_inst == pattern_list[i]}} & micro_list[i]);
       hit = hit | (lut_inst == pattern_list[i]);
-
-      // $display("lut_inst: %b, pattern_list[%0d]: %b, micro_list[%0d]: %b", lut_inst, i,
-      //          pattern_list[i], i, micro_list[i]);
+    end
+    if (hit) begin
+      $display("Micro command hit: %b, inst: %b, micro_cmd: %b", hit, inst, micro_cmd);
     end
   end
 

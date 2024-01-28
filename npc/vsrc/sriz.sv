@@ -15,7 +15,8 @@ module sriz (
       .din  (wdata),
       .dout (pc),
       .wen  (1'b1),
-      .Pcjen(Pcjen)
+      .Pcjen(Pcjen),
+      .Brken(Brken)
   );
 
   reg [31:0] inst  /*verilator public*/;
@@ -33,6 +34,8 @@ module sriz (
   bit [1:0] Mwen;
   bit [1:0] Mren;
   bit [2:0] AluOp;
+  bit BrchOP;
+  bit Brchen;
   bit Brken;
   bit [31:0] imm;
   bit [31:0] a0;
@@ -52,6 +55,7 @@ module sriz (
       .Mwen(Mwen),
       .Mren(Mren),
       .AluOp(AluOp),
+      .BrchOP(BrchOP),
       .Jalen(Jalen),
       .Brken(Brken)
   );
@@ -80,6 +84,8 @@ module sriz (
       .rst(rst),
       .AluOp(AluOp),
       .Brken(Brken),
+      .Brchen(Brchen),
+      .BrchOP(BrchOP),
       .a0(a0),
       .imm(imm),
       .Pcren(Pcren),

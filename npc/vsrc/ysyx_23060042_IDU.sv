@@ -13,6 +13,7 @@ module ysyx_23060042_IDU (
     output [1:0] Mwen,
     output [1:0] Mren,
     output [2:0] AluOp,
+    output BrchOP,
     output Jalen,
     output Brken
 );
@@ -72,6 +73,13 @@ module ysyx_23060042_IDU (
         3'b111,
         j_imm
       })
+  );
+
+  MuxKeyWithDefault #(1, 3, 1) Brchen_mux (
+      .out(BrchOP),
+      .key(micro_cmd[2:0]),  // Only B type instruction has branch condition
+      .default_out(1'b0),
+      .lut({3'b011, 1'b1})
   );
 
 endmodule
