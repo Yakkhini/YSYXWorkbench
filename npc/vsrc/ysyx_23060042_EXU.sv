@@ -8,6 +8,7 @@ module ysyx_23060042_EXU (
     output [31:0] wdata,
     input [31:0] imm,
     input Pcren,
+    input IMMen,
     input Brken,
     input BrchOP,
     input [1:0] Mren,
@@ -16,6 +17,7 @@ module ysyx_23060042_EXU (
 );
 
   bit [31:0] data1;
+  bit [31:0] data2;
   bit [31:0] alu_result;
 
   MuxKeyWithDefault #(2, 1, 32) data1_mux (
@@ -25,10 +27,16 @@ module ysyx_23060042_EXU (
       .lut({1'b0, rdata1, 1'b1, pc})
   );
 
+  MuxKey #(2, 1, 32) data2_mux (
+      .out(data2),
+      .key({IMMen}),
+      .lut({1'b0, rdata2, 1'b1, imm})
+  );
+
   ysyx_23060042_ALU ALU (
       .AluOp(AluOp),
       .data1(data1),
-      .data2(imm),
+      .data2(data2),
       .out  (alu_result)
   );
 
