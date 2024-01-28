@@ -150,6 +150,10 @@ void cpu_sync() {
 
 void cpu_check() {
   disassembler();
+  if (cpu.top->sriz->IDU->lut->hit == 0) {
+    Log("ERROR INST NOT SUPPORT: LUT HIT FAILED at pc = 0x%08X", cpu.pc_prev);
+    npc_state = SRIZ_ABORT;
+  }
   ftrace_check();
   mtrace();
   difftest_step(cpu.pc_prev, cpu.pc);

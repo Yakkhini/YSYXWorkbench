@@ -32,6 +32,7 @@ module sriz (
   bit Regen;
   bit [1:0] Mwen;
   bit [1:0] Mren;
+  bit [2:0] AluOp;
   bit Brken;
   bit [31:0] imm;
   bit [31:0] a0;
@@ -47,9 +48,10 @@ module sriz (
       .rd(rd),
       .Regen(Regen),
       .Pcjen(Pcjen),
-      .Mwen(Mwen),
       .Pcren(Pcren),
+      .Mwen(Mwen),
       .Mren(Mren),
+      .AluOp(AluOp),
       .Jalen(Jalen),
       .Brken(Brken)
   );
