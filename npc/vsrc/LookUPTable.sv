@@ -4,7 +4,7 @@ module LookUPTable (
 );
   parameter int unsigned PATTERN_LEN = 15;
   parameter int unsigned MICRO_LEN = 13;
-  parameter int unsigned INST_NR = 16;
+  parameter int unsigned INST_NR = 17;
 
   parameter bit REGEN_TRUE = 1'b1;
   parameter bit REGEN_FALSE = 1'b0;
@@ -55,6 +55,10 @@ module LookUPTable (
   localparam bit [PATTERN_LEN-1:0] BEQPattern = {7'b0000000, 3'b000, 5'b11000};
   localparam bit [MICRO_LEN-1:0] BEQMicro = {
     REGEN_FALSE, PCJEN_TRUE, PCREN_TRUE, MWEN_NONE, MREN_NONE, ALUOP_ADD_BEQ, IMM_TYPE_SB
+  };
+  localparam bit [PATTERN_LEN-1:0] BNEPattern = {7'b0000000, 3'b001, 5'b11000};
+  localparam bit [MICRO_LEN-1:0] BNEMicro = {
+    REGEN_FALSE, PCJEN_TRUE, PCREN_TRUE, MWEN_NONE, MREN_NONE, ALUOP_SUB_BNE, IMM_TYPE_SB
   };
   localparam bit [PATTERN_LEN-1:0] LBPattern = {7'b0000000, 3'b000, 5'b00000};
   localparam bit [MICRO_LEN-1:0] LBMicro = {
@@ -114,28 +118,30 @@ module LookUPTable (
     micro_list[3] = JALRMicro;
     pattern_list[4] = BEQPattern;
     micro_list[4] = BEQMicro;
-    pattern_list[5] = LBPattern;
-    micro_list[5] = LBMicro;
-    pattern_list[6] = LHPattern;
-    micro_list[6] = LHMicro;
-    pattern_list[7] = LWPattern;
-    micro_list[7] = LWMicro;
-    pattern_list[8] = SBPattern;
-    micro_list[8] = SBMicro;
-    pattern_list[9] = SHPattern;
-    micro_list[9] = SHMicro;
-    pattern_list[10] = SWPattern;
-    micro_list[10] = SWMicro;
-    pattern_list[11] = ADDIPattern;
-    micro_list[11] = ADDIMicro;
-    pattern_list[12] = SLTIPattern;
-    micro_list[12] = SLTIMicro;
-    pattern_list[13] = SLTIUPattern;
-    micro_list[13] = SLTIUMicro;
-    pattern_list[14] = SUBPattern;
-    micro_list[14] = SUBMicro;
-    pattern_list[15] = EBREAKPattern;
-    micro_list[15] = EBREAKMicro;
+    pattern_list[5] = BNEPattern;
+    micro_list[5] = BNEMicro;
+    pattern_list[6] = LBPattern;
+    micro_list[6] = LBMicro;
+    pattern_list[7] = LHPattern;
+    micro_list[7] = LHMicro;
+    pattern_list[8] = LWPattern;
+    micro_list[8] = LWMicro;
+    pattern_list[9] = SBPattern;
+    micro_list[9] = SBMicro;
+    pattern_list[10] = SHPattern;
+    micro_list[10] = SHMicro;
+    pattern_list[11] = SWPattern;
+    micro_list[11] = SWMicro;
+    pattern_list[12] = ADDIPattern;
+    micro_list[12] = ADDIMicro;
+    pattern_list[13] = SLTIPattern;
+    micro_list[13] = SLTIMicro;
+    pattern_list[14] = SLTIUPattern;
+    micro_list[14] = SLTIUMicro;
+    pattern_list[15] = SUBPattern;
+    micro_list[15] = SUBMicro;
+    pattern_list[16] = EBREAKPattern;
+    micro_list[16] = EBREAKMicro;
   end
 
   import "DPI-C" function void halt(int code);
