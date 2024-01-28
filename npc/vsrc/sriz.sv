@@ -37,6 +37,7 @@ module sriz (
   bit [2:0] AluOp;
   bit BrchOP;
   bit Brchen;
+  bit Unsignen;
   bit IMMen;
   bit Brken;
   bit [31:0] imm;
@@ -57,6 +58,7 @@ module sriz (
       .Mwen(Mwen),
       .Mren(Mren),
       .AluOp(AluOp),
+      .Unsignen(Unsignen),
       .BrchOP(BrchOP),
       .Jalen(Jalen),
       .IMMen(IMMen),
@@ -102,14 +104,15 @@ module sriz (
   );
 
   Memory mem (
-      .rst  (rst),
-      .clk  (clk),
-      .Mwen (Mwen),
-      .Mren (Mren),
+      .rst(rst),
+      .clk(clk),
+      .Mwen(Mwen),
+      .Mren(Mren),
+      .Unsignen(Unsignen),
       .waddr(rdata1 + imm),
       .raddr(rdata1 + imm),
       .wdata(rdata2),
-      .rdata(mrdata)
+      .mrdata(mrdata)
   );
 
 endmodule

@@ -3,10 +3,11 @@ module Memory (
     input clk,
     input [1:0] Mwen,
     input [1:0] Mren,
+    input Unsignen,
     input [31:0] waddr,
     input [31:0] raddr,
     input [31:0] wdata,
-    output bit [31:0] rdata
+    output bit [31:0] mrdata
 );
 
   import "DPI-C" function int vaddr_read(
@@ -27,13 +28,29 @@ module Memory (
     end
   end
 
+  bit [31:0] rdata_unsign;
   always_comb begin
-    rdata = 0;
+    rdata_unsign = 0;
     if ((Mren[1] | Mren[0]) & !rst) begin
-      rdata = vaddr_read(raddr, Mren);
+      rdata_unsign = vaddr_read(raddr, Mren);
     end else begin
       mtrace_reset();
     end
   end
+
+  MuxKey #(4, 2, 32) mdata_mux (
+      .out(mrdata),
+      .key(Mren),
+      .lut({
+        2'b00,
+        rdata_unsign,
+        2'b01,
+        {{24{rdata_unsign[7] & !Unsignen & !rst}}, rdata_unsign[7:0]},
+        2'b10,
+        {{16{rdata_unsign[15] & !Unsignen & !rst}}, rdata_unsign[15:0]},
+        2'b11,
+        rdata_unsign
+      })
+  );
 
 endmodule

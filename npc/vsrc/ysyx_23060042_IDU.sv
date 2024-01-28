@@ -13,6 +13,7 @@ module ysyx_23060042_IDU (
     output [1:0] Mwen,
     output [1:0] Mren,
     output [2:0] AluOp,
+    output Unsignen,
     output IMMen,
     output BrchOP,
     output Jalen,
@@ -37,21 +38,22 @@ module ysyx_23060042_IDU (
   assign rs2 = inst[24:20];
   assign rd = inst[11:7];
 
-  // Micro command format: [12]REGEN [11]PCJEN [10]PCREN [9:8]MWEN [7:6]MREN [5:3]ALUOP [2:0]IMM_TYPE
+  // Micro command format: [13]REGEN [12]PCJEN [11]PCREN [10:9]MWEN [8:7]MREN [6:4]ALUOP [3]UNSIGN [2:0]IMM_TYPE
   // IMM Type: 000 for R, 001 for I, 010 for S, 011 for SB, 110 for U, 111 for UJ
-  parameter int unsigned MICRO_LEN = 13;
+  parameter int unsigned MICRO_LEN = 14;
   wire [MICRO_LEN-1:0] micro_cmd;
   LookUPTable lut (
       .inst({inst[31:25], inst[14:12], inst[6:2]}),
       .micro_cmd(micro_cmd)
   );
 
-  assign Regen = micro_cmd[12];
-  assign Pcjen = micro_cmd[11];
-  assign Pcren = micro_cmd[10];
-  assign Mwen  = micro_cmd[9:8];
-  assign Mren  = micro_cmd[7:6];
-  assign AluOp = micro_cmd[5:3];
+  assign Regen = micro_cmd[13];
+  assign Pcjen = micro_cmd[12];
+  assign Pcren = micro_cmd[11];
+  assign Mwen = micro_cmd[10:9];
+  assign Mren = micro_cmd[8:7];
+  assign AluOp = micro_cmd[6:4];
+  assign Unsignen = micro_cmd[3];
   assign Jalen = Regen & Pcjen;
   assign Brken = !(Regen | Pcjen | Mwen[1] | Mwen[0]);
 
