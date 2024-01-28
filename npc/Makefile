@@ -56,7 +56,11 @@ embed: buildembed
 buildembed: $(EMBEDSRC)
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) $(EMBEDSRC)
 
-compile: build/bin $(CSRC) $(VSRC)
+vsrc/verible.filelist: $(VSRC)
+	@echo "Generating verible.filelist..."
+	@find $(VSRC_DIR) -name '*.sv' >! $(VSRC_DIR)/verible.filelist
+
+compile: build/bin vsrc/verible.filelist $(CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "New Processor Core Sim RTL."
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) --top-module $(NPC_NAME) \
@@ -81,6 +85,7 @@ fmt: $(CSRC) $(VSRC)
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(YOSYS_STA_HOME)/result
+	rm -rf $(VSRC_DIR)/verible.filelist
 
 .PHONY: compile sim wave fmt clean embed njudlco ysyxpre
 
