@@ -57,8 +57,9 @@ buildembed: $(EMBEDSRC)
 	$(VERILATOR) --cc --Mdir $(BUILD_DIR) $(EMBEDSRC)
 
 vsrc/verible.filelist: $(VSRC)
-	@echo "Generating verible.filelist..."
-	@find $(VSRC_DIR) -name '*.sv' >! $(VSRC_DIR)/verible.filelist
+	echo "Generating verible.filelist..."
+	rm -rf $(VSRC_DIR)/verible.filelist
+	find $(VSRC_DIR) -name '*.sv' > $(VSRC_DIR)/verible.filelist
 
 compile: build/bin vsrc/verible.filelist $(CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
@@ -85,7 +86,6 @@ fmt: $(CSRC) $(VSRC)
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(YOSYS_STA_HOME)/result
-	rm -rf $(VSRC_DIR)/verible.filelist
 
 .PHONY: compile sim wave fmt clean embed njudlco ysyxpre
 
