@@ -1,6 +1,7 @@
 module ysyx_23060042_EXU (
     input rst,
     input [31:0] pc,
+    input [2:0] AluOp,
     input [31:0] rdata1,
     input [31:0] rdata2,
     input [31:0] mrdata,
@@ -23,6 +24,7 @@ module ysyx_23060042_EXU (
   );
 
   ysyx_23060042_ALU ALU (
+      .AluOp(AluOp),
       .data1(src1),
       .data2(imm),
       .out  (alu_result)

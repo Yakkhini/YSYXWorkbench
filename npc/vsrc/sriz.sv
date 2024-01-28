@@ -78,6 +78,7 @@ module sriz (
 
   ysyx_23060042_EXU EXU (
       .rst(rst),
+      .AluOp(AluOp),
       .Brken(Brken),
       .a0(a0),
       .imm(imm),
