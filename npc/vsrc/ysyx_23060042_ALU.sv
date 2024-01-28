@@ -5,11 +5,27 @@ module ysyx_23060042_ALU (
     output [31:0] out
 );
 
-  MuxKeyWithDefault #(2, 3, 32) alu_mux (
+  MuxKey #(8, 3, 32) alu_mux (
       .out(out),
       .key(AluOp),
-      .default_out(32'h00000000),
-      .lut({3'b000, data1 + data2, 3'b001, data1 - data2})
+      .lut({
+        3'b000,
+        data1 + data2,
+        3'b001,
+        data1 - data2,
+        3'b010,
+        data1 << data2,
+        3'b011,
+        data1 >> data2,
+        3'b100,
+        data1 | data2,
+        3'b101,
+        data1 ^ data2,
+        3'b110,
+        data1 & data2,
+        3'b111,
+        {31'b0, data1 < data2}
+      })
   );
 
 endmodule
