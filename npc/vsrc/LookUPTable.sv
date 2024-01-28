@@ -4,7 +4,7 @@ module LookUPTable (
 );
   parameter int unsigned PATTERN_LEN = 15;
   parameter int unsigned MICRO_LEN = 13;
-  parameter int unsigned INST_NR = 13;
+  parameter int unsigned INST_NR = 15;
 
   parameter bit REGEN_TRUE = 1'b1;
   parameter bit REGEN_FALSE = 1'b0;
@@ -80,6 +80,14 @@ module LookUPTable (
   localparam bit [MICRO_LEN-1:0] ADDIMicro = {
     REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_ADD, IMM_TYPE_I
   };
+  localparam bit [PATTERN_LEN-1:0] SLTIPattern = {7'b0000000, 3'b010, 5'b00100};
+  localparam bit [MICRO_LEN-1:0] SLTIMicro = {
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_LESS, IMM_TYPE_I
+  };
+  localparam bit [PATTERN_LEN-1:0] SLTIUPattern = {7'b0000000, 3'b011, 5'b00100};
+  localparam bit [MICRO_LEN-1:0] SLTIUMicro = {
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_LESS, IMM_TYPE_I
+  };
   localparam bit [PATTERN_LEN-1:0] SUBPattern = {7'b0100000, 3'b000, 5'b01100};
   localparam bit [MICRO_LEN-1:0] SUBMicro = {
     REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_SUB, IMM_TYPE_NONE
@@ -103,8 +111,10 @@ module LookUPTable (
     pattern_list[8] = SHPattern;
     pattern_list[9] = SWPattern;
     pattern_list[10] = ADDIPattern;
-    pattern_list[11] = SUBPattern;
-    pattern_list[12] = EBREAKPattern;
+    pattern_list[11] = SLTIPattern;
+    pattern_list[12] = SLTIUPattern;
+    pattern_list[13] = SUBPattern;
+    pattern_list[14] = EBREAKPattern;
 
     micro_list[0] = LUIMicro;
     micro_list[1] = AUIPCMicro;
@@ -117,8 +127,10 @@ module LookUPTable (
     micro_list[8] = SHMicro;
     micro_list[9] = SWMicro;
     micro_list[10] = ADDIMicro;
-    micro_list[11] = SUBMicro;
-    micro_list[12] = EBREAKMicro;
+    micro_list[11] = SLTIMicro;
+    micro_list[12] = SLTIUMicro;
+    micro_list[13] = SUBMicro;
+    micro_list[14] = EBREAKMicro;
   end
 
   import "DPI-C" function void halt(int code);
