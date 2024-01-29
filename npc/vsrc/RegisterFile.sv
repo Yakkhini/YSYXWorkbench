@@ -20,6 +20,7 @@ module RegisterFile #(
 
   assign rdata1 = rf[raddr1];
   assign rdata2 = rf[raddr2];
+  assign a0 = rf[10];
 
   wire [31:0] regin  /*verilator public*/;
   MuxKeyWithDefault #(2, 1, 32) regin_mux (
