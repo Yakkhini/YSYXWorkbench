@@ -86,7 +86,14 @@ void monitor_init(int argc, char **argv) {
 
   parse_args(argc, argv);
   long img_size = load_img();
+
+#if CONFIG_BATCH_MODE == true
+  batch_mode_enable();
+#endif
+
+#if CONFIG_DIFFTEST == true
   difftest_init(diff_so_file, img_size, 1234);
+#endif
 
   init_regex();
   init_wp_pool();

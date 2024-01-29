@@ -82,7 +82,9 @@ void reset() {
 }
 
 void cpu_init(int argc, char **argv) {
+#if CONFIG_DISASM
   disasm_init();
+#endif
 
   contextp = new VerilatedContext;
   contextp->commandArgs(argc, argv);
@@ -149,14 +151,21 @@ void cpu_sync() {
 }
 
 void cpu_check() {
+
+#if CONFIG_DISASM
   disassembler();
+#endif
   if (cpu.top->sriz->IDU->lut->hit == 0) {
     Log("ERROR INST NOT SUPPORT: LUT HIT FAILED at pc = 0x%08X", cpu.pc_prev);
     npc_state = SRIZ_ABORT;
   }
   ftrace_check();
   mtrace();
+
+#if CONFIG_DIFFTEST
   difftest_step(cpu.pc_prev, cpu.pc);
+#endif
+
   check_wp();
   finish();
 }
