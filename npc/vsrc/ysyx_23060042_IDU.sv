@@ -13,7 +13,7 @@ module ysyx_23060042_IDU (
     output [1:0] Mwen,
     output [1:0] Mren,
     output [2:0] AluOp,
-    output Unsignen,
+    output UnsignArithen,
     output IMMen,
     output BrchOP,
     output Jalen,
@@ -53,7 +53,7 @@ module ysyx_23060042_IDU (
   assign Mwen = micro_cmd[10:9];
   assign Mren = micro_cmd[8:7];
   assign AluOp = micro_cmd[6:4];
-  assign Unsignen = micro_cmd[3];
+  assign UnsignArithen = micro_cmd[3];
   assign Jalen = Regen & Pcjen;
   assign Brken = !(Regen | Pcjen | Mwen[1] | Mwen[0]);
 

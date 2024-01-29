@@ -9,6 +9,7 @@ module ysyx_23060042_EXU (
     input [31:0] imm,
     input Pcren,
     input IMMen,
+    input UnsignArithen,
     input Brken,
     input BrchOP,
     input [1:0] Mren,
@@ -35,9 +36,10 @@ module ysyx_23060042_EXU (
 
   ysyx_23060042_ALU ALU (
       .AluOp(AluOp),
+      .UnsignArithen(UnsignArithen),
       .data1(data1),
       .data2(data2),
-      .out  (alu_result)
+      .out(alu_result)
   );
 
   MuxKeyWithDefault #(4, 3, 1) brch_mux (

@@ -28,8 +28,8 @@ module LookUPTable (
   parameter bit [2:0] ALUOP_XOR_BGE = 3'b101;
   parameter bit [2:0] ALUOP_AND = 3'b110;
   parameter bit [2:0] ALUOP_LESS = 3'b111;
-  parameter bit UNSIGN_TRUE = 1'b1;
-  parameter bit UNSIGN_FALSE = 1'b0;
+  parameter bit UNSIGN_ARITH_TRUE = 1'b1;
+  parameter bit UNSIGN_LOGIC_FALSE = 1'b0;
   parameter bit [2:0] IMM_TYPE_NONE = 3'b000;
   parameter bit [2:0] IMM_TYPE_I = 3'b001;
   parameter bit [2:0] IMM_TYPE_S = 3'b010;
@@ -46,7 +46,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_U
   };
   localparam bit [PATTERN_LEN-1:0] AUIPCPattern = {7'b0000000, 3'b000, 5'b00101};
@@ -57,7 +57,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_U
   };
   localparam bit [PATTERN_LEN-1:0] JALPattern = {7'b0000000, 3'b000, 5'b11011};
@@ -68,7 +68,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_UJ
   };
   localparam bit [PATTERN_LEN-1:0] JALRPattern = {7'b0000000, 3'b000, 5'b11001};
@@ -79,7 +79,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] BEQPattern = {7'b0000000, 3'b000, 5'b11000};
@@ -90,7 +90,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_SB
   };
   localparam bit [PATTERN_LEN-1:0] BNEPattern = {7'b0000000, 3'b001, 5'b11000};
@@ -101,7 +101,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_SUB_BNE,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_SB
   };
   localparam bit [PATTERN_LEN-1:0] BLTPattern = {7'b0000000, 3'b100, 5'b11000};
@@ -112,7 +112,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_OR_BLT,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_SB
   };
   localparam bit [PATTERN_LEN-1:0] BGEPattern = {7'b0000000, 3'b101, 5'b11000};
@@ -123,7 +123,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_XOR_BGE,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_SB
   };
   localparam bit [PATTERN_LEN-1:0] BLTUPattern = {7'b0000000, 3'b110, 5'b11000};
@@ -135,7 +135,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_OR_BLT,
-    UNSIGN_TRUE,
+    UNSIGN_ARITH_TRUE,
     IMM_TYPE_SB
   };
   localparam bit [PATTERN_LEN-1:0] BGEUPattern = {7'b0000000, 3'b111, 5'b11000};
@@ -147,7 +147,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_XOR_BGE,
-    UNSIGN_TRUE,
+    UNSIGN_ARITH_TRUE,
     IMM_TYPE_SB
   };
   localparam bit [PATTERN_LEN-1:0] LBPattern = {7'b0000000, 3'b000, 5'b00000};
@@ -158,7 +158,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_BYTE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] LHPattern = {7'b0000000, 3'b001, 5'b00000};
@@ -169,7 +169,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_HALF,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] LWPattern = {7'b0000000, 3'b010, 5'b00000};
@@ -180,7 +180,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_WORD,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] LBUPattern = {7'b0000000, 3'b100, 5'b00000};
@@ -191,7 +191,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_BYTE,
     ALUOP_ADD_BEQ,
-    UNSIGN_TRUE,
+    UNSIGN_ARITH_TRUE,
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] LHUPattern = {7'b0000000, 3'b101, 5'b00000};
@@ -202,7 +202,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_HALF,
     ALUOP_ADD_BEQ,
-    UNSIGN_TRUE,
+    UNSIGN_ARITH_TRUE,
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SBPattern = {7'b0000000, 3'b000, 5'b01000};
@@ -213,7 +213,7 @@ module LookUPTable (
     MWEN_BYTE,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_S
   };
   localparam bit [PATTERN_LEN-1:0] SHPattern = {7'b0000000, 3'b001, 5'b01000};
@@ -224,7 +224,7 @@ module LookUPTable (
     MWEN_HALF,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_S
   };
   localparam bit [PATTERN_LEN-1:0] SWPattern = {7'b0000000, 3'b010, 5'b01000};
@@ -235,7 +235,7 @@ module LookUPTable (
     MWEN_WORD,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_S
   };
   localparam bit [PATTERN_LEN-1:0] ADDIPattern = {7'b0000000, 3'b000, 5'b00100};
@@ -246,17 +246,31 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SLTIPattern = {7'b0000000, 3'b010, 5'b00100};
   localparam bit [MICRO_LEN-1:0] SLTIMicro = {
-    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_LESS, UNSIGN_FALSE, IMM_TYPE_I
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_LESS,
+    UNSIGN_LOGIC_FALSE,
+    IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SLTIUPattern = {7'b0000000, 3'b011, 5'b00100};
   // Not Implement Unsigned Yet, Maybe Cause Error
   localparam bit [MICRO_LEN-1:0] SLTIUMicro = {
-    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_LESS, UNSIGN_FALSE, IMM_TYPE_I
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_LESS,
+    UNSIGN_LOGIC_FALSE,
+    IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] XORIPattern = {7'b0000000, 3'b100, 5'b00100};
   localparam bit [MICRO_LEN-1:0] XORIMicro = {
@@ -266,7 +280,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_XOR_BGE,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] ORIPattern = {7'b0000000, 3'b110, 5'b00100};
@@ -277,25 +291,52 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_OR_BLT,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] ANDIPattern = {7'b0000000, 3'b111, 5'b00100};
   localparam bit [MICRO_LEN-1:0] ANDIMicro = {
-    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_AND, UNSIGN_FALSE, IMM_TYPE_I
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_AND,
+    UNSIGN_LOGIC_FALSE,
+    IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SLLIPattern = {7'b0000000, 3'b001, 5'b00100};
   localparam bit [MICRO_LEN-1:0] SLLIMicro = {
-    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_SL, UNSIGN_FALSE, IMM_TYPE_I
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_SL,
+    UNSIGN_LOGIC_FALSE,
+    IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SRLIPattern = {7'b0000000, 3'b101, 5'b00100};
   localparam bit [MICRO_LEN-1:0] SRLIMicro = {
-    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_SR, UNSIGN_FALSE, IMM_TYPE_I
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_SR,
+    UNSIGN_LOGIC_FALSE,
+    IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SRAIPattern = {7'b0100000, 3'b101, 5'b00100};
-  // Not Implement Arithmetic Shift Yet, Maybe Cause Error
   localparam bit [MICRO_LEN-1:0] SRAIMicro = {
-    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_SR, UNSIGN_FALSE, IMM_TYPE_I
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_SR,
+    UNSIGN_ARITH_TRUE,
+    IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] ADDPattern = {7'b0000000, 3'b000, 5'b01100};
   localparam bit [MICRO_LEN-1:0] ADDMicro = {
@@ -305,7 +346,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] SUBPattern = {7'b0100000, 3'b000, 5'b01100};
@@ -316,7 +357,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_SUB_BNE,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] SLLPattern = {7'b0000000, 3'b001, 5'b01100};
@@ -327,7 +368,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_SL,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] SLTPattern = {7'b0000000, 3'b010, 5'b01100};
@@ -338,7 +379,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_LESS,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] SLTUPattern = {7'b0000000, 3'b011, 5'b01100};
@@ -350,7 +391,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_LESS,
-    UNSIGN_TRUE,
+    UNSIGN_ARITH_TRUE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] XORPattern = {7'b0000000, 3'b100, 5'b01100};
@@ -361,7 +402,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_XOR_BGE,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] SRLPattern = {7'b0000000, 3'b101, 5'b01100};
@@ -372,11 +413,10 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_SR,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] SRAPattern = {7'b0100000, 3'b101, 5'b01100};
-  // Not Implement Arithmetic Shift Yet, Maybe Cause Error
   localparam bit [MICRO_LEN-1:0] SRAMicro = {
     REGEN_TRUE,
     PCJEN_FALSE,
@@ -384,7 +424,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_SR,
-    UNSIGN_FALSE,
+    UNSIGN_ARITH_TRUE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] ORPattern = {7'b0000000, 3'b110, 5'b01100};
@@ -395,7 +435,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_OR_BLT,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] ANDPattern = {7'b0000000, 3'b111, 5'b01100};
@@ -406,7 +446,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_AND,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] EBREAKPattern = {7'b0000000, 3'b000, 5'b11100};
@@ -417,7 +457,7 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_ADD_BEQ,
-    UNSIGN_FALSE,
+    UNSIGN_LOGIC_FALSE,
     IMM_TYPE_NONE
   };
 
