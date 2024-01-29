@@ -52,9 +52,26 @@ module ysyx_23060042_EXU (
         3'b001,
         (rdata1 != rdata2) & BrchOP,
         3'b100,
-        ($signed(rdata1) < $signed(rdata2)) & BrchOP,
+        Brch_greater_less_en,
         3'b101,
-        ($signed(rdata1) >= $signed(rdata2)) & BrchOP
+        Brch_greater_less_en
+      })
+  );
+
+  bit Brch_greater_less_en;
+  MuxKeyWithDefault #(4, 4, 1) brch_greater_less_mux (
+      .out(Brch_greater_less_en),
+      .key({AluOp, UnsignArithen}),
+      .default_out(1'b0),
+      .lut({
+        4'b1000,
+        ($signed(rdata1) < $signed(rdata2)) & BrchOP,
+        4'b1010,
+        ($signed(rdata1) >= $signed(rdata2)) & BrchOP,
+        4'b1001,
+        ($unsigned(rdata1) < $unsigned(rdata2)) & BrchOP,
+        4'b1011,
+        ($unsigned(rdata1) >= $unsigned(rdata2)) & BrchOP
       })
   );
 

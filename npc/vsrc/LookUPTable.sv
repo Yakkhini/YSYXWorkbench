@@ -261,7 +261,6 @@ module LookUPTable (
     IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SLTIUPattern = {7'b0000000, 3'b011, 5'b00100};
-  // Not Implement Unsigned Yet, Maybe Cause Error
   localparam bit [MICRO_LEN-1:0] SLTIUMicro = {
     REGEN_TRUE,
     PCJEN_FALSE,
@@ -383,7 +382,6 @@ module LookUPTable (
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] SLTUPattern = {7'b0000000, 3'b011, 5'b01100};
-  // Not Implement Unsigned Yet, Maybe Cause Error
   localparam bit [MICRO_LEN-1:0] SLTUMicro = {
     REGEN_TRUE,
     PCJEN_FALSE,
