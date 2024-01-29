@@ -211,6 +211,28 @@ module LookUPTable (
   localparam bit [MICRO_LEN-1:0] SLTIUMicro = {
     REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_LESS, UNSIGN_FALSE, IMM_TYPE_I
   };
+  localparam bit [PATTERN_LEN-1:0] SLLIPattern = {7'b0000000, 3'b001, 5'b00100};
+  localparam bit [MICRO_LEN-1:0] SLLIMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_SL_BLT,
+    UNSIGN_FALSE,
+    IMM_TYPE_I
+  };
+  localparam bit [PATTERN_LEN-1:0] SRLIPattern = {7'b0000000, 3'b101, 5'b00100};
+  localparam bit [MICRO_LEN-1:0] SRLIMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_SR_BGE,
+    UNSIGN_FALSE,
+    IMM_TYPE_I
+  };
   localparam bit [PATTERN_LEN-1:0] SUBPattern = {7'b0100000, 3'b000, 5'b01100};
   localparam bit [MICRO_LEN-1:0] SUBMicro = {
     REGEN_TRUE,
@@ -288,7 +310,8 @@ module LookUPTable (
     hit = 0;
     for (integer i = 0; i < INST_NR; i = i + 1) begin
       func3 = {3{!(micro_list[i][2] & micro_list[i][1])}};  // U & J Type no need func3
-      func7 = {7{micro_list[i][2:0] == IMM_TYPE_NONE}};  // Only no IMM Type need func7
+      // Only no IMM Type or Shift inst need func7
+      func7 = {7{(micro_list[i][2:0] == IMM_TYPE_NONE) | (micro_list[i][6:5] == 2'b01)}};
       lut_inst = {inst[14:8] & func7, inst[7:5] & func3, inst[4:0]};
       micro_cmd = micro_cmd | ({MICRO_LEN{lut_inst == pattern_list[i]}} & micro_list[i]);
       hit = hit | (lut_inst == pattern_list[i]);
