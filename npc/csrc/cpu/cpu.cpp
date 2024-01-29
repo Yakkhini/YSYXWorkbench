@@ -155,12 +155,16 @@ void cpu_check() {
 #if CONFIG_DISASM
   disassembler();
 #endif
+
   if (cpu.top->sriz->IDU->lut->hit == 0) {
     Log("ERROR INST NOT SUPPORT: LUT HIT FAILED at pc = 0x%08X", cpu.pc_prev);
     npc_state = SRIZ_ABORT;
   }
   ftrace_check();
+
+#if CONFIG_MTRACE
   mtrace();
+#endif
 
 #if CONFIG_DIFFTEST
   difftest_step(cpu.pc_prev, cpu.pc);
