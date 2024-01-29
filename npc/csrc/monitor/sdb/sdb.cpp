@@ -5,6 +5,10 @@
 #include <readline/readline.h>
 #include <sdb.h>
 
+static bool batch_mode = false;
+
+void batch_mode_enable() { batch_mode = true; }
+
 static char *rl_gets() {
   static char *line_read = NULL;
 
@@ -144,6 +148,11 @@ static int cmd_help(char *args) {
 }
 
 void sdb_mainloop() {
+  if (batch_mode) {
+    cpu_exec(-1);
+    return;
+  }
+
   for (char *str; (str = rl_gets()) != NULL;) {
     char *str_end = str + strlen(str);
 

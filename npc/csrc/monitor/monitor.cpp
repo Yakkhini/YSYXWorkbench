@@ -40,12 +40,16 @@ long load_img() {
 
 void parse_args(int argc, char *argv[]) {
   const struct option table[] = {
+      {"batch", no_argument, NULL, 'b'},
       {"ftrace", required_argument, NULL, 'f'},
       {0, 0, NULL, 0},
   };
   int o;
-  while ((o = getopt_long(argc, argv, "-hf:", table, NULL)) != -1) {
+  while ((o = getopt_long(argc, argv, "-bhf:", table, NULL)) != -1) {
     switch (o) {
+    case 'b':
+      batch_mode_enable();
+      break;
     case 'f':
       ftrace_init(optarg);
       break;

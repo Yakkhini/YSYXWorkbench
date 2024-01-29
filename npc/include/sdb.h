@@ -16,6 +16,8 @@ typedef struct watchpoint {
   word_t result;
 } WP;
 
+void batch_mode_enable();
+
 WP *new_WP();
 void free_wp(int wp_no);
 void read_wp();
