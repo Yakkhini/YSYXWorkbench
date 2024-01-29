@@ -4,7 +4,7 @@ module LookUPTable (
 );
   parameter int unsigned PATTERN_LEN = 15;
   parameter int unsigned MICRO_LEN = 14;
-  parameter int unsigned INST_NR = 33;
+  parameter int unsigned INST_NR = 34;
 
   parameter bit REGEN_TRUE = 1'b1;
   parameter bit REGEN_FALSE = 1'b0;
@@ -245,6 +245,17 @@ module LookUPTable (
     UNSIGN_FALSE,
     IMM_TYPE_I
   };
+  localparam bit [PATTERN_LEN-1:0] SRAIPattern = {7'b0100000, 3'b101, 5'b00100};
+  localparam bit [MICRO_LEN-1:0] SRAIMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_SR_BGE,
+    UNSIGN_FALSE,
+    IMM_TYPE_I
+  };
   localparam bit [PATTERN_LEN-1:0] ADDPattern = {7'b0000000, 3'b000, 5'b01100};
   localparam bit [MICRO_LEN-1:0] ADDMicro = {
     REGEN_TRUE,
@@ -403,7 +414,7 @@ module LookUPTable (
     pattern_list[15] = SLTIPattern;
     micro_list[15] = SLTIMicro;
     pattern_list[16] = SLTIUPattern;
-    micro_list[16] = SLTIUMicro;
+    micro_list[16] = SLTIUMicro;  // Not Implement Unsigned Yet, Maybe Cause Error
     pattern_list[17] = XORIPattern;
     micro_list[17] = XORIMicro;
     pattern_list[18] = ORIPattern;
@@ -414,28 +425,30 @@ module LookUPTable (
     micro_list[20] = SLLIMicro;
     pattern_list[21] = SRLIPattern;
     micro_list[21] = SRLIMicro;
-    pattern_list[22] = ADDPattern;
-    micro_list[22] = ADDMicro;
-    pattern_list[23] = SUBPattern;
-    micro_list[23] = SUBMicro;
-    pattern_list[24] = SLLPattern;
-    micro_list[24] = SLLMicro;
-    pattern_list[25] = SLTPattern;
-    micro_list[25] = SLTMicro;
-    pattern_list[26] = SLTUPattern;
-    micro_list[26] = SLTUMicro;
-    pattern_list[27] = XORPattern;
-    micro_list[27] = XORMicro;
-    pattern_list[28] = SRLPattern;
-    micro_list[28] = SRLMicro;
-    pattern_list[29] = SRAPattern;
-    micro_list[29] = SRAMicro;
-    pattern_list[30] = ORPattern;
-    micro_list[30] = ORMicro;
-    pattern_list[31] = ANDPattern;
-    micro_list[31] = ANDMicro;
-    pattern_list[32] = EBREAKPattern;
-    micro_list[32] = EBREAKMicro;
+    pattern_list[22] = SRAIPattern;
+    micro_list[22] = SRAIMicro;  // Not Implement Arithmetic Shift Yet, Maybe Cause Error
+    pattern_list[23] = ADDPattern;
+    micro_list[23] = ADDMicro;
+    pattern_list[24] = SUBPattern;
+    micro_list[24] = SUBMicro;
+    pattern_list[25] = SLLPattern;
+    micro_list[25] = SLLMicro;
+    pattern_list[26] = SLTPattern;
+    micro_list[26] = SLTMicro;
+    pattern_list[27] = SLTUPattern;  // Not Implement Unsigned Yet, Maybe Cause Error
+    micro_list[27] = SLTUMicro;
+    pattern_list[28] = XORPattern;
+    micro_list[28] = XORMicro;
+    pattern_list[29] = SRLPattern;
+    micro_list[29] = SRLMicro;
+    pattern_list[30] = SRAPattern;
+    micro_list[30] = SRAMicro;
+    pattern_list[31] = ORPattern;
+    micro_list[31] = ORMicro;
+    pattern_list[32] = ANDPattern;
+    micro_list[32] = ANDMicro;
+    pattern_list[33] = EBREAKPattern;
+    micro_list[33] = EBREAKMicro;
   end
 
   import "DPI-C" function void halt(int code);
