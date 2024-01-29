@@ -50,9 +50,9 @@ module ysyx_23060042_EXU (
         3'b001,
         (rdata1 != rdata2) & BrchOP,
         3'b100,
-        (rdata1 < rdata2) & BrchOP,
+        ($signed(rdata1) < $signed(rdata2)) & BrchOP,
         3'b101,
-        (rdata1 >= rdata2) & BrchOP
+        ($signed(rdata1) >= $signed(rdata2)) & BrchOP
       })
   );
 
