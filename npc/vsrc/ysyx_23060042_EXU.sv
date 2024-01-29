@@ -49,9 +49,9 @@ module ysyx_23060042_EXU (
         (rdata1 == rdata2) & BrchOP,
         3'b001,
         (rdata1 != rdata2) & BrchOP,
-        3'b010,
+        3'b100,
         (rdata1 < rdata2) & BrchOP,
-        3'b011,
+        3'b101,
         (rdata1 >= rdata2) & BrchOP
       })
   );

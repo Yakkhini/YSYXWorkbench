@@ -4,7 +4,7 @@ module LookUPTable (
 );
   parameter int unsigned PATTERN_LEN = 15;
   parameter int unsigned MICRO_LEN = 14;
-  parameter int unsigned INST_NR = 34;
+  parameter int unsigned INST_NR = 38;
 
   parameter bit REGEN_TRUE = 1'b1;
   parameter bit REGEN_FALSE = 1'b0;
@@ -22,10 +22,10 @@ module LookUPTable (
   parameter bit [1:0] MREN_NONE = 2'b00;
   parameter bit [2:0] ALUOP_ADD_BEQ = 3'b000;
   parameter bit [2:0] ALUOP_SUB_BNE = 3'b001;
-  parameter bit [2:0] ALUOP_SL_BLT = 3'b010;
-  parameter bit [2:0] ALUOP_SR_BGE = 3'b011;
-  parameter bit [2:0] ALUOP_OR = 3'b100;
-  parameter bit [2:0] ALUOP_XOR = 3'b101;
+  parameter bit [2:0] ALUOP_SL = 3'b010;
+  parameter bit [2:0] ALUOP_SR = 3'b011;
+  parameter bit [2:0] ALUOP_OR_BLT = 3'b100;
+  parameter bit [2:0] ALUOP_XOR_BGE = 3'b101;
   parameter bit [2:0] ALUOP_AND = 3'b110;
   parameter bit [2:0] ALUOP_LESS = 3'b111;
   parameter bit UNSIGN_TRUE = 1'b1;
@@ -102,6 +102,52 @@ module LookUPTable (
     MREN_NONE,
     ALUOP_SUB_BNE,
     UNSIGN_FALSE,
+    IMM_TYPE_SB
+  };
+  localparam bit [PATTERN_LEN-1:0] BLTPattern = {7'b0000000, 3'b100, 5'b11000};
+  localparam bit [MICRO_LEN-1:0] BLTMicro = {
+    REGEN_FALSE,
+    PCJEN_TRUE,
+    PCREN_TRUE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_OR_BLT,
+    UNSIGN_FALSE,
+    IMM_TYPE_SB
+  };
+  localparam bit [PATTERN_LEN-1:0] BGEPattern = {7'b0000000, 3'b101, 5'b11000};
+  localparam bit [MICRO_LEN-1:0] BGEMicro = {
+    REGEN_FALSE,
+    PCJEN_TRUE,
+    PCREN_TRUE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_XOR_BGE,
+    UNSIGN_FALSE,
+    IMM_TYPE_SB
+  };
+  localparam bit [PATTERN_LEN-1:0] BLTUPattern = {7'b0000000, 3'b110, 5'b11000};
+  // Not Implement Unsigned Yet, Maybe Cause Error
+  localparam bit [MICRO_LEN-1:0] BLTUMicro = {
+    REGEN_FALSE,
+    PCJEN_TRUE,
+    PCREN_TRUE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_OR_BLT,
+    UNSIGN_TRUE,
+    IMM_TYPE_SB
+  };
+  localparam bit [PATTERN_LEN-1:0] BGEUPattern = {7'b0000000, 3'b111, 5'b11000};
+  // Not Implement Unsigned Yet, Maybe Cause Error
+  localparam bit [MICRO_LEN-1:0] BGEUMicro = {
+    REGEN_FALSE,
+    PCJEN_TRUE,
+    PCREN_TRUE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_XOR_BGE,
+    UNSIGN_TRUE,
     IMM_TYPE_SB
   };
   localparam bit [PATTERN_LEN-1:0] LBPattern = {7'b0000000, 3'b000, 5'b00000};
@@ -208,16 +254,31 @@ module LookUPTable (
     REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_LESS, UNSIGN_FALSE, IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SLTIUPattern = {7'b0000000, 3'b011, 5'b00100};
+  // Not Implement Unsigned Yet, Maybe Cause Error
   localparam bit [MICRO_LEN-1:0] SLTIUMicro = {
     REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_LESS, UNSIGN_FALSE, IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] XORIPattern = {7'b0000000, 3'b100, 5'b00100};
   localparam bit [MICRO_LEN-1:0] XORIMicro = {
-    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_XOR, UNSIGN_FALSE, IMM_TYPE_I
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_XOR_BGE,
+    UNSIGN_FALSE,
+    IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] ORIPattern = {7'b0000000, 3'b110, 5'b00100};
   localparam bit [MICRO_LEN-1:0] ORIMicro = {
-    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_OR, UNSIGN_FALSE, IMM_TYPE_I
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_OR_BLT,
+    UNSIGN_FALSE,
+    IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] ANDIPattern = {7'b0000000, 3'b111, 5'b00100};
   localparam bit [MICRO_LEN-1:0] ANDIMicro = {
@@ -225,36 +286,16 @@ module LookUPTable (
   };
   localparam bit [PATTERN_LEN-1:0] SLLIPattern = {7'b0000000, 3'b001, 5'b00100};
   localparam bit [MICRO_LEN-1:0] SLLIMicro = {
-    REGEN_TRUE,
-    PCJEN_FALSE,
-    PCREN_FALSE,
-    MWEN_NONE,
-    MREN_NONE,
-    ALUOP_SL_BLT,
-    UNSIGN_FALSE,
-    IMM_TYPE_I
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_SL, UNSIGN_FALSE, IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SRLIPattern = {7'b0000000, 3'b101, 5'b00100};
   localparam bit [MICRO_LEN-1:0] SRLIMicro = {
-    REGEN_TRUE,
-    PCJEN_FALSE,
-    PCREN_FALSE,
-    MWEN_NONE,
-    MREN_NONE,
-    ALUOP_SR_BGE,
-    UNSIGN_FALSE,
-    IMM_TYPE_I
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_SR, UNSIGN_FALSE, IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] SRAIPattern = {7'b0100000, 3'b101, 5'b00100};
+  // Not Implement Arithmetic Shift Yet, Maybe Cause Error
   localparam bit [MICRO_LEN-1:0] SRAIMicro = {
-    REGEN_TRUE,
-    PCJEN_FALSE,
-    PCREN_FALSE,
-    MWEN_NONE,
-    MREN_NONE,
-    ALUOP_SR_BGE,
-    UNSIGN_FALSE,
-    IMM_TYPE_I
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_SR, UNSIGN_FALSE, IMM_TYPE_I
   };
   localparam bit [PATTERN_LEN-1:0] ADDPattern = {7'b0000000, 3'b000, 5'b01100};
   localparam bit [MICRO_LEN-1:0] ADDMicro = {
@@ -285,7 +326,7 @@ module LookUPTable (
     PCREN_FALSE,
     MWEN_NONE,
     MREN_NONE,
-    ALUOP_SL_BLT,
+    ALUOP_SL,
     UNSIGN_FALSE,
     IMM_TYPE_NONE
   };
@@ -301,6 +342,7 @@ module LookUPTable (
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] SLTUPattern = {7'b0000000, 3'b011, 5'b01100};
+  // Not Implement Unsigned Yet, Maybe Cause Error
   localparam bit [MICRO_LEN-1:0] SLTUMicro = {
     REGEN_TRUE,
     PCJEN_FALSE,
@@ -318,7 +360,7 @@ module LookUPTable (
     PCREN_FALSE,
     MWEN_NONE,
     MREN_NONE,
-    ALUOP_XOR,
+    ALUOP_XOR_BGE,
     UNSIGN_FALSE,
     IMM_TYPE_NONE
   };
@@ -329,18 +371,19 @@ module LookUPTable (
     PCREN_FALSE,
     MWEN_NONE,
     MREN_NONE,
-    ALUOP_SR_BGE,
+    ALUOP_SR,
     UNSIGN_FALSE,
     IMM_TYPE_NONE
   };
   localparam bit [PATTERN_LEN-1:0] SRAPattern = {7'b0100000, 3'b101, 5'b01100};
+  // Not Implement Arithmetic Shift Yet, Maybe Cause Error
   localparam bit [MICRO_LEN-1:0] SRAMicro = {
     REGEN_TRUE,
     PCJEN_FALSE,
     PCREN_FALSE,
     MWEN_NONE,
     MREN_NONE,
-    ALUOP_SR_BGE,
+    ALUOP_SR,
     UNSIGN_FALSE,
     IMM_TYPE_NONE
   };
@@ -351,7 +394,7 @@ module LookUPTable (
     PCREN_FALSE,
     MWEN_NONE,
     MREN_NONE,
-    ALUOP_OR,
+    ALUOP_OR_BLT,
     UNSIGN_FALSE,
     IMM_TYPE_NONE
   };
@@ -393,62 +436,70 @@ module LookUPTable (
     micro_list[4] = BEQMicro;
     pattern_list[5] = BNEPattern;
     micro_list[5] = BNEMicro;
-    pattern_list[6] = LBPattern;
-    micro_list[6] = LBMicro;
-    pattern_list[7] = LHPattern;
-    micro_list[7] = LHMicro;
-    pattern_list[8] = LWPattern;
-    micro_list[8] = LWMicro;
-    pattern_list[9] = LBUPattern;
-    micro_list[9] = LBUMicro;
-    pattern_list[10] = LHUPattern;
-    micro_list[10] = LHUMicro;
-    pattern_list[11] = SBPattern;
-    micro_list[11] = SBMicro;
-    pattern_list[12] = SHPattern;
-    micro_list[12] = SHMicro;
-    pattern_list[13] = SWPattern;
-    micro_list[13] = SWMicro;
-    pattern_list[14] = ADDIPattern;
-    micro_list[14] = ADDIMicro;
-    pattern_list[15] = SLTIPattern;
-    micro_list[15] = SLTIMicro;
-    pattern_list[16] = SLTIUPattern;
-    micro_list[16] = SLTIUMicro;  // Not Implement Unsigned Yet, Maybe Cause Error
-    pattern_list[17] = XORIPattern;
-    micro_list[17] = XORIMicro;
-    pattern_list[18] = ORIPattern;
-    micro_list[18] = ORIMicro;
-    pattern_list[19] = ANDIPattern;
-    micro_list[19] = ANDIMicro;
-    pattern_list[20] = SLLIPattern;
-    micro_list[20] = SLLIMicro;
-    pattern_list[21] = SRLIPattern;
-    micro_list[21] = SRLIMicro;
-    pattern_list[22] = SRAIPattern;
-    micro_list[22] = SRAIMicro;  // Not Implement Arithmetic Shift Yet, Maybe Cause Error
-    pattern_list[23] = ADDPattern;
-    micro_list[23] = ADDMicro;
-    pattern_list[24] = SUBPattern;
-    micro_list[24] = SUBMicro;
-    pattern_list[25] = SLLPattern;
-    micro_list[25] = SLLMicro;
-    pattern_list[26] = SLTPattern;
-    micro_list[26] = SLTMicro;
-    pattern_list[27] = SLTUPattern;  // Not Implement Unsigned Yet, Maybe Cause Error
-    micro_list[27] = SLTUMicro;
-    pattern_list[28] = XORPattern;
-    micro_list[28] = XORMicro;
-    pattern_list[29] = SRLPattern;
-    micro_list[29] = SRLMicro;
-    pattern_list[30] = SRAPattern;
-    micro_list[30] = SRAMicro;
-    pattern_list[31] = ORPattern;
-    micro_list[31] = ORMicro;
-    pattern_list[32] = ANDPattern;
-    micro_list[32] = ANDMicro;
-    pattern_list[33] = EBREAKPattern;
-    micro_list[33] = EBREAKMicro;
+    pattern_list[6] = BLTPattern;
+    micro_list[6] = BLTMicro;
+    pattern_list[7] = BGEPattern;
+    micro_list[7] = BGEMicro;
+    pattern_list[8] = BLTUPattern;
+    micro_list[8] = BLTUMicro;
+    pattern_list[9] = BGEUPattern;
+    micro_list[9] = BGEUMicro;
+    pattern_list[10] = LBPattern;
+    micro_list[10] = LBMicro;
+    pattern_list[11] = LHPattern;
+    micro_list[11] = LHMicro;
+    pattern_list[12] = LWPattern;
+    micro_list[12] = LWMicro;
+    pattern_list[13] = LBUPattern;
+    micro_list[13] = LBUMicro;
+    pattern_list[14] = LHUPattern;
+    micro_list[14] = LHUMicro;
+    pattern_list[15] = SBPattern;
+    micro_list[15] = SBMicro;
+    pattern_list[16] = SHPattern;
+    micro_list[16] = SHMicro;
+    pattern_list[17] = SWPattern;
+    micro_list[17] = SWMicro;
+    pattern_list[18] = ADDIPattern;
+    micro_list[18] = ADDIMicro;
+    pattern_list[19] = SLTIPattern;
+    micro_list[19] = SLTIMicro;
+    pattern_list[20] = SLTIUPattern;
+    micro_list[20] = SLTIUMicro;
+    pattern_list[21] = XORIPattern;
+    micro_list[21] = XORIMicro;
+    pattern_list[22] = ORIPattern;
+    micro_list[22] = ORIMicro;
+    pattern_list[23] = ANDIPattern;
+    micro_list[23] = ANDIMicro;
+    pattern_list[24] = SLLIPattern;
+    micro_list[24] = SLLIMicro;
+    pattern_list[25] = SRLIPattern;
+    micro_list[25] = SRLIMicro;
+    pattern_list[26] = SRAIPattern;
+    micro_list[26] = SRAIMicro;
+    pattern_list[27] = ADDPattern;
+    micro_list[27] = ADDMicro;
+    pattern_list[28] = SUBPattern;
+    micro_list[28] = SUBMicro;
+    pattern_list[29] = SLLPattern;
+    micro_list[29] = SLLMicro;
+    pattern_list[30] = SLTPattern;
+    micro_list[30] = SLTMicro;
+    pattern_list[31] = SLTUPattern;
+    micro_list[31] = SLTUMicro;
+    pattern_list[32] = XORPattern;
+    micro_list[32] = XORMicro;
+    pattern_list[33] = SRLPattern;
+    micro_list[33] = SRLMicro;
+    pattern_list[34] = SRAPattern;
+    micro_list[34] = SRAMicro;
+    pattern_list[35] = ORPattern;
+    micro_list[35] = ORMicro;
+    pattern_list[36] = ANDPattern;
+    micro_list[36] = ANDMicro;
+    pattern_list[37] = EBREAKPattern;
+    micro_list[37] = EBREAKMicro;
   end
 
   import "DPI-C" function void halt(int code);
