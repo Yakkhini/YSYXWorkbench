@@ -107,7 +107,7 @@ void cpu_exec(int n) {
   case SRIZ_INIT:
     reset();
     npc_state = SRIZ_RUNNING;
-    return;
+    break;
   case SRIZ_HALT:
     Log("Program already finished!");
     return;
