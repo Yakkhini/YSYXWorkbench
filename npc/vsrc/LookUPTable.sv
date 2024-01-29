@@ -4,7 +4,7 @@ module LookUPTable (
 );
   parameter int unsigned PATTERN_LEN = 15;
   parameter int unsigned MICRO_LEN = 14;
-  parameter int unsigned INST_NR = 19;
+  parameter int unsigned INST_NR = 33;
 
   parameter bit REGEN_TRUE = 1'b1;
   parameter bit REGEN_FALSE = 1'b0;
@@ -211,6 +211,18 @@ module LookUPTable (
   localparam bit [MICRO_LEN-1:0] SLTIUMicro = {
     REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_LESS, UNSIGN_FALSE, IMM_TYPE_I
   };
+  localparam bit [PATTERN_LEN-1:0] XORIPattern = {7'b0000000, 3'b100, 5'b00100};
+  localparam bit [MICRO_LEN-1:0] XORIMicro = {
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_XOR, UNSIGN_FALSE, IMM_TYPE_I
+  };
+  localparam bit [PATTERN_LEN-1:0] ORIPattern = {7'b0000000, 3'b110, 5'b00100};
+  localparam bit [MICRO_LEN-1:0] ORIMicro = {
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_OR, UNSIGN_FALSE, IMM_TYPE_I
+  };
+  localparam bit [PATTERN_LEN-1:0] ANDIPattern = {7'b0000000, 3'b111, 5'b00100};
+  localparam bit [MICRO_LEN-1:0] ANDIMicro = {
+    REGEN_TRUE, PCJEN_FALSE, PCREN_FALSE, MWEN_NONE, MREN_NONE, ALUOP_AND, UNSIGN_FALSE, IMM_TYPE_I
+  };
   localparam bit [PATTERN_LEN-1:0] SLLIPattern = {7'b0000000, 3'b001, 5'b00100};
   localparam bit [MICRO_LEN-1:0] SLLIMicro = {
     REGEN_TRUE,
@@ -233,6 +245,17 @@ module LookUPTable (
     UNSIGN_FALSE,
     IMM_TYPE_I
   };
+  localparam bit [PATTERN_LEN-1:0] ADDPattern = {7'b0000000, 3'b000, 5'b01100};
+  localparam bit [MICRO_LEN-1:0] ADDMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_ADD_BEQ,
+    UNSIGN_FALSE,
+    IMM_TYPE_NONE
+  };
   localparam bit [PATTERN_LEN-1:0] SUBPattern = {7'b0100000, 3'b000, 5'b01100};
   localparam bit [MICRO_LEN-1:0] SUBMicro = {
     REGEN_TRUE,
@@ -241,6 +264,94 @@ module LookUPTable (
     MWEN_NONE,
     MREN_NONE,
     ALUOP_SUB_BNE,
+    UNSIGN_FALSE,
+    IMM_TYPE_NONE
+  };
+  localparam bit [PATTERN_LEN-1:0] SLLPattern = {7'b0000000, 3'b001, 5'b01100};
+  localparam bit [MICRO_LEN-1:0] SLLMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_SL_BLT,
+    UNSIGN_FALSE,
+    IMM_TYPE_NONE
+  };
+  localparam bit [PATTERN_LEN-1:0] SLTPattern = {7'b0000000, 3'b010, 5'b01100};
+  localparam bit [MICRO_LEN-1:0] SLTMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_LESS,
+    UNSIGN_FALSE,
+    IMM_TYPE_NONE
+  };
+  localparam bit [PATTERN_LEN-1:0] SLTUPattern = {7'b0000000, 3'b011, 5'b01100};
+  localparam bit [MICRO_LEN-1:0] SLTUMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_LESS,
+    UNSIGN_TRUE,
+    IMM_TYPE_NONE
+  };
+  localparam bit [PATTERN_LEN-1:0] XORPattern = {7'b0000000, 3'b100, 5'b01100};
+  localparam bit [MICRO_LEN-1:0] XORMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_XOR,
+    UNSIGN_FALSE,
+    IMM_TYPE_NONE
+  };
+  localparam bit [PATTERN_LEN-1:0] SRLPattern = {7'b0000000, 3'b101, 5'b01100};
+  localparam bit [MICRO_LEN-1:0] SRLMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_SR_BGE,
+    UNSIGN_FALSE,
+    IMM_TYPE_NONE
+  };
+  localparam bit [PATTERN_LEN-1:0] SRAPattern = {7'b0100000, 3'b101, 5'b01100};
+  localparam bit [MICRO_LEN-1:0] SRAMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_SR_BGE,
+    UNSIGN_FALSE,
+    IMM_TYPE_NONE
+  };
+  localparam bit [PATTERN_LEN-1:0] ORPattern = {7'b0000000, 3'b110, 5'b01100};
+  localparam bit [MICRO_LEN-1:0] ORMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_OR,
+    UNSIGN_FALSE,
+    IMM_TYPE_NONE
+  };
+  localparam bit [PATTERN_LEN-1:0] ANDPattern = {7'b0000000, 3'b111, 5'b01100};
+  localparam bit [MICRO_LEN-1:0] ANDMicro = {
+    REGEN_TRUE,
+    PCJEN_FALSE,
+    PCREN_FALSE,
+    MWEN_NONE,
+    MREN_NONE,
+    ALUOP_AND,
     UNSIGN_FALSE,
     IMM_TYPE_NONE
   };
@@ -293,10 +404,38 @@ module LookUPTable (
     micro_list[15] = SLTIMicro;
     pattern_list[16] = SLTIUPattern;
     micro_list[16] = SLTIUMicro;
-    pattern_list[17] = SUBPattern;
-    micro_list[17] = SUBMicro;
-    pattern_list[18] = EBREAKPattern;
-    micro_list[18] = EBREAKMicro;
+    pattern_list[17] = XORIPattern;
+    micro_list[17] = XORIMicro;
+    pattern_list[18] = ORIPattern;
+    micro_list[18] = ORIMicro;
+    pattern_list[19] = ANDIPattern;
+    micro_list[19] = ANDIMicro;
+    pattern_list[20] = SLLIPattern;
+    micro_list[20] = SLLIMicro;
+    pattern_list[21] = SRLIPattern;
+    micro_list[21] = SRLIMicro;
+    pattern_list[22] = ADDPattern;
+    micro_list[22] = ADDMicro;
+    pattern_list[23] = SUBPattern;
+    micro_list[23] = SUBMicro;
+    pattern_list[24] = SLLPattern;
+    micro_list[24] = SLLMicro;
+    pattern_list[25] = SLTPattern;
+    micro_list[25] = SLTMicro;
+    pattern_list[26] = SLTUPattern;
+    micro_list[26] = SLTUMicro;
+    pattern_list[27] = XORPattern;
+    micro_list[27] = XORMicro;
+    pattern_list[28] = SRLPattern;
+    micro_list[28] = SRLMicro;
+    pattern_list[29] = SRAPattern;
+    micro_list[29] = SRAMicro;
+    pattern_list[30] = ORPattern;
+    micro_list[30] = ORMicro;
+    pattern_list[31] = ANDPattern;
+    micro_list[31] = ANDMicro;
+    pattern_list[32] = EBREAKPattern;
+    micro_list[32] = EBREAKMicro;
   end
 
   import "DPI-C" function void halt(int code);
@@ -317,7 +456,7 @@ module LookUPTable (
       hit = hit | (lut_inst == pattern_list[i]);
     end
     if (hit) begin
-      $display("Micro command hit: %b, inst: %b, micro_cmd: %b", hit, inst, micro_cmd);
+      // $display("Micro command hit: %b, inst: %b, micro_cmd: %b", hit, inst, micro_cmd);
     end
   end
 
