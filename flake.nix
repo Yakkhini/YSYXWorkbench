@@ -102,6 +102,8 @@
         stdpkgs.perl
         stdpkgs.libunwind
         stdpkgs.yosys
+        stdpkgs.yosys-synlig
+        stdpkgs.surelog
         stdpkgs.verible
         packages.x86_64-linux.ista-bin
         packages.x86_64-linux.capstone
