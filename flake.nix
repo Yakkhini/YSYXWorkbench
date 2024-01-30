@@ -13,6 +13,7 @@
   }: let
     stdpkgs = pkgs.legacyPackages.x86_64-linux;
     npcmake = stdpkgs.writeScriptBin "npcmake" ''make -C $NPC_HOME $1'';
+    ista-run = stdpkgs.writeScriptBin "ista-run" ''LD_LIBRARY_PATH=bin/ ista-bin'';
   in rec {
     formatter.x86_64-linux = pkgs.legacyPackages.x86_64-linux.alejandra;
     packages.x86_64-linux.ista-bin = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation {
@@ -20,7 +21,7 @@
 
       system = "x86_64-linux";
 
-      src = stdpkgs.fetchzip{
+      src = stdpkgs.fetchzip {
         url = "https://ysyx.oscc.cc/slides/resources/archive/ista.tar.bz2";
         hash = "sha256-yseeHz+lVA+q9K2A40iNUP6jf/sGYjqKwga5gLvaXYo=";
       };
@@ -105,6 +106,7 @@
         packages.x86_64-linux.ista-bin
         packages.x86_64-linux.capstone
         npcmake
+        ista-run
       ];
 
       buildInputs = [
