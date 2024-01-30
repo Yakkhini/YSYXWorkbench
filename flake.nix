@@ -20,7 +20,10 @@
 
       system = "x86_64-linux";
 
-      src = ./npc/bin/iSTA;
+      src = stdpkgs.fetchzip{
+        url = "https://ysyx.oscc.cc/slides/resources/archive/ista.tar.bz2";
+        hash = "sha256-yseeHz+lVA+q9K2A40iNUP6jf/sGYjqKwga5gLvaXYo=";
+      };
       nativeBuildInputs = [
         stdpkgs.autoPatchelfHook # Automatically setup the loader, and do the magic
       ];
@@ -39,7 +42,7 @@
       # Extract and copy executable in $out/bin
       installPhase = ''
         mkdir -p $out/bin
-        cp $src $out/bin/ista-bin
+        cp $src/iSTA $out/bin/ista-bin
       '';
 
       meta = with stdpkgs.lib; {
