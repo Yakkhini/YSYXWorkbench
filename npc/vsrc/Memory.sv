@@ -10,6 +10,7 @@ module Memory (
     output bit [31:0] mrdata
 );
 
+  // synopsys translate_off
   import "DPI-C" function int vaddr_read(
     int addr,
     bit [1:0] len
@@ -28,7 +29,6 @@ module Memory (
     end
   end
 
-  bit [31:0] rdata_unsign;
   always_comb begin
     rdata_unsign = 0;
     if ((Mren[1] | Mren[0]) & !rst) begin
@@ -37,6 +37,9 @@ module Memory (
       mtrace_reset();
     end
   end
+  // synopsys translate_on
+
+  bit [31:0] rdata_unsign;
 
   MuxKey #(4, 2, 32) mdata_mux (
       .out(mrdata),

@@ -459,8 +459,8 @@ module LookUPTable (
     IMM_TYPE_NONE
   };
 
-  bit [PATTERN_LEN-1:0] pattern_list[INST_NR];
-  bit [  MICRO_LEN-1:0] micro_list  [INST_NR];
+  logic [PATTERN_LEN-1:0] pattern_list[INST_NR];
+  logic [  MICRO_LEN-1:0] micro_list  [INST_NR];
   initial begin
     pattern_list[0] = LUIPattern;
     micro_list[0] = LUIMicro;

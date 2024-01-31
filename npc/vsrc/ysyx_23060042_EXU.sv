@@ -82,7 +82,7 @@ module ysyx_23060042_EXU (
       .lut({2'b00, alu_result, 2'b10, mrdata, 2'b01, pc + imm})
   );
 
-
+  // synopsys translate_off
   import "DPI-C" function void halt(input int code);
 
   always_comb begin
@@ -90,5 +90,6 @@ module ysyx_23060042_EXU (
       halt(a0);
     end
   end
+  // synopsys translate_on
 
 endmodule
