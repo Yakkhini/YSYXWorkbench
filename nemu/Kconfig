@@ -148,6 +148,11 @@ config TRACE_END
   int "When tracing is disabled (unit: number of instructions)"
   default 10000
 
+config FTRACE
+  depends on TRACE
+  bool "Enable function tracer"
+  default 1
+
 config MTRACE
   depends on TRACE
   bool "Enable memory trace"
