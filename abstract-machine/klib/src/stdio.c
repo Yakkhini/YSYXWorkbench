@@ -20,28 +20,37 @@ int printf(const char *fmt, ...) {
       continue;
     }
 
-    switch (fmt[j + 1]) {
-    case 's':
-      s = va_arg(vl, char *);
-      while (*s != '\0') {
-        putch(*s);
-        s++;
+    bool find_type = false;
+    while (!find_type) {
+      switch (fmt[j + 1]) {
+      case 's':
+        s = va_arg(vl, char *);
+        while (*s != '\0') {
+          putch(*s);
+          s++;
+        }
+        find_type = true;
+        break;
+      case 'd':
+        d = va_arg(vl, int);
+        char sd[256];
+        sprintf(sd, "%d", d);
+        int i = 0;
+        while (sd[i] != '\0') {
+          putch(sd[i]);
+          i++;
+        }
+        find_type = true;
+        break;
+      case 'c':
+        c = va_arg(vl, int);
+        putch(c);
+        find_type = true;
+        break;
+      default:
+        j++;
+        continue;
       }
-      break;
-    case 'd':
-      d = va_arg(vl, int);
-      char sd[256];
-      sprintf(sd, "%d", d);
-      int i = 0;
-      while (sd[i] != '\0') {
-        putch(sd[i]);
-        i++;
-      }
-      break;
-    case 'c':
-      c = va_arg(vl, int);
-      putch(c);
-      break;
     }
 
     j += 2;
