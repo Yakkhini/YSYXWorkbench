@@ -80,10 +80,24 @@ void *memset(void *s, int c, size_t n) {
 }
 
 void *memmove(void *dst, const void *src, size_t n) {
-  panic("Not implemented");
+  uintptr_t offset = 0;
+  while (dst + offset != src && offset < n) {
+    ((char *)dst)[offset] = ((char *)src)[offset];
+    offset++;
+  }
+
+  return dst;
 }
 
-void *memcpy(void *out, const void *in, size_t n) { panic("Not implemented"); }
+void *memcpy(void *out, const void *in, size_t n) {
+  uintptr_t offset = 0;
+  while (offset < n) {
+    ((char *)out)[offset] = ((char *)in)[offset];
+    offset++;
+  }
+
+  return out;
+}
 
 int memcmp(const void *s1, const void *s2, size_t n) {
   int i = 0;
