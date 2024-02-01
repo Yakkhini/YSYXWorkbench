@@ -42,6 +42,26 @@ int printf(const char *fmt, ...) {
         }
         find_type = true;
         break;
+      case 'u':
+        d = va_arg(vl, int);
+        sprintf(sd, "%d", d);
+        i = 0;
+        while (sd[i] != '\0') {
+          putch(sd[i]);
+          i++;
+        }
+        find_type = true;
+        break;
+      case 'x':
+        d = va_arg(vl, int);
+        sprintf(sd, "%d", d);
+        i = 0;
+        while (sd[i] != '\0') {
+          putch(sd[i]);
+          i++;
+        }
+        find_type = true;
+        break;
       case 'c':
         c = va_arg(vl, int);
         putch(c);
