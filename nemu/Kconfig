@@ -158,6 +158,11 @@ config MTRACE
   bool "Enable memory trace"
   default n
 
+config DTRACE
+  depends on TRACE
+  bool "Enable device trace"
+  default 0
+
 config ITRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
   bool "Enable instruction tracer"
