@@ -47,9 +47,10 @@ static void audio_play(void *userdata, uint8_t *stream, int len) {
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
-  if (!is_write || !audio_base[reg_init]) {
+  if (audio_base[reg_init] == 0) {
     return;
   }
+  audio_base[reg_init] = 0;
 
   SDL_AudioSpec spec = {};
   spec.freq = audio_base[reg_freq];
