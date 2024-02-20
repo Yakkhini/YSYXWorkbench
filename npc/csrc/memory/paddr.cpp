@@ -1,4 +1,5 @@
 #include <common.h>
+#include <device/device.h>
 #include <memory/host.h>
 #include <memory/paddr.h>
 
@@ -17,21 +18,27 @@ static void pmem_write(paddr_t addr, int len, word_t data) {
 }
 
 word_t paddr_read(paddr_t addr, int len) {
-  // IFDEF(CONFIG_MTRACE, Log("Read memory 0x%X for %i len.", addr, len));
   if (in_pmem(addr))
     return pmem_read(addr, len);
-  // IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
+
+#if CONFIG_DEVICE
+  return mmio_read(addr, len);
+#endif
+
   Log("Invalid memory access at address 0x%08x", addr);
   return 0;
 }
 
 void paddr_write(paddr_t addr, int len, word_t data) {
-  // IFDEF(CONFIG_MTRACE, Log("Write memory 0x%X for %i len. Data: 0x%X", addr,
-  // len, data));
   if (in_pmem(addr)) {
     pmem_write(addr, len, data);
     return;
   }
-  // IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
+
+#if CONFIG_DEVICE
+  mmio_write(addr, len, data);
+  return;
+#endif
+
   Log("Invalid memory access at address 0x%08x", addr);
 }
