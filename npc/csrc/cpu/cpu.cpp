@@ -11,8 +11,11 @@ CPU cpu;
 NPCState npc_state = SRIZ_INIT;
 
 static char *NPC_HOME = getenv("NPC_HOME");
-static VerilatedVcdC *tfp;
 static VerilatedContext *contextp;
+
+#if CONFIG_WAVE_RECORD
+static VerilatedVcdC *tfp;
+#endif
 
 void finish();
 void halt(int code) {
@@ -45,11 +48,18 @@ void single_clock() {
   contextp->timeInc(1);
   cpu.top->clk = 1;
   cpu.top->eval();
+
+#if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+#endif
+
   contextp->timeInc(1);
   cpu.top->clk = 0;
   cpu.top->eval();
+
+#if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+#endif
 
   cpu_sync();
   cpu_check();
@@ -60,20 +70,35 @@ void reset() {
   cpu.top->rst = 1;
   cpu.top->clk = 1;
   cpu.top->eval();
+
+#if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+#endif
+
   contextp->timeInc(1);
   cpu.top->clk = 0;
   cpu.top->eval();
+
+#if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+#endif
+
   contextp->timeInc(1);
   cpu.top->clk = 1;
   cpu.top->eval();
+
+#if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+#endif
+
   contextp->timeInc(1);
   cpu.top->rst = 0;
   cpu.top->clk = 0;
   cpu.top->eval();
+
+#if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+#endif
 
   cpu_sync();
   cpu_check();
@@ -90,11 +115,12 @@ void cpu_init(int argc, char **argv) {
   contextp->commandArgs(argc, argv);
 
   cpu.top = new Vsriz(contextp);
+  Log("Welcome to SuanChou Processor Core Verilating Model.");
 
+#if CONFIG_WAVE_RECORD
   char wavefile_name[80];
   strcpy(wavefile_name, NPC_HOME);
   strcat(wavefile_name, "/build/waveform.vcd");
-  Log("Welcome to SuanChou Processor Core Verilating Model.");
   Log("Wave Path: %s.", wavefile_name);
 
   Verilated::traceEverOn(true);
@@ -102,6 +128,9 @@ void cpu_init(int argc, char **argv) {
   cpu.top->trace(tfp, 5);
 
   tfp->open(wavefile_name);
+#else
+  Log("Waveform Recording: " ANSI_FMT("DISABLE", ANSI_FG_GREEN) ANSI_FG_BLUE);
+#endif
 }
 
 void cpu_exec(int n) {
@@ -197,7 +226,10 @@ void finish() {
 }
 
 void cpu_exit() {
+#if CONFIG_WAVE_RECORD
   tfp->close();
+#endif
+
   cpu.top->final();
   delete cpu.top;
 
