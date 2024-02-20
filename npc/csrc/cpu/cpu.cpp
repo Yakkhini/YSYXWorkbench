@@ -160,7 +160,10 @@ void cpu_check() {
     Log("ERROR INST NOT SUPPORT: LUT HIT FAILED at pc = 0x%08X", cpu.pc_prev);
     npc_state = SRIZ_ABORT;
   }
+
+#if CONFIG_FTRACE
   ftrace_check();
+#endif
 
 #if CONFIG_MTRACE
   mtrace();
