@@ -45,15 +45,17 @@ int return_status() {
 void cpu_sync();
 void cpu_check();
 void single_clock() {
+#if CONFIG_WAVE_RECORD
   contextp->timeInc(1);
+#endif
   cpu.top->clk = 1;
   cpu.top->eval();
 
 #if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+  contextp->timeInc(1);
 #endif
 
-  contextp->timeInc(1);
   cpu.top->clk = 0;
   cpu.top->eval();
 
@@ -66,32 +68,35 @@ void single_clock() {
 }
 
 void reset() {
+#if CONFIG_WAVE_RECORD
   contextp->timeInc(1);
+#endif
+
   cpu.top->rst = 1;
   cpu.top->clk = 1;
   cpu.top->eval();
 
 #if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+  contextp->timeInc(1);
 #endif
 
-  contextp->timeInc(1);
   cpu.top->clk = 0;
   cpu.top->eval();
 
 #if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+  contextp->timeInc(1);
 #endif
 
-  contextp->timeInc(1);
   cpu.top->clk = 1;
   cpu.top->eval();
 
 #if CONFIG_WAVE_RECORD
   tfp->dump(contextp->time());
+  contextp->timeInc(1);
 #endif
 
-  contextp->timeInc(1);
   cpu.top->rst = 0;
   cpu.top->clk = 0;
   cpu.top->eval();
