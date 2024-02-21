@@ -2,89 +2,55 @@
 #include <memory/paddr.h>
 #include <memory/vaddr.h>
 
-enum MemLen { MEM_BYTE, MEM_HWORD, MEM_WORD };
-
+#if CONFIG_MTRACE
 enum MemTraceType { MEM_TRACE_READ, MEM_TRACE_WRITE };
 
 typedef struct {
   bool trace_on;
   MemTraceType type;
-  MemLen len;
+  int len;
   int addr;
   int data;
 } MTRACERecord;
 
 static MTRACERecord mtrace_record;
+#endif
 
 word_t vaddr_ifetch(vaddr_t addr) { return paddr_read(addr, 4); }
 
 int vaddr_read(int addr, const svBitVecVal *len) {
-  mtrace_record.trace_on = true;
+  int plen = *len;
+  if (plen == 3)
+    plen = 4;
+  int ret = paddr_read(addr, plen);
 
-  switch (*len) {
-    int ret;
-  case 1:
-    ret = paddr_read(addr, 1);
-    mtrace_record = (MTRACERecord){.trace_on = true,
-                                   .type = MEM_TRACE_READ,
-                                   .len = MEM_BYTE,
-                                   .addr = addr,
-                                   .data = ret};
-    return ret;
-  case 2:
-    ret = paddr_read(addr, 2);
-    mtrace_record = (MTRACERecord){.trace_on = true,
-                                   .type = MEM_TRACE_READ,
-                                   .len = MEM_HWORD,
-                                   .addr = addr,
-                                   .data = ret};
-    return ret;
-  case 3:
-    ret = paddr_read(addr, 4);
-    mtrace_record = (MTRACERecord){.trace_on = true,
-                                   .type = MEM_TRACE_READ,
-                                   .len = MEM_WORD,
-                                   .addr = addr,
-                                   .data = ret};
-    return ret;
-  default:
-    Log("Invalid memory access type");
-    return 0;
-  }
+#if CONFIG_MTRACE
+  mtrace_record = (MTRACERecord){.trace_on = true,
+                                 .type = MEM_TRACE_READ,
+                                 .len = plen,
+                                 .addr = addr,
+                                 .data = ret};
+#endif
+
+  return ret;
 }
 
 void vaddr_write(int addr, const svBitVecVal *len, int data) {
-  switch (*len) {
-  case 1:
-    mtrace_record = (MTRACERecord){.trace_on = true,
-                                   .type = MEM_TRACE_WRITE,
-                                   .len = MEM_BYTE,
-                                   .addr = addr,
-                                   .data = data};
-    paddr_write(addr, 1, data);
-    break;
-  case 2:
-    mtrace_record = (MTRACERecord){.trace_on = true,
-                                   .type = MEM_TRACE_WRITE,
-                                   .len = MEM_HWORD,
-                                   .addr = addr,
-                                   .data = data};
-    paddr_write(addr, 2, data);
-    break;
-  case 3:
-    mtrace_record = (MTRACERecord){.trace_on = true,
-                                   .type = MEM_TRACE_WRITE,
-                                   .len = MEM_WORD,
-                                   .addr = addr,
-                                   .data = data};
-    paddr_write(addr, 4, data);
-    break;
-  default:
-    Log("Invalid memory access type");
-    break;
-  }
+  int plen = *len;
+  if (plen == 3)
+    plen = 4;
+  paddr_write(addr, plen, data);
+
+#if CONFIG_MTRACE
+  mtrace_record = (MTRACERecord){.trace_on = true,
+                                 .type = MEM_TRACE_WRITE,
+                                 .len = plen,
+                                 .addr = addr,
+                                 .data = data};
+#endif
 }
 
+#if CONFIG_MTRACE
 void mtrace() {
   if (!mtrace_record.trace_on) {
     return;
@@ -103,13 +69,13 @@ void mtrace() {
   }
 
   switch (mtrace_record.len) {
-  case MEM_BYTE:
+  case 1:
     len = (char *)"byte";
     break;
-  case MEM_HWORD:
+  case 2:
     len = (char *)"half word";
     break;
-  case MEM_WORD:
+  case 4:
     len = (char *)"word";
     break;
   }
@@ -119,5 +85,10 @@ void mtrace() {
 
   mtrace_record.trace_on = false;
 }
+#endif
 
-void mtrace_reset() { mtrace_record.trace_on = false; }
+void mtrace_reset() {
+#if CONFIG_MTRACE
+  mtrace_record.trace_on = false;
+#endif
+}
