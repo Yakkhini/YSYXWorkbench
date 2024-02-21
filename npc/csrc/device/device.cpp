@@ -18,7 +18,7 @@ word_t mmio_read(paddr_t addr, int len) {
 void mmio_write(paddr_t addr, int len, word_t data) {
   switch (addr) {
   case CONFIG_SERIAL_MMIO:
-    putchar((char)(data & 0xff));
+    putchar((char)data);
     break;
   default:
     break;
