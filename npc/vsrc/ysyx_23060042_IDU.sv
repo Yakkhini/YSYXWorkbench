@@ -34,7 +34,7 @@ module ysyx_23060042_IDU (
   assign u_imm = {inst[31], inst[30:12], 12'b0};
   assign j_imm = {inst[31], {11{inst[31]}}, u_imm[19:12], i_imm[0], i_imm[10:1], 1'b0};
 
-  assign rs1 = inst[19:15];
+  // rs1 use mux later
   assign rs2 = inst[24:20];
   assign rd = inst[11:7];
 
@@ -90,6 +90,14 @@ module ysyx_23060042_IDU (
       .key(micro_cmd[2:0]),  // IMM None type instruction no need immediate value
       .default_out(1'b1),
       .lut({3'b000, 1'b0})
+  );
+
+  // rs1 use mux here
+  MuxKeyWithDefault #(1, 3, 5) rs1_mux (
+      .out(rs1),
+      .key(micro_cmd[2:0]),  // U type instruction no need rs1
+      .default_out(inst[19:15]),
+      .lut({3'b110, 5'b00000})
   );
 
 endmodule
