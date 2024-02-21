@@ -202,7 +202,10 @@ void cpu_check() {
   difftest_step(cpu.pc_prev, cpu.pc);
 #endif
 
+#if CONFIG_WATCHPOINT
   check_wp();
+#endif
+
   finish();
 }
 
