@@ -12,6 +12,12 @@ module ysyx_23060042_ALU (
       .key(UnsignArithen),
       .lut({1'b0, data1 >> (data2 & 32'h0000001f), 1'b1, $signed(data1) >>> (data2 & 32'h0000001f)})
   );
+  bit sltdata;
+  MuxKey #(2, 1, 1) slt_mux (
+      .out(sltdata),
+      .key(UnsignArithen),
+      .lut({1'b0, $signed(data1) < $signed(data2), 1'b1, data1 < data2})
+  );
 
   MuxKey #(8, 3, 32) alu_mux (
       .out(out),
@@ -32,7 +38,7 @@ module ysyx_23060042_ALU (
         3'b110,
         data1 & data2,
         3'b111,
-        {31'b0, data1 < data2}
+        {31'b0, sltdata}
       })
   );
 

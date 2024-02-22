@@ -568,6 +568,7 @@ module LookUPTable (
       if (lut_inst == pattern_list[i]) begin
         micro_cmd = micro_list[i];
         hit = 1;
+        // $display("Micro command hit: %b, inst: %b, micro_cmd: %b", hit, lut_inst, micro_cmd);
         disable lookup_micro;
       end
     end
