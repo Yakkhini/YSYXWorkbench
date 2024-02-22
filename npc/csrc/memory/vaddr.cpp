@@ -16,7 +16,7 @@ typedef struct {
 static MTRACERecord mtrace_record;
 #endif
 
-word_t vaddr_ifetch(vaddr_t addr) { return paddr_read(addr, 4); }
+word_t vaddr_ifetch(vaddr_t addr) { return paddr_ifetch(addr); }
 
 int vaddr_read(int addr, const svBitVecVal *len) {
   int plen = *len;

@@ -17,6 +17,8 @@ static void pmem_write(paddr_t addr, int len, word_t data) {
   host_write(guest_to_host(addr), len, data);
 }
 
+word_t paddr_ifetch(paddr_t addr) { return pmem_read(addr, 4); }
+
 word_t paddr_read(paddr_t addr, int len) {
   if (in_pmem(addr))
     return pmem_read(addr, len);
