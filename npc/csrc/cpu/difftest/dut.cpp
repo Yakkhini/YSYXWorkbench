@@ -8,6 +8,7 @@
 void (*ref_difftest_memcpy)(paddr_t addr, void *buf, size_t n,
                             bool direction) = NULL;
 void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
+void (*ref_difftest_pccpy)(void *pc) = NULL;
 void (*ref_difftest_exec)(uint64_t n) = NULL;
 void (*ref_difftest_raise_intr)(uint64_t NO) = NULL;
 
@@ -57,6 +58,9 @@ void difftest_init(char *ref_so_file, long img_size, int port) {
   ref_difftest_regcpy =
       (void (*)(void *dut, bool direction))dlsym(handle, "difftest_regcpy");
   assert(ref_difftest_regcpy);
+
+  ref_difftest_pccpy = (void (*)(void *dut))dlsym(handle, "difftest_pccpy");
+  assert(ref_difftest_pccpy);
 
   ref_difftest_exec = (void (*)(uint64_t n))dlsym(handle, "difftest_exec");
   assert(ref_difftest_exec);
@@ -124,7 +128,8 @@ void difftest_step(vaddr_t pc, vaddr_t npc) {
   if (is_skip_ref) {
     // to skip the checking of an instruction, just copy the reg state to
     // reference design
-    ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+    ref_difftest_regcpy(&cpu.regs, DIFFTEST_TO_REF);
+    ref_difftest_pccpy(&cpu.pc);
     is_skip_ref = false;
     return;
   }
