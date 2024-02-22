@@ -23,7 +23,10 @@ module Memory (
 
   import "DPI-C" function void mtrace_reset();
 
-  always_comb begin  // Maybe cause unexpected behavior
+  import "DPI-C" function void vaddr_difftest_skip_cancel();
+  import "DPI-C" function void vaddr_difftest_skip_check(int addr);
+
+  always @(posedge clk) begin
     if ((Mwen[1] | Mwen[0]) & !rst) begin
       vaddr_write(waddr, Mwen, wdata);
     end
@@ -33,7 +36,11 @@ module Memory (
     rdata_unsign = 0;
     if ((Mren[1] | Mren[0]) & !rst) begin
       rdata_unsign = vaddr_read(raddr, Mren);
+      vaddr_difftest_skip_check(raddr);
+    end else if ((Mwen[1] | Mwen[0]) & !rst) begin
+      vaddr_difftest_skip_check(waddr);
     end else begin
+      vaddr_difftest_skip_cancel();
       mtrace_reset();
     end
   end
