@@ -23,7 +23,7 @@ module Memory (
 
   import "DPI-C" function void mtrace_reset();
 
-  always @(posedge clk) begin
+  always_comb begin // Maybe cause unexpected behavior
     if ((Mwen[1] | Mwen[0]) & !rst) begin
       vaddr_write(waddr, Mwen, wdata);
     end
