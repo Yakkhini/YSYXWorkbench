@@ -1,4 +1,5 @@
 #include <common.h>
+#include <cpu/difftest.h>
 #include <device/device.h>
 
 word_t mmio_read(paddr_t addr, int len) {
@@ -12,6 +13,10 @@ word_t mmio_read(paddr_t addr, int len) {
     break;
   }
 
+#if CONFIG_DIFFTEST
+  difftest_skip_ref();
+#endif
+
   return 0;
 }
 
@@ -23,6 +28,10 @@ void mmio_write(paddr_t addr, int len, word_t data) {
   default:
     break;
   }
+
+#if CONFIG_DIFFTEST
+  difftest_skip_ref();
+#endif
 
   return;
 }

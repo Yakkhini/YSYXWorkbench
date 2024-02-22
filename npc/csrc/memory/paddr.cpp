@@ -1,4 +1,5 @@
 #include <common.h>
+#include <cpu/difftest.h>
 #include <device/device.h>
 #include <memory/host.h>
 #include <memory/paddr.h>
@@ -20,8 +21,13 @@ static void pmem_write(paddr_t addr, int len, word_t data) {
 word_t paddr_ifetch(paddr_t addr) { return pmem_read(addr, 4); }
 
 word_t paddr_read(paddr_t addr, int len) {
-  if (in_pmem(addr))
+  if (in_pmem(addr)) {
+#if CONFIG_DIFFTEST
+    difftest_skip_ref_cancel();
+#endif
+
     return pmem_read(addr, len);
+  }
 
 #if CONFIG_DEVICE
   return mmio_read(addr, len);
@@ -33,6 +39,10 @@ word_t paddr_read(paddr_t addr, int len) {
 
 void paddr_write(paddr_t addr, int len, word_t data) {
   if (in_pmem(addr)) {
+#if CONFIG_DIFFTEST
+    difftest_skip_ref_cancel();
+#endif
+
     pmem_write(addr, len, data);
     return;
   }
