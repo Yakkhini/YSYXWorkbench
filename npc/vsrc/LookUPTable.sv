@@ -543,23 +543,37 @@ module LookUPTable (
   import "DPI-C" function void halt(int code);
 
   bit hit  /*verilator public*/;
-  bit [2:0] func3;
-  bit [6:0] func7;
+  //bit [2:0] func3;
+  //bit [6:0] func7;
   bit [PATTERN_LEN-1:0] lut_inst;
   always_comb begin : lookup_micro
     micro_cmd = 0;
     hit = 0;
     for (integer i = 0; i < INST_NR; i = i + 1) begin
-      func3 = {3{!(micro_list[i][2] & micro_list[i][1])}};  // U & J Type no need func3
+      //func3 = {3{~(micro_list[i][2] & micro_list[i][1])}};  // U & J Type no need func3
       // Only no IMM Type or Shift inst need func7
-      func7 = {7{(micro_list[i][2:0] == IMM_TYPE_NONE) | (micro_list[i][6:5] == 2'b01)}};
-      lut_inst = {inst[14:8] & func7, inst[7:5] & func3, inst[4:0]};
-      micro_cmd = micro_cmd | ({MICRO_LEN{lut_inst == pattern_list[i]}} & micro_list[i]);
-      hit = hit | (lut_inst == pattern_list[i]);
+      //func7 = {7{(micro_list[i][2:0] == IMM_TYPE_NONE) | (micro_list[i][6:5] == 2'b01)}};
+      //lut_inst = {inst[14:8] & func7, inst[7:5] & func3, inst[4:0]};
+
+      lut_inst = {inst[14:8], inst[7:5], inst[4:0]};
+
+      if (micro_list[i][2] & micro_list[i][1]) begin
+        lut_inst[7:5] = 3'b000;
+      end
+
+      if (~((micro_list[i][2:0] == IMM_TYPE_NONE) | (micro_list[i][6:5] == 2'b01))) begin
+        lut_inst[14:8] = 7'b0000000;
+      end
+
+      if (lut_inst == pattern_list[i]) begin
+        micro_cmd = micro_list[i];
+        hit = 1;
+        disable lookup_micro;
+      end
     end
-    if (hit) begin
-      // $display("Micro command hit: %b, inst: %b, micro_cmd: %b", hit, inst, micro_cmd);
-    end
+    //if (hit) begin
+    // $display("Micro command hit: %b, inst: %b, micro_cmd: %b", hit, inst, micro_cmd);
+    //end
   end
 
 endmodule
