@@ -3,12 +3,16 @@
 #include <device/device.h>
 
 word_t mmio_read(paddr_t addr, int len) {
+  word_t ret = 0;
+
   switch (addr) {
   case CONFIG_RTC_MMIO:
     timer_update();
-    return npc_time.usec;
+    ret = npc_time.usec;
+    break;
   case CONFIG_RTC_MMIO + 4:
-    return npc_time.sec;
+    ret = npc_time.sec;
+    break;
   default:
     break;
   }
@@ -17,7 +21,7 @@ word_t mmio_read(paddr_t addr, int len) {
   difftest_skip_ref();
 #endif
 
-  return 0;
+  return ret;
 }
 
 void mmio_write(paddr_t addr, int len, word_t data) {
