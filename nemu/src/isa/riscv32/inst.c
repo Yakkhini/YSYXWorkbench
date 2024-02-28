@@ -21,6 +21,7 @@
 #include <stdint.h>
 
 #define R(i) gpr(i)
+#define SR(i) csr(i)
 #define Mr vaddr_read
 #define Mw vaddr_write
 
@@ -65,11 +66,12 @@ enum {
            (BITS(i, 30, 25) << 5) | (BITS(i, 11, 8) << 1);                     \
   } while (0)
 
-static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2,
-                           word_t *imm, int type) {
+static void decode_operand(Decode *s, int *rd, int *csr_idx, word_t *src1,
+                           word_t *src2, word_t *imm, int type) {
   uint32_t i = s->isa.inst.val;
   int rs1 = BITS(i, 19, 15);
   int rs2 = BITS(i, 24, 20);
+  *csr_idx = BITS(i, 31, 20);
   *rd = BITS(i, 11, 7);
   switch (type) {
   case TYPE_R:
@@ -101,13 +103,14 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2,
 
 static int decode_exec(Decode *s) {
   int rd = 0;
+  int csr_idx = 0;
   word_t src1 = 0, src2 = 0, imm = 0;
   s->dnpc = s->snpc;
 
 #define INSTPAT_INST(s) ((s)->isa.inst.val)
 #define INSTPAT_MATCH(s, name, type, ... /* execute body */)                   \
   {                                                                            \
-    decode_operand(s, &rd, &src1, &src2, &imm, concat(TYPE_, type));           \
+    decode_operand(s, &rd, &csr_idx, &src1, &src2, &imm, concat(TYPE_, type)); \
     __VA_ARGS__;                                                               \
   }
 
@@ -203,8 +206,12 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu, R,
           R(rd) = src1 % src2);
 
+  /* CSR Instructions & Privileged Instructions */
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak, N,
           NEMUTRAP(s->pc, R(10))); // R(10) is $a0
+  INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I,
+          R(rd) = SR(csr_idx), SR(csr_idx) = src1);
+
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv, N, INV(s->pc));
   INSTPAT_END();
 
