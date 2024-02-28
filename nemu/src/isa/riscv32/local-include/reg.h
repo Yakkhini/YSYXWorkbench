@@ -27,8 +27,14 @@ static inline int check_reg_idx(int idx) {
 
 static inline word_t *check_csr_idx(int idx) {
   switch (idx) {
+  case 0x300:
+    return &cpu.csr.mstatus;
   case 0x305:
     return &cpu.csr.mtvec;
+  case 0x341:
+    return &cpu.csr.mepc;
+  case 0x342:
+    return &cpu.csr.mcause;
   default:
     panic("CSR 0x%x not implemented", idx);
   }
