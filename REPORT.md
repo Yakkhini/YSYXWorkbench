@@ -535,17 +535,48 @@ M[5] = 16; M[6] = 33; # Didn't change in execution.
 
 注意，最后一个状态 `(6, 98, 33, 8d49)` 是将 M[5] 处的数值当作指令执行的结果，也就是不想要的一个状态。
 
-#### 立即数背后的故事（不太确定）
+#### 立即数背后的故事 Pt.1
 
-由于 NEMU 天生的用途与性质，其在维护开发与使用中往往涉及两种甚至多种不同的 ISA。因此我认为要想解决立即数中的端序问题乃至更多特定的 ISA 问题，首先需要理解的是在 NEMU 及 相关测试代码框架中不同的功能部分、模块里是按照何种 ISA 编译、运行或是写入、模拟的。
+由于 NEMU 天生的用途与性质，其在维护开发与使用中往往涉及两种甚至多种不同的 ISA。因此我认为要想解决立即数中的端序问题乃至更多特定的 ISA 问题，首先需要理解的是在 NEMU 及 客户程序是按照何种 ISA 及端序编译、运行或是写入、模拟的。
 
-至少以 cpu-test 测试的过程为例。测例中的代码会在交叉编译后生成 `$(ARCH)` 的可执行文件，也遵从 ISA 的端序；而 NEMU 及其相关数据的计算都是遵从本机的架构与端序。
+至少以 cpu-test 测例客户程序为例。在本机磁盘存储中，测例客户程序的代码会在交叉编译后生成 `$(ARCH)` 的可执行文件，其遵从 ISA 的端序；而 NEMU 本身需要运行在本机，其编译结果遵从本机的架构与端序。它们存储在 `Makefile` 中为编译指令约定的编译结果文件夹，如 `am-kernels/tests/cpu-tests/biuld` 或 `$NEMU/build`。
 
-这样来看，其中不同端序转换出现的「误解」问题应当出现在 `vaddr_` 相关函数中。因为我们知道，在运行时整个可执行文件以特定方式加载到内存中，包括指令及相关数据等。显然的，目标 ISA 的端序格式及内存格式应当在整个模拟过程中持续维护。所以可以利用预处理命令为 `memory` 增添一个端序改变的开关，在读写时按需改变端序，达到正常运行的效果。
+NEMU 启动后，NEMU 本身经过编译得到的可执行文件加载到内存中，分为 `.text` 段、`.data` 段等。为叙述方便，我们简化为仅区分存放 NEMU 程序编译的机器码的内存区域与存放其运行时各种数据的内存区域。其端序格式与存储时一致。
 
-当然这只是一个较为粗略的思路。不同 ISA 格式有差异，其在实际实现中会有各样的具体问题。比如 32 位指令集下无法将 32 位常数编码到一条指令中。
+关键在于接下来 NEMU 运行后开始初始化模拟客户机器并加载客户程序的步骤，客户程序架构的端序在在这一过程中引入。NEMU 在这一阶段除了初始化 CPU 关键还会申请一段连续内存空间专门用来存放客户程序编译出的可执行文件，也是模拟客户机器的内存硬件。在 NEMU 眼中这段内存是其数据内存空间中的一段，以主机端序格式存写；而在客户程序编译出的可执行文件眼中，这段内存是其指令内存空间中的一段，以客户机端序格式存写。
 
-至少在 `riscv32` 指令集中，对 32 位常数的处理被切分位两条指令。
+![NEMU 与客户程序的内存空间](img/oscpu-host-guest-memory.excalidraw.png)
+
+但是客户机并不真正具备独立的内存设备及内存读写的功能，进一步地讲它只是 NEMU 中由一系列逻辑代码虚构的一个机器。在客户机产生访存请求时，会通过 NEMU 来调用 `vaddr_` 相关函数来访问 Guest Machine Memory。而如果忽略 NEMU 各种功能设计，这本质上只是 NEMU 作为主机中一个正在运行的普通程序在读写操作系统分配给它的内存，当然以主机端序格式存写。
+
+```c
+
+static inline word_t host_read(void *addr, int len) {
+  switch (len) {
+    case 1: return *(uint8_t  *)addr;
+    case 2: return *(uint16_t *)addr;
+    case 4: return *(uint32_t *)addr;
+    default: MUXDEF(CONFIG_RT_CHECK, assert(0), return 0);
+  }
+}
+
+static inline void host_write(void *addr, int len, word_t data) {
+  switch (len) {
+    case 1: *(uint8_t  *)addr = data; return;
+    case 2: *(uint16_t *)addr = data; return;
+    case 4: *(uint32_t *)addr = data; return;
+  }
+}
+
+```
+
+这是 NEMU 中模拟客户机访存行为的函数中最内层的两个函数。它们通过合法的 `addr` 参数（此时已经转换为真实内存设备中存放数据的真正地址）来访问内存，`len` 参数来指定访问的字长。经过编译后它们会变成 NEMU 可执行文件中一系列可执行机器码，并以主机端序格式存储，直接由运行 NEMU 的机器 CPU 来执行。所以，不管在内存此处存放的数据是什么端序，`host_read` 和 `host_write` 函数都会以主机端序格式返回，或是写入 `data` 变量值的主机端序格式。
+
+因此解决办法其实也很简单：可以在 NEMU 的 ISA 模块中为每一种支持架构说明其端序格式，并在启动后可以分辨并检查客户机与 NEMU 的端序是否一致。如果不一致，可以在访存时进行端序转换。这样就可以保证客户程序在 NEMU 中的运行时不会受到端序问题的影响。
+
+#### 立即数背后的故事 Pt.2
+
+至少在 `RV32E` 指令集中，对 32 位常数的处理被切分为两条指令。来观察一下规格手册中对 `LUI` 和 `AUIPC` 指令的说明：
 
 > LUI (load upper immediate) is used to build 32-bit constants and uses the U-type format. LUI places the U-immediate value in the top 20 bits of the destination register rd, filling in the lowest 12 bits with zeros. 
 > 
@@ -553,7 +584,34 @@ M[5] = 16; M[6] = 33; # Didn't change in execution.
 > 
 > *——The RISC-V Instruction Set Manual Volume I: Unprivileged ISA*
 
+这是两条 U-Type 类型的指令，它对应的 U-IMM 格式立即数只能占用整个 32 位长指令中的 20 位，而另有 12 位用于存储目标寄存器及操作码。这显然是有必要的，因为中央处理器需要先通过读取操作码等信息来识别指令类型，再决定下一步的译码与执行如何正确完成。也因此，没有任何一条指令可以存储 **任意** 32 位长的立即数，即 $2^{32}$ 种不同的立即数。之所以这样表达是因为 RISC-V 并不是无法在指令中声明 32 位长的立即数，比如 U-IMM 格式的立即数会将其存储的 20 位长的立即数左移 12 位，再填充 12 位 0，这样就可以表达 $2^{20}$ 种不同的 32 位立即数。
 
+但是在 RISC-V 架构上依然支持任意 32 位长的指令跳转，这是由 `AUIPC` 与 `JALR` 两条指令来完成的。`AUIPC` 指令会将其 U-IMM 格式的立即数左移 12 位，再填充 12 位 0，然后加上当前指令的地址，最后将结果存入目标寄存器。`JALR` 指令则会将其 I-IMM 格式的立即数加上读取寄存器的地址，然后跳转到这个地址。这样就可以实现任意 32 位长的指令跳转。
+
+> The AUIPC instruction supports two-instruction sequences to access arbitrary offsets from the PC for both control-flow transfers and data accesses. The combination of an AUIPC and the 12-bit immediate in a JALR can transfer control to any 32-bit PC-relative address, while an AUIPC plus the 12-bit immediate offset in regular load or store instructions can access any 32-bit PC-relative data address. 
+>
+> *——The RISC-V Instruction Set Manual Volume I: Unprivileged ISA*
+
+同样的，在其他数据读取、计算、写入过程中也可以通过组合多条指令来操作 32 位数字。例如：
+
+1. 通过高位立即数与低位立即数的组合在寄存器中形成任意 32 位立即数；
+2. 通过指令组合在多个寄存器中的数值来操作 32 位立即数；
+3. 通过指令组合对单个寄存器中的数值进行操作，再将结果存入另一个寄存器中；
+4. 从内存中读取 32 位立即数，再将其存入寄存器中，并在下几条指令中操作。
+
+总之，虽然 RISC-V 指令集中的单条指令无法直接声明 32 位长的立即数，但是通过指令组合可以实现对 32 位长立即数的灵活操作。
+
+#### 运行时库的好处
+
+在 AM 中抽象了 klib 库。通过运行时库的抽象，可以将运行时库的实现与客户程序的编译分离。一方面来说，整个项目通过分为 Abstract Machine 与 NEMU 来分离了模拟机器的实现与简易操作系统的实现，可以让更多的客户程序移植到 NEMU 上运行。
+
+另一方面来说，运行时库的抽象也可以增加相关代码的复用性。比如 `printf()` 函数，它在不同的更下层环境可能会实现不同，因为它设计系统与硬件的一些功能。但是通过抽象运行时库，可以在客户程序中复用库的 `printf()` 而不是自己实现一个。这样既可以减少客户程序的代码量，还可以保证结果的一致性和正确性。
+
+#### `stdargs.h` 的实现
+
+经过学习之后，我发现 `stdarg.h` 与其宏的实现并不简单。我首先尝试在 `glibc` 库与 `newlib` 库中寻找这一头文件，却发现它们并没有直接提供 `stdarg.h`。原来是获取函数参数等行为与编译器行为高度相关，也就是必须由编译器来提供这一头文件，以此来保证正确性。果然，在 gcc 附带的 `include` 库中我找到了这一头文件。这个头文件中定义了一些宏，如 `va_list`、`va_start`、`va_arg`、`va_end` 等，并在预处理后扩展为 `__builtin_va_list`、`__builtin_va_start`、`__builtin_va_arg`、`__builtin_va_end` 等内建函数。在 C 语言标准中，以双下划线开头的函数约定为编译器使用的函数，而不是用户定义的函数，因此称为编译器内建函数。
+
+但是我在 GCC 文档中的内建函数列表与说明中并没有找到这些函数。原来这些函数是更加特殊的内建函数，可以说是一种编译器原语，它们的行为还要参考指令架构的调用约定与目标机器的 ABI。在很多情况下，这些函数会直接编译为一系列的汇编指令或机器码，而不是在某个文件中以 C 语言定义并导入编译过程中。
 
 ## 参考资料
 
