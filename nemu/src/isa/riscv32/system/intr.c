@@ -13,10 +13,15 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
+#include "debug.h"
 #include <isa.h>
 
 word_t isa_raise_intr(word_t NO, vaddr_t epc) {
- // Currently only NO.11 "Environment call from M-mode" is
+#if CONFIG_ETRACE
+  Log("ETRACE: Exception NO = %d", NO);
+#endif
+
+  // Currently only NO.11 "Environment call from M-mode" is
   // used by  ECALL instruction so no switch case is needed.
   cpu.csr.mcause = NO;
 

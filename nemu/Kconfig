@@ -148,6 +148,11 @@ config TRACE_END
   int "When tracing is disabled (unit: number of instructions)"
   default 10000
 
+config ETRACE
+  depends on TRACE
+  bool "Enable exception tracer"
+  default 0
+
 config FTRACE
   depends on TRACE
   bool "Enable function tracer"
