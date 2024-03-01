@@ -126,6 +126,7 @@
         export NPC_HOME=`readlink -f npc`
         export NEMU_HOME=`readlink -f nemu`
         export AM_HOME=`readlink -f abstract-machine`
+        export NAVY_HOME=`readlink -f navy-apps`
         export NVBOARD_HOME=`readlink -f nvboard`
         export YOSYS_STA_HOME=`readlink -f yosys-sta`
         export PATH="$NPC_HOME/build/bin:$PATH"
