@@ -116,6 +116,7 @@
         stdpkgs.gnumake
         stdpkgs.bear
         pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv64-embedded.buildPackages.gcc
+        pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv64.buildPackages.gcc
         pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv32-embedded.libcCross
         stdpkgs.SDL2
         stdpkgs.SDL2_image
