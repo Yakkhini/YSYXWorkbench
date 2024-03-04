@@ -37,6 +37,8 @@ void do_syscall(Context *c) {
     panic("Unhandled syscall ID = %d", type);
   }
 
+  c->GPRx = ret;
+
 #if CONFIG_STRACE
   Log("Return value = %d", ret);
 #endif
