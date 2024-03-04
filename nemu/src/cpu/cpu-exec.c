@@ -108,8 +108,8 @@ static void statistic() {
 
 void assert_fail_msg() {
   isa_reg_display();
-  statistic();
   IFDEF(CONFIG_IRINGBUF, iringbuf_print());
+  statistic();
 }
 
 /* Simulate how the CPU works. */
