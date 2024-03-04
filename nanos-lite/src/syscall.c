@@ -33,6 +33,16 @@ void do_syscall(Context *c) {
     yield();
     ret = 0;
     break;
+  case SYS_write: // a[0] = count, a[1] = fd, a[2] = buf
+    if (a[1] == 1 || a[1] == 2) {
+      for (int i = 0; i < a[0]; i++) {
+        putch(*(char *)(a[2] + i));
+      }
+      ret = a[0];
+    } else {
+      ret = -1;
+    }
+    break;
   default:
     panic("Unhandled syscall ID = %d", type);
   }
