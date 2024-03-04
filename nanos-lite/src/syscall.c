@@ -1,4 +1,5 @@
 #include "syscall.h"
+#include "config.h"
 #include <common.h>
 
 void do_syscall(Context *c) {
@@ -17,8 +18,10 @@ void do_syscall(Context *c) {
   a[1] = c->GPR3;
   a[2] = c->GPR4;
 
+#if CONFIG_STRACE
   Log("Handling syscall ID = %d (%s), arguments = %d, %d, %d, %d", type,
       syscall_names[type], a[0], a[1], a[2]);
+#endif
 
   switch (type) {
   case SYS_exit:
@@ -32,5 +35,7 @@ void do_syscall(Context *c) {
     panic("Unhandled syscall ID = %d", type);
   }
 
+#if CONFIG_STRACE
   Log("Return value = %d", ret);
+#endif
 }
