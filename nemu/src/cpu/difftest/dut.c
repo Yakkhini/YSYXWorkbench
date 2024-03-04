@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include <cpu/iringbuf.h>
 #include <dlfcn.h>
 
 #include <isa.h>
@@ -96,6 +97,7 @@ static void checkregs(CPU_state *ref, vaddr_t pc) {
     nemu_state.state = NEMU_ABORT;
     nemu_state.halt_pc = pc;
     isa_reg_display();
+    iringbuf_print();
   }
 }
 
