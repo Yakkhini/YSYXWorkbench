@@ -21,7 +21,7 @@ void do_syscall(Context *c) {
   a[2] = c->GPR4;
 
 #if CONFIG_STRACE
-  Log("Handling syscall ID = %d (%s), arguments = %d, %d, %d, %d", type,
+  Log("Handling syscall ID = %d (%s), arguments = %d, %d, %d", type,
       syscall_names[type], a[0], a[1], a[2]);
 #endif
 
