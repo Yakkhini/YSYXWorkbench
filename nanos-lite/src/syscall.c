@@ -1,6 +1,8 @@
 #include "syscall.h"
 #include "config.h"
 #include <common.h>
+#include <stdint.h>
+#include <string.h>
 
 void do_syscall(Context *c) {
 #if CONFIG_STRACE
@@ -42,6 +44,10 @@ void do_syscall(Context *c) {
     } else {
       ret = -1;
     }
+    break;
+  case SYS_brk:
+    memset((void *)a[2], 0, a[1]);
+    ret = 0;
     break;
   default:
     panic("Unhandled syscall ID = %d", type);
