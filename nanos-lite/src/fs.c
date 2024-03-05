@@ -1,5 +1,8 @@
 #include <fs.h>
 
+size_t ramdisk_read(void *buf, size_t offset, size_t len);
+size_t ramdisk_write(const void *buf, size_t offset, size_t len);
+
 typedef size_t (*ReadFn)(void *buf, size_t offset, size_t len);
 typedef size_t (*WriteFn)(const void *buf, size_t offset, size_t len);
 
@@ -36,9 +39,14 @@ static int file_num = sizeof(file_table) / sizeof(file_table[0]);
 int fs_open(const char *pathname, int flags, int mode) {
   for (int i = 0; i < file_num; i++) {
     if (strcmp(pathname, file_table[i].name) == 0) {
+      if (i >= 3) {
+        file_table[i].read = ramdisk_read;
+        file_table[i].write = ramdisk_write;
+      }
       return i;
     }
   }
+  panic("no such file: %s", pathname);
   return -1;
 };
 
