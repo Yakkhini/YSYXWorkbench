@@ -82,6 +82,26 @@ size_t fs_write(int fd, const void *buf, size_t len) {
   return ret;
 };
 
+size_t fs_lseek(int fd, size_t offset, int whence) {
+  if (fd < 0 || fd >= file_num) {
+    return 0;
+  }
+  switch (whence) {
+  case SEEK_SET:
+    file_table[fd].open_offset = offset;
+    break;
+  case SEEK_CUR:
+    file_table[fd].open_offset += offset;
+    break;
+  case SEEK_END:
+    file_table[fd].open_offset = file_table[fd].size + offset;
+    break;
+  default:
+    return 0;
+  }
+  return file_table[fd].open_offset;
+};
+
 void init_fs() {
   // TODO: initialize the size of /dev/fb
 }
