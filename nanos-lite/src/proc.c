@@ -1,3 +1,4 @@
+#include "config.h"
 #include <common.h>
 #include <proc.h>
 
@@ -27,7 +28,7 @@ void init_proc() {
 
   Log("Initializing processes...");
 
-  naive_uload(NULL, NULL);
+  naive_uload(NULL, CONFIG_LOAD_FILE_NAME);
 
 }
 
