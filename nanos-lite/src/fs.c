@@ -1,4 +1,5 @@
 #include <fs.h>
+#include <stddef.h>
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
@@ -100,6 +101,14 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
     return 0;
   }
   return file_table[fd].open_offset;
+};
+
+size_t fs_close(int fd) {
+  if (fd < 0 || fd >= file_num) {
+    return -1;
+  }
+  file_table[fd].open_offset = 0;
+  return 0;
 };
 
 void init_fs() {
