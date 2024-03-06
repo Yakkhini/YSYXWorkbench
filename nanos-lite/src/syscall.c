@@ -1,6 +1,7 @@
 #include "syscall.h"
 #include "config.h"
 #include <common.h>
+#include <fs.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -35,15 +36,20 @@ void do_syscall(Context *c) {
     yield();
     ret = 0;
     break;
-  case SYS_write: // a[0] = count, a[1] = fd, a[2] = buf
-    if (a[1] == 1 || a[1] == 2) {
-      for (int i = 0; i < a[0]; i++) {
-        putch(*(char *)(a[2] + i));
-      }
-      ret = a[0];
-    } else {
-      ret = -1;
-    }
+  case SYS_open:
+    ret = fs_open((const char *)a[0], 0, 0);
+    break;
+  case SYS_write: // a[0] = fd, a[1] = buf, a[2] = count
+    ret = fs_write(a[0], (const void *)a[1], a[2]);
+    break;
+  case SYS_read: // a[0] = fd, a[1] = buf, a[2] = count
+    ret = fs_read(a[0], (void *)a[1], a[2]);
+    break;
+  case SYS_close:
+    ret = fs_close(a[0]);
+    break;
+  case SYS_lseek:
+    ret = fs_lseek(a[0], a[1], a[2]);
     break;
   case SYS_brk:
     memset((void *)a[2], 0, a[1]);
