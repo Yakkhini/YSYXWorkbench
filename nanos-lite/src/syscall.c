@@ -26,6 +26,15 @@ void do_syscall(Context *c) {
 #if CONFIG_STRACE
   Log("Handling syscall ID = %d (%s), arguments = %d, %d, %d", type,
       syscall_names[type], a[0], a[1], a[2]);
+  if (type == SYS_open) {
+    Log("File name = %s", a[0]);
+  }
+
+  if (type == SYS_read || type == SYS_write || type == SYS_close ||
+      type == SYS_lseek) {
+    char *strace_file_name = file_name(a[0]);
+    Log("File name = %s", strace_file_name);
+  }
 #endif
 
   switch (type) {
