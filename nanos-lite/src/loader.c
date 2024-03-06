@@ -1,4 +1,5 @@
 #include <elf.h>
+#include <fs.h>
 #include <proc.h>
 #include <stdint.h>
 
@@ -15,10 +16,6 @@
 #elif defined(__riscv)
 #define EXPECT_MACHINETYPE EM_RISCV
 #endif
-
-int fs_open(const char *pathname, int flags, int mode);
-size_t fs_read(int fd, void *buf, size_t len);
-size_t fs_write(int fd, const void *buf, size_t len);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
