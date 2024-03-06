@@ -12,6 +12,7 @@ typedef struct {
   size_t disk_offset;
   ReadFn read;
   WriteFn write;
+  size_t open_offset; // This member must be the last one
 } Finfo;
 
 enum { FD_STDIN, FD_STDOUT, FD_STDERR, FD_FB };
@@ -49,7 +50,9 @@ int fs_open(const char *pathname, int flags, int mode) {
       if (i >= 3) {
         file_table[i].read = ramdisk_read;
         file_table[i].write = ramdisk_write;
+        file_table[i].open_offset = 0;
       }
+      Log("open file: %s, fd: %d", pathname, i);
       return i;
     }
   }
@@ -61,14 +64,22 @@ size_t fs_read(int fd, void *buf, size_t len) {
   if (fd < 0 || fd >= file_num) {
     return 0;
   }
-  return file_table[fd].read(buf, file_table[fd].disk_offset, len);
+  int target_offset = file_table[fd].disk_offset + file_table[fd].open_offset;
+  size_t ret = file_table[fd].read(buf, target_offset, len);
+  file_table[fd].open_offset += ret;
+
+  return ret;
 };
 
 size_t fs_write(int fd, const void *buf, size_t len) {
   if (fd < 0 || fd >= file_num) {
     return 0;
   }
-  return file_table[fd].write(buf, file_table[fd].disk_offset, len);
+  int target_offset = file_table[fd].disk_offset + file_table[fd].open_offset;
+  size_t ret = file_table[fd].write(buf, target_offset, len);
+  file_table[fd].open_offset += ret;
+
+  return ret;
 };
 
 void init_fs() {
