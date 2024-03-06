@@ -14,4 +14,6 @@ size_t fs_lseek(int fd, size_t offset, int whence);
 size_t fs_lseek(int fd, size_t offset, int whence);
 size_t fs_close(int fd);
 
+char *file_name(int fd);
+
 #endif
