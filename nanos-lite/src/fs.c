@@ -57,6 +57,20 @@ int fs_open(const char *pathname, int flags, int mode) {
   return -1;
 };
 
+size_t fs_read(int fd, void *buf, size_t len) {
+  if (fd < 0 || fd >= file_num) {
+    return 0;
+  }
+  return file_table[fd].read(buf, file_table[fd].disk_offset, len);
+};
+
+size_t fs_write(int fd, const void *buf, size_t len) {
+  if (fd < 0 || fd >= file_num) {
+    return 0;
+  }
+  return file_table[fd].write(buf, file_table[fd].disk_offset, len);
+};
+
 void init_fs() {
   // TODO: initialize the size of /dev/fb
 }
