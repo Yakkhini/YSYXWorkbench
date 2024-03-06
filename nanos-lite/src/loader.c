@@ -20,9 +20,11 @@
 static uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
 
+  fs_lseek(fd, 0, SEEK_SET);
   Elf_Ehdr *ehdr = (Elf_Ehdr *)malloc(sizeof(Elf_Ehdr));
   fs_read(fd, ehdr, sizeof(Elf_Ehdr));
   Elf_Phdr *phdr_list = (Elf_Phdr *)malloc(ehdr->e_phnum * sizeof(Elf_Phdr));
+  fs_lseek(fd, ehdr->e_phoff, SEEK_SET);
   fs_read(fd, phdr_list, ehdr->e_phnum * sizeof(Elf_Phdr));
 
   assert(*(uint32_t *)ehdr->e_ident ==
@@ -38,6 +40,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       void *buf = malloc(filesz);
       Log("Loading [0x%08x, 0x%08x) to [0x%08x, 0x%08x)", off, off + filesz,
           addr, addr + memsz);
+      fs_lseek(fd, off, SEEK_SET);
       fs_read(fd, buf, filesz);
       memcpy((void *)addr, buf, filesz);
       memset((void *)(addr + filesz), 0, memsz - filesz);
