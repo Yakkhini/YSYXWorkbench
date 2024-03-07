@@ -37,6 +37,7 @@ void do_syscall(Context *c) {
   }
 #endif
 
+  struct timeval *tv;
   switch (type) {
   case SYS_exit:
     halt(a[0]);
@@ -62,6 +63,15 @@ void do_syscall(Context *c) {
     break;
   case SYS_brk:
     memset((void *)a[2], 0, a[1]);
+    ret = 0;
+    break;
+  case SYS_gettimeofday:
+    tv = (struct timeval *)a[1];
+    tv->tv_sec = io_read(AM_TIMER_UPTIME).us / 1000000;
+    tv->tv_usec = io_read(AM_TIMER_UPTIME).us / 1000;
+#if CONFIG_STRACE
+    Log("gettimeofday: %d, %d", tv->tv_sec, tv->tv_usec);
+#endif
     ret = 0;
     break;
   default:
