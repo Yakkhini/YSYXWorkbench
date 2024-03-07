@@ -1,16 +1,16 @@
+#include <NDL.h>
 #include <stdio.h>
-#include <sys/time.h>
 #include <unistd.h>
 
 int main() {
-  struct timeval tv;
+  NDL_Init(0);
+
   long last_print = 0;
   long now_ms = 0;
 
   // Print every 0.5 seconds
   while (1) {
-    gettimeofday(&tv, NULL);
-    now_ms = tv.tv_usec;
+    now_ms = NDL_GetTicks();
 
     for (int i = 0; i < 10000; i++)
       ;
@@ -20,5 +20,8 @@ int main() {
       last_print = now_ms;
     }
   }
+
+  NDL_Quit();
+
   return 0;
 }
