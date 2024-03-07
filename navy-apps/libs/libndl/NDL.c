@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +21,19 @@ uint32_t NDL_GetTicks() {
   return tv->tv_usec;
 }
 
-int NDL_PollEvent(char *buf, int len) { return 0; }
+int NDL_PollEvent(char *buf, int len) {
+  if (evtdev == -1) {
+    printf("NDL_PollEvent: NDL not init or event device not exist.\n");
+    return 0;
+  }
+
+  memset(buf, 0, len);
+  if (read(evtdev, buf, len)) {
+    return 1;
+  }
+
+  return 0;
+}
 
 void NDL_OpenCanvas(int *w, int *h) {
   if (getenv("NWM_APP")) {
@@ -58,9 +71,19 @@ int NDL_QueryAudio() { return 0; }
 int NDL_Init(uint32_t flags) {
   if (getenv("NWM_APP")) {
     evtdev = 3;
+  } else {
+    evtdev = open("/dev/events", O_RDONLY);
   }
+
   tv = (struct timeval *)malloc(sizeof(struct timeval));
   return 0;
 }
 
-void NDL_Quit() {}
+void NDL_Quit() {
+  if (evtdev != -1) {
+    close(evtdev);
+  }
+  if (tv != NULL) {
+    free(tv);
+  }
+}
