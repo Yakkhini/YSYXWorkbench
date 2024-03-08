@@ -36,6 +36,11 @@ int NDL_PollEvent(char *buf, int len) {
 }
 
 void NDL_OpenCanvas(int *w, int *h) {
+  if (fbdev == -1) {
+    printf("NDL_OpenCanvas: NDL not init.\n");
+    return;
+  }
+
   if (getenv("NWM_APP")) {
     int fbctl = 4;
     fbdev = 5;
@@ -56,9 +61,45 @@ void NDL_OpenCanvas(int *w, int *h) {
     }
     close(fbctl);
   }
+
+  fbdev = open("/dev/fb", O_RDWR);
+  uint32_t size = 0;
+  read(fbdev, &size, 0);
+  uint32_t fb_width = size >> 16;
+  uint32_t fb_height = size & 0xffff;
+
+  if (*w == 0 && *h == 0) {
+    *w = fb_width;
+    *h = fb_height;
+  }
+
+  screen_w = *w;
+  screen_h = *h;
+
+  return;
 }
 
-void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {}
+void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
+  switch (fbdev) {
+  case -1:
+    printf("NDL_DrawRect: NDL not init.\n");
+    return;
+  case -2:
+    printf("NDL_DrawRect: Canvas not open.\n");
+    return;
+  default:
+    break;
+  }
+
+  uint32_t *buf = (uint32_t *)malloc(5 * sizeof(uint32_t));
+  buf[0] = x;
+  buf[1] = y;
+  buf[2] = w;
+  buf[3] = h;
+  buf[4] = (uint32_t)pixels;
+
+  write(fbdev, buf, 0);
+}
 
 void NDL_OpenAudio(int freq, int channels, int samples) {}
 
@@ -75,6 +116,7 @@ int NDL_Init(uint32_t flags) {
     evtdev = open("/dev/events", O_RDONLY);
   }
 
+  fbdev = -2;
   tv = (struct timeval *)malloc(sizeof(struct timeval));
   return 0;
 }
@@ -82,6 +124,11 @@ int NDL_Init(uint32_t flags) {
 void NDL_Quit() {
   if (evtdev != -1) {
     close(evtdev);
+    evtdev = -1;
+  }
+  if (fbdev != -1) {
+    close(fbdev);
+    fbdev = -1;
   }
   if (tv != NULL) {
     free(tv);
