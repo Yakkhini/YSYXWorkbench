@@ -13,21 +13,17 @@ int SDL_PushEvent(SDL_Event *ev) {
   return 0;
 }
 
-int SDL_WaitEvent(SDL_Event *event) {
+int SDL_PollEvent(SDL_Event *ev) {
 
   char buf[64];
-  while (1) {
-    if (NDL_PollEvent(buf, sizeof(buf))) {
-      break;
-    }
-  }
+  NDL_PollEvent(buf, sizeof(buf));
 
   switch (buf[1]) {
   case 'd':
-    event->type = SDL_KEYDOWN;
+    ev->type = SDL_KEYDOWN;
     break;
   case 'u':
-    event->type = SDL_KEYUP;
+    ev->type = SDL_KEYUP;
     break;
   default:
     return 0;
@@ -46,11 +42,21 @@ int SDL_WaitEvent(SDL_Event *event) {
   i = 0;
   while (i < 81) {
     if (strcmp(buf + 3, keyname[i]) == 0) {
-      event->key.keysym.sym = i;
-      break;
+      ev->key.keysym.sym = i;
+      return 1;
     }
 
     i++;
+  }
+  return 0;
+}
+
+int SDL_WaitEvent(SDL_Event *event) {
+
+  while (1) {
+    if (SDL_PollEvent(event)) {
+      break;
+    }
   }
 
   return 1;
