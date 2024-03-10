@@ -76,7 +76,13 @@ int _write(int fd, void *buf, size_t count) {
 
 void *_sbrk(intptr_t increment) {
   static intptr_t segment_end = (intptr_t)&_end;
-  int check = _syscall_(SYS_brk, 0, increment, segment_end);
+  // int check = _syscall_(SYS_brk, 0, increment, segment_end);
+  int check = 0;
+  if (increment > 0) {
+    check = _syscall_(SYS_brk, 0, increment, segment_end);
+  } else {
+    check = _syscall_(SYS_brk, 0, -1 * increment, segment_end + increment);
+  }
   if (check == 0) {
     segment_end += increment;
     return (void *)(segment_end - increment);
