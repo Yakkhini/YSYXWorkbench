@@ -11,7 +11,9 @@ int SDL_RemoveTimer(SDL_TimerID id) {
 }
 
 uint32_t SDL_GetTicks() {
-  return 0;
+  // It should be reset or wrap every 49 days according to the doc.
+  // But we don't care about it. No one will run the NEMU for 49 days.
+  return NDL_GetTicks();
 }
 
 void SDL_Delay(uint32_t ms) {
