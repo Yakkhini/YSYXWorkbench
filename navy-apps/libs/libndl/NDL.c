@@ -98,6 +98,13 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   buf[3] = h;
   buf[4] = (uint32_t)pixels;
 
+  // if x == 0, y == 0, w == 0, h == 0, then update the whole screen
+  if (x || y || w || h) {
+    write(fbdev, buf, 0);
+  }
+
+  buf[2] = screen_w;
+  buf[3] = screen_h;
   write(fbdev, buf, 0);
 }
 
