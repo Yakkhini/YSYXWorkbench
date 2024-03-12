@@ -122,6 +122,8 @@
         pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv32-embedded.libcCross
         stdpkgs.SDL2
         stdpkgs.SDL2_image
+        stdpkgs.SDL # Required by flappy bird sdl
+        stdpkgs.SDL_image # Required by flappy bird sdl
         stdpkgs.pkg-config
       ];
 
