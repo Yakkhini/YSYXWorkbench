@@ -26,10 +26,19 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst,
     dst_y = dstrect->y;
   }
 
-  for (int i = 0; i < h; i++) {
-    for (int j = 0; j < w; j++) {
-      ((uint32_t *)dst->pixels)[(i + dst_y) * dst->w + j + dst_x] =
-          ((uint32_t *)src->pixels)[(i + src_y) * src->w + j + src_x];
+  if (src->format->BytesPerPixel == 1) {
+    for (int i = 0; i < h; i++) {
+      for (int j = 0; j < w; j++) {
+        ((uint8_t *)dst->pixels)[(i + dst_y) * dst->w + j + dst_x] =
+            ((uint8_t *)src->pixels)[(i + src_y) * src->w + j + src_x];
+      }
+    }
+  } else {
+    for (int i = 0; i < h; i++) {
+      for (int j = 0; j < w; j++) {
+        ((uint32_t *)dst->pixels)[(i + dst_y) * dst->w + j + dst_x] =
+            ((uint32_t *)src->pixels)[(i + src_y) * src->w + j + src_x];
+      }
     }
   }
 }
@@ -46,15 +55,43 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
     h = dstrect->h;
   }
 
-  for (int i = y; i < y + h; i++) {
-    for (int j = x; j < x + w; j++) {
-      ((uint32_t *)dst->pixels)[i * dst->w + j] = color;
+  if (dst->format->BytesPerPixel == 1) {
+    for (int i = y; i < y + h; i++) {
+      for (int j = x; j < x + w; j++) {
+        ((uint8_t *)dst->pixels)[i * dst->w + j] = color;
+      }
+    }
+  } else {
+    for (int i = y; i < y + h; i++) {
+      for (int j = x; j < x + w; j++) {
+        ((uint32_t *)dst->pixels)[i * dst->w + j] = color;
+      }
     }
   }
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
-  NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
+
+  uint8_t *real_pixels = NULL;
+
+  if (s->format->BytesPerPixel == 1) {
+    real_pixels = malloc(s->w * s->h * 4);
+    for (int i = 0; i < s->w * s->h; i++) {
+      uint8_t c = ((uint8_t *)s->pixels)[i];
+      real_pixels[i * 4] = s->format->palette->colors[c].b;
+      real_pixels[i * 4 + 1] = s->format->palette->colors[c].g;
+      real_pixels[i * 4 + 2] = s->format->palette->colors[c].r;
+      real_pixels[i * 4 + 3] = 0xff;
+    }
+  } else {
+    real_pixels = s->pixels;
+  }
+
+  NDL_DrawRect((uint32_t *)real_pixels, x, y, w, h);
+
+  if (s->format->BytesPerPixel == 1) {
+    free(real_pixels);
+  }
 }
 
 // APIs below are already implemented.
