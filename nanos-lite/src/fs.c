@@ -53,7 +53,6 @@ int fs_open(const char *pathname, int flags, int mode) {
         file_table[i].write = ramdisk_write;
         file_table[i].open_offset = 0;
       }
-      Log("open file: %s, fd: %d", pathname, i);
       return i;
     }
   }
