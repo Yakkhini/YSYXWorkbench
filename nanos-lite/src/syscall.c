@@ -43,7 +43,7 @@ void do_syscall(Context *c) {
   struct timeval *tv;
   switch (type) {
   case SYS_exit:
-    halt(a[0]);
+    naive_uload(NULL, "/bin/menu");
     break;
   case SYS_yield:
     yield();
