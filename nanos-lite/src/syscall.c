@@ -2,8 +2,11 @@
 #include "config.h"
 #include <common.h>
 #include <fs.h>
+#include <proc.h>
 #include <stdint.h>
 #include <string.h>
+
+void naive_uload(PCB *pcb, const char *filename);
 
 void do_syscall(Context *c) {
 #if CONFIG_STRACE
@@ -64,6 +67,10 @@ void do_syscall(Context *c) {
   case SYS_brk:
     memset((void *)a[2], 0, a[1]);
     ret = 0;
+    break;
+  case SYS_execve:
+    naive_uload(NULL, (const char *)a[0]);
+    ret = -1; // naive_uload should never return
     break;
   case SYS_gettimeofday:
     tv = (struct timeval *)a[1];
