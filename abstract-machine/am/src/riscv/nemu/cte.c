@@ -44,6 +44,7 @@ bool cte_init(Context *(*handler)(Event, Context *)) {
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   Context *c = (Context *)(kstack.end - sizeof(Context));
   memset(c, 0, sizeof(Context));
+  c->gpr[10] = (uintptr_t)arg; // Why not use a0 - a7 but only a0?
   c->mstatus = 0x1800;
   c->mepc = (uintptr_t)entry;
   return c;
