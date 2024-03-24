@@ -69,6 +69,9 @@ case $1 in
   npc)
     addenv NPC_HOME npc
     ;;
+  rt-thread)
+    init NJU-ProjectN/rt-thread-am master rt-thread false
+    ;;
   yosys-sta)
     init OSCPU/yosys-sta master yosys-sta false YOSYS_STA_HOME
     ;;
