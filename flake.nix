@@ -116,6 +116,7 @@
       buildInputs = [
         stdpkgs.clang-tools
         stdpkgs.gnumake
+        stdpkgs.scons
         stdpkgs.bear
         pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv64-embedded.buildPackages.gcc
         pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv64.buildPackages.gcc
