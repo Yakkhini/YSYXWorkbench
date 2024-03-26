@@ -15,6 +15,13 @@
     npcmake = stdpkgs.writeScriptBin "npcmake" ''make -C $NPC_HOME $1'';
     nemumake = stdpkgs.writeScriptBin "nemumake" ''make -C $NEMU_HOME $1'';
     ista-run = stdpkgs.writeScriptBin "ista-run" ''LD_LIBRARY_PATH=bin/ ista-bin'';
+    riscv-toolchain = import pkgsunstable {
+      localSystem = "x86_64-linux";
+      crossSystem = {
+        config = "riscv64-unknown-linux-gnu";
+        gcc = {abi = "ilp32";};
+      };
+    };
   in rec {
     formatter.x86_64-linux = pkgs.legacyPackages.x86_64-linux.alejandra;
     packages.x86_64-linux.ista-bin = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation {
@@ -118,9 +125,7 @@
         stdpkgs.gnumake
         stdpkgs.scons
         stdpkgs.bear
-        pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv64-embedded.buildPackages.gcc
-        pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv64.buildPackages.gcc
-        pkgsunstable.legacyPackages.x86_64-linux.pkgsCross.riscv32-embedded.libcCross
+        riscv-toolchain.buildPackages.gcc
         stdpkgs.SDL2
         stdpkgs.SDL2_image
         stdpkgs.SDL # Required by flappy bird sdl
