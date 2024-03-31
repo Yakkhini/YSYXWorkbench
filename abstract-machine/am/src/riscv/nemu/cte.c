@@ -10,7 +10,6 @@ Context *__am_irq_handle(Context *c) {
     switch (c->gpr[17]) {
     case -1:
       ev.event = EVENT_YIELD;
-      c->gpr[10] = 0;
       c->mepc += 4;
       break;
     case 0 ... 19:
