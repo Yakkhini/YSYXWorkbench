@@ -113,6 +113,7 @@
         stdpkgs.yosys-synlig
         stdpkgs.surelog
         stdpkgs.verible
+        stdpkgs.metals # scala lsp
         packages.x86_64-linux.ista-bin
         packages.x86_64-linux.capstone
         npcmake
@@ -123,6 +124,11 @@
       buildInputs = [
         stdpkgs.clang-tools
         stdpkgs.gnumake
+        stdpkgs.just
+        stdpkgs.scalafmt
+        (stdpkgs.mill.override {jre = stdpkgs.temurin-bin;}) # scala project builder
+        stdpkgs.temurin-bin
+        stdpkgs.circt
         stdpkgs.scons
         stdpkgs.bear
         riscv-toolchain.buildPackages.gcc
@@ -139,8 +145,10 @@
         export AM_HOME=`readlink -f abstract-machine`
         export NAVY_HOME=`readlink -f navy-apps`
         export NVBOARD_HOME=`readlink -f nvboard`
+        export LAB_HOME=`readlink -f digital-design-lab`
         export YOSYS_STA_HOME=`readlink -f yosys-sta`
         export PATH="$NPC_HOME/build/bin:$PATH"
+        export CHISEL_FIRTOOL_PATH=${stdpkgs.circt}/bin
         export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
         export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/include"
         alias npcmake="make -C $NPC_HOME"
