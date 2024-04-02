@@ -1,0 +1,37 @@
+set dotenv-load
+
+BUILD_DIR := "$LAB_HOME/build"
+NVBOARD_ARCHIVE := "$NVBOARD_HOME/build/nvboard.a"
+
+vsrc dir:
+    #!/usr/bin/env zsh
+    cd ./{{dir}}
+    mill -i build.run
+    cd ..
+    echo "vsrc done"
+
+_common target: (vsrc target)
+    #!/usr/bin/env zsh
+    mkdir -p {{BUILD_DIR}}/bin
+    VSRC=`find {{target}} -name '*.sv' | tr '\n' ' '`
+    CSRC=`find {{target}} -name '*.cc' | tr '\n' ' '`
+    verilator --cc -Mdir {{BUILD_DIR}} \
+    --top-module {{target}} \
+    --build -Wall -Wno-UNUSEDSIGNAL -Wno-DECLFILENAME `echo $CSRC` `echo $VSRC` {{NVBOARD_ARCHIVE}} \
+    -LDFLAGS -lSDL2 -LDFLAGS -lSDL2_image -CFLAGS -I{{BUILD_DIR}} \
+    --exe -o {{BUILD_DIR}}/bin/{{target}}
+    {{BUILD_DIR}}/bin/{{target}}
+
+ysyxpre lab:
+    just _common ysyxpre{{lab}}
+
+nju lab:
+    just _common nju{{lab}}
+
+fmt:
+    scalafmt
+
+clean:
+    rm -rf */out
+    rm -rf build
+    rm -rf out

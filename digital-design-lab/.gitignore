@@ -1,0 +1,7 @@
+!*.sc
+!*.scala
+!*.cc
+!*.h
+out
+build
+compile_commands.json
