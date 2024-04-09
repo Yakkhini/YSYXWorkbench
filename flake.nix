@@ -141,6 +141,7 @@
 
       shellHook = ''
         export NPC_HOME=`readlink -f npc`
+        export NPC_CHISEL=`readlink -f npc-chisel`
         export NEMU_HOME=`readlink -f nemu`
         export AM_HOME=`readlink -f abstract-machine`
         export NAVY_HOME=`readlink -f navy-apps`

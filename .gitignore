@@ -6,6 +6,7 @@
 !/nanos-lite/*
 !/navy-apps/*
 !/npc/*
+!/npc-chisel/*
 !/digital-design-lab/*
 !Makefile
 !README.md
