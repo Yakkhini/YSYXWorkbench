@@ -15,7 +15,7 @@
 !init.sh
 !flake.lock
 /fceux-am
-/nvboard
 /am-kernels
 /yosys-sta
 /rt-thread
+/nvboard
