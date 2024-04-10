@@ -134,6 +134,7 @@
         riscv-toolchain.buildPackages.gcc
         stdpkgs.SDL2
         stdpkgs.SDL2_image
+        stdpkgs.SDL2_ttf
         stdpkgs.SDL # Required by flappy bird sdl
         stdpkgs.SDL_image # Required by flappy bird sdl
         stdpkgs.pkg-config
