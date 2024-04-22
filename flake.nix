@@ -63,6 +63,18 @@
       };
     };
 
+    packages.x86_64-linux.espresso = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation rec {
+      pname = "espresso";
+      version = "2.4";
+      nativeBuildInputs = [stdpkgs.cmake stdpkgs.ninja];
+      src = stdpkgs.fetchFromGitHub {
+        owner = "chipsalliance";
+        repo = "espresso";
+        rev = "v${version}";
+        sha256 = "sha256-z5By57VbmIt4sgRgvECnLbZklnDDWUA6fyvWVyXUzsI=";
+      };
+    };
+
     packages.x86_64-linux.capstone = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation rec {
       pname = "capstone";
       version = "5.0.1";
@@ -129,6 +141,7 @@
         (stdpkgs.mill.override {jre = stdpkgs.temurin-bin;}) # scala project builder
         stdpkgs.temurin-bin
         stdpkgs.circt
+        packages.x86_64-linux.espresso
         stdpkgs.scons
         stdpkgs.bear
         riscv-toolchain.buildPackages.gcc
