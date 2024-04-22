@@ -56,7 +56,7 @@
 
       meta = with stdpkgs.lib; {
         description = "iSTA binary";
-        homepage = https://github.com/OSCC-Project/iEDA;
+        homepage = "https://github.com/OSCC-Project/iEDA";
         license = licenses.mulan-psl2;
         maintainers = with stdenv.lib.maintainers; [YAKKHINI];
         platforms = ["x86_64-linux"];
