@@ -1,17 +1,17 @@
 /***************************************************************************************
-* Copyright (c) 2014-2022 Zihao Yu, Nanjing University
-*
-* NEMU is licensed under Mulan PSL v2.
-* You can use this software according to the terms and conditions of the Mulan PSL v2.
-* You may obtain a copy of Mulan PSL v2 at:
-*          http://license.coscl.org.cn/MulanPSL2
-*
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-* EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-* MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-*
-* See the Mulan PSL v2 for more details.
-***************************************************************************************/
+ * Copyright (c) 2014-2022 Zihao Yu, Nanjing University
+ *
+ * NEMU is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan
+ *PSL v2. You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ *
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY
+ *KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+ *NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ *
+ * See the Mulan PSL v2 for more details.
+ ***************************************************************************************/
 
 #include <common.h>
 #include <cpu/cpu.h>
@@ -32,7 +32,13 @@ __EXPORT void difftest_regcpy(void *dut, bool direction) {
   }
 }
 
-__EXPORT void difftest_pccpy(void *dut) { cpu.pc = *(vaddr_t *)dut; }
+__EXPORT void difftest_pccpy(void *pc, bool direction) {
+  if (direction == DIFFTEST_TO_REF) {
+    cpu.pc = *(vaddr_t *)pc;
+  } else {
+    *(vaddr_t *)pc = cpu.pc;
+  }
+}
 
 __EXPORT void difftest_exec(uint64_t n) {
   cpu_exec(n); // Maybe not low enough...
