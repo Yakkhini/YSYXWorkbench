@@ -138,6 +138,7 @@
         stdpkgs.gnumake
         stdpkgs.just
         stdpkgs.scalafmt
+        stdpkgs.scalafix
         (stdpkgs.mill.override {jre = stdpkgs.temurin-bin;}) # scala project builder
         stdpkgs.temurin-bin
         stdpkgs.circt
