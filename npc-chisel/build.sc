@@ -12,10 +12,10 @@ object taohe extends ScalaModule {
   )
 
   override def ivyDeps = Agg(
-    ivy"org.chipsalliance::chisel:6.2.0"
+    ivy"org.chipsalliance::chisel:6.5.0"
   )
   override def scalacPluginIvyDeps = Agg(
-    ivy"org.chipsalliance:::chisel-plugin:6.2.0"
+    ivy"org.chipsalliance:::chisel-plugin:6.5.0"
   )
 
 }
