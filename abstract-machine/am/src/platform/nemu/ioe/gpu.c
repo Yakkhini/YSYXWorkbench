@@ -2,14 +2,14 @@
 #include <nemu.h>
 
 #define SYNC_ADDR (VGACTL_ADDR + 4)
-uint32_t screen_w;
-uint32_t screen_h;
+uint32_t am_screen_w;
+uint32_t am_screen_h;
 
 void __am_gpu_init() {
   // ref: vgactl_port_base[0] = (screen_width() << 16) | screen_height();
   uint32_t size = inl(VGACTL_ADDR);
-  screen_w = size >> 16;
-  screen_h = size & 0xffff;
+  am_screen_w = size >> 16;
+  am_screen_h = size & 0xffff;
 }
 
 void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
@@ -28,7 +28,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   }
   uint32_t *px = ctl->pixels;
   int x = ctl->x, y = ctl->y, w = ctl->w, h = ctl->h;
-  int W = screen_w, H = screen_h;
+  int W = am_screen_w, H = am_screen_h;
   int i;
   for (i = 0; i < h && y + i < H; i++) {
     int j;
