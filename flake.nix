@@ -139,7 +139,8 @@
         stdpkgs.just
         stdpkgs.scalafmt
         stdpkgs.scalafix
-        (stdpkgs.mill.override {jre = stdpkgs.temurin-bin;}) # scala project builder
+        (stdpkgs.mill.override {jre = stdpkgs.temurin-jre-bin-17;}) # scala project builder
+        (stdpkgs.sbt.override {jre = stdpkgs.temurin-jre-bin-17;}) # scala project builder
         stdpkgs.temurin-bin
         stdpkgs.circt
         packages.x86_64-linux.espresso
