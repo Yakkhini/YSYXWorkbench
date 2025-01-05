@@ -1,7 +1,7 @@
 {
   description = "Flake for ysyx";
   inputs = {
-    yamlcpp06pkgs.url = "github:NixOS/nixpkgs/66e44425c6dfecbea68a5d6dc221ccd56561d4f1";
+    yamlcpp07pkgs.url = "github:NixOS/nixpkgs/c9b4c7dccdbf196fbe1113ef27da7da17f84b994";
     pkgsunstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     pkgs.url = "pkgs";
   };
@@ -9,7 +9,7 @@
     self,
     pkgs,
     pkgsunstable,
-    yamlcpp06pkgs,
+    yamlcpp07pkgs,
   }: let
     stdpkgs = pkgs.legacyPackages.x86_64-linux;
     npcmake = stdpkgs.writeScriptBin "npcmake" ''make -C $NPC_HOME $1'';
@@ -24,14 +24,14 @@
     };
   in rec {
     formatter.x86_64-linux = pkgs.legacyPackages.x86_64-linux.alejandra;
-    packages.x86_64-linux.ista-bin = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation {
-      name = "ista-bin";
+    packages.x86_64-linux.ieda-bin = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation {
+      name = "ieda-bin";
 
       system = "x86_64-linux";
 
       src = stdpkgs.fetchzip {
-        url = "https://ysyx.oscc.cc/slides/resources/archive/ista.tar.bz2";
-        hash = "sha256-yseeHz+lVA+q9K2A40iNUP6jf/sGYjqKwga5gLvaXYo=";
+        url = "https://ysyx.oscc.cc/slides/resources/archive/ieda.tar.bz2";
+        hash = "sha256-onNCcYiS3KjFBCqKhkx3jMJ/G5AW+/XSAUs1OJ6a8ok=";
       };
       nativeBuildInputs = [
         stdpkgs.autoPatchelfHook # Automatically setup the loader, and do the magic
@@ -39,11 +39,12 @@
 
       # Required at running time
       buildInputs = [
+        stdpkgs.gmp
         stdpkgs.glibc
         stdpkgs.libunwind
         stdpkgs.zlib
         stdpkgs.tcllib
-        yamlcpp06pkgs.legacyPackages.x86_64-linux.libyamlcpp
+        yamlcpp07pkgs.legacyPackages.x86_64-linux.yaml-cpp
       ];
 
       unpackPhase = "true";
@@ -51,11 +52,11 @@
       # Extract and copy executable in $out/bin
       installPhase = ''
         mkdir -p $out/bin
-        cp $src/iSTA $out/bin/ista-bin
+        cp $src/iEDA $out/bin/ieda
       '';
 
       meta = with stdpkgs.lib; {
-        description = "iSTA binary";
+        description = "iEDA binary";
         homepage = "https://github.com/OSCC-Project/iEDA";
         license = licenses.mulan-psl2;
         maintainers = with stdenv.lib.maintainers; [YAKKHINI];
@@ -72,37 +73,6 @@
         repo = "espresso";
         rev = "v${version}";
         sha256 = "sha256-z5By57VbmIt4sgRgvECnLbZklnDDWUA6fyvWVyXUzsI=";
-      };
-    };
-
-    packages.x86_64-linux.capstone = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation rec {
-      pname = "capstone";
-      version = "5.0.1";
-
-      src = stdpkgs.fetchFromGitHub {
-        owner = "capstone-engine";
-        repo = "capstone";
-        rev = version;
-        sha256 = "sha256-kKmL5sae9ruWGu1gas1mel9qM52qQOD+zLj8cRE3isg=";
-      };
-
-      nativeBuildInputs =
-        [
-          stdpkgs.cmake
-        ]
-        ++ stdpkgs.lib.optionals stdpkgs.stdenv.isDarwin [
-          stdpkgs.lib.fixDarwinDylibNames
-        ];
-
-      doCheck = true;
-
-      meta = with stdpkgs.lib; {
-        description = "Advanced disassembly library";
-        homepage = "http://www.capstone-engine.org";
-        license = licenses.bsd3;
-        maintainers = with stdenv.lib.maintainers; [thoughtpolice ris];
-        mainProgram = "cstool";
-        platforms = ["x86_64-linux"];
       };
     };
 
@@ -126,8 +96,8 @@
         stdpkgs.surelog
         stdpkgs.verible
         stdpkgs.metals # scala lsp
-        packages.x86_64-linux.ista-bin
-        packages.x86_64-linux.capstone
+        packages.x86_64-linux.ieda-bin
+        stdpkgs.capstone
         npcmake
         nemumake
         ista-run
