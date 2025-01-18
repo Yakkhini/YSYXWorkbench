@@ -81,6 +81,7 @@
       packages = [
         stdpkgs.verilator
         stdpkgs.gtkwave
+        stdpkgs.surfer
         stdpkgs.bison
         stdpkgs.dtc
         stdpkgs.flex
