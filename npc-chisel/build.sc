@@ -1,8 +1,7 @@
 import mill._, scalalib._
 
-object build extends ScalaModule {
-  override def millSourcePath = os.pwd
-  override def scalaVersion = "2.13.12"
+object taohe extends ScalaModule {
+  override def scalaVersion = "2.13.14"
 
   override def scalacOptions = Seq(
     "-deprecation",
