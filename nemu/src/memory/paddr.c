@@ -26,6 +26,8 @@ static uint8_t *pmem = NULL;
 static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 #endif
 
+static uint8_t SRAM[0xffffff] PG_ALIGN = {};
+
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }
 paddr_t host_to_guest(uint8_t *haddr) { return haddr - pmem + CONFIG_MBASE; }
 
@@ -62,6 +64,11 @@ word_t paddr_read(paddr_t addr, int len) {
   IFDEF(CONFIG_MTRACE, Log("Read memory 0x%X for %i len.", addr, len));
   if (likely(in_pmem(addr))) return pmem_read(addr, len);
   IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
+
+  if (addr >= 0x0f000000 && addr <= 0x0fffffff) {
+    return host_read(SRAM + addr - 0x0f000000, len);
+  }
+
   out_of_bound(addr);
   return 0;
 }
@@ -70,5 +77,11 @@ void paddr_write(paddr_t addr, int len, word_t data) {
   IFDEF(CONFIG_MTRACE, Log("Write memory 0x%X for %i len. Data: 0x%X", addr, len, data));
   if (likely(in_pmem(addr))) { pmem_write(addr, len, data); return; }
   IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
+
+  if (addr >= 0x0f000000 && addr <= 0x0fffffff) {
+    host_write(SRAM + addr - 0x0f000000, len, data);
+    return;
+  }
+
   out_of_bound(addr);
 }
