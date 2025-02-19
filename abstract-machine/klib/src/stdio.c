@@ -3,6 +3,8 @@
 #include <klib.h>
 #include <stdarg.h>
 
+#pragma GCC optimize("Oz")
+
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 static inline int isdigit(int ch) { return (ch >= '0') && (ch <= '9'); }
@@ -244,6 +246,8 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
     case 'd':
     case 'i':
       flags |= SIGN;
+      break;
+
     case 'u':
       break;
 
@@ -290,11 +294,14 @@ int printf(const char *fmt, ...) {
   printed = vsprintf(printf_buf, fmt, args);
   va_end(args);
 
-  for (int i = 0; i < printed; i++)
+  for (int i = 0; i < printed; i++) {
     putch(printf_buf[i]);
+  }
 
   return printed;
 }
+
+#pragma GCC reset_options
 
 int snprintf(char *out, size_t n, const char *fmt, ...) {
   panic("Not implemented");
