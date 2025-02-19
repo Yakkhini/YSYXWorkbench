@@ -1,5 +1,6 @@
 #include <am.h>
 #include <klib-macros.h>
+#include <klib.h>
 #include <ysyxsoc.h>
 
 extern char _heap_start;
@@ -23,7 +24,15 @@ void halt(int code) {
     ;
 }
 
+extern char _data_size, _data_load_start;
+
 void _trm_init() {
+  // Bootloader
+  // The malloc just to adjust the heap start address
+  void *lma_start = malloc((uintptr_t)&_data_size);
+  lma_start = &_heap_start;
+  memcpy(lma_start, &_data_load_start, (size_t)&_data_size);
+
   int ret = main(mainargs);
   halt(ret);
 }
