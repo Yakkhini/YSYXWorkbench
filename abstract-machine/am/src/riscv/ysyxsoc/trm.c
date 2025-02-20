@@ -16,7 +16,11 @@ Area heap = RANGE(&_heap_start, PMEM_END);
 #endif
 static const char mainargs[] = MAINARGS;
 
-void putch(char ch) { outb(SERIAL_PORT, ch); }
+void putch(char ch) {
+  while ((inb(SERIAL_PORT + 5) & 0B00100000) == 0)
+    ;
+  outb(SERIAL_PORT, ch);
+}
 
 void halt(int code) {
   npc_trap(code);
@@ -32,6 +36,14 @@ void _trm_init() {
   void *lma_start = malloc((uintptr_t)&_data_size);
   lma_start = &_heap_start;
   memcpy(lma_start, &_data_load_start, (size_t)&_data_size);
+
+  // Initialize UART
+  // Line Control Register: Offset 3
+  outb(SERIAL_PORT + 3, 0B00000011); // RESET LCR
+  outb(SERIAL_PORT + 3, 0B10000011); // ENABLE DLAB
+  outb(SERIAL_PORT + 1, 0x00);       // Set Baud rate to 9600, MSB first
+  outb(SERIAL_PORT + 0, 0x0C);       // Set Baud rate to 9600, LSB next
+  outb(SERIAL_PORT + 3, 0B00000011); // RESET LCR & DISABLE DLAB
 
   int ret = main(mainargs);
   halt(ret);
