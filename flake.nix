@@ -3,7 +3,7 @@
   inputs = {
     yamlcpp07pkgs.url = "github:NixOS/nixpkgs/c9b4c7dccdbf196fbe1113ef27da7da17f84b994";
     pkgsunstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    pkgs.url = "pkgs";
+    pkgs.url = "nixpkgs";
   };
   outputs = {
     self,
@@ -24,45 +24,6 @@
     };
   in rec {
     formatter.x86_64-linux = pkgs.legacyPackages.x86_64-linux.alejandra;
-    packages.x86_64-linux.ieda-bin = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation {
-      name = "ieda-bin";
-
-      system = "x86_64-linux";
-
-      src = stdpkgs.fetchzip {
-        url = "https://ysyx.oscc.cc/slides/resources/archive/ieda.tar.bz2";
-        hash = "sha256-onNCcYiS3KjFBCqKhkx3jMJ/G5AW+/XSAUs1OJ6a8ok=";
-      };
-      nativeBuildInputs = [
-        stdpkgs.autoPatchelfHook # Automatically setup the loader, and do the magic
-      ];
-
-      # Required at running time
-      buildInputs = [
-        stdpkgs.gmp
-        stdpkgs.glibc
-        stdpkgs.libunwind
-        stdpkgs.zlib
-        stdpkgs.tcllib
-        yamlcpp07pkgs.legacyPackages.x86_64-linux.yaml-cpp
-      ];
-
-      unpackPhase = "true";
-
-      # Extract and copy executable in $out/bin
-      installPhase = ''
-        mkdir -p $out/bin
-        cp $src/iEDA $out/bin/ieda
-      '';
-
-      meta = with stdpkgs.lib; {
-        description = "iEDA binary";
-        homepage = "https://github.com/OSCC-Project/iEDA";
-        license = licenses.mulan-psl2;
-        maintainers = with stdenv.lib.maintainers; [YAKKHINI];
-        platforms = ["x86_64-linux"];
-      };
-    };
 
     packages.x86_64-linux.espresso = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation rec {
       pname = "espresso";
@@ -96,7 +57,7 @@
         stdpkgs.surelog
         stdpkgs.verible
         stdpkgs.metals # scala lsp
-        packages.x86_64-linux.ieda-bin
+        stdpkgs.ieda
         stdpkgs.capstone
         npcmake
         nemumake
@@ -135,8 +96,6 @@
         export YOSYS_STA_HOME=`readlink -f yosys-sta`
         export PATH="$NPC_CHISEL/out/bin:$NPC_HOME/build/bin:$PATH"
         export CHISEL_FIRTOOL_PATH=${stdpkgs.circt}/bin
-        export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
-        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/include"
         alias npcmake="make -C $NPC_HOME"
       '';
     };
