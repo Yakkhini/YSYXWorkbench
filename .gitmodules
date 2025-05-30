@@ -1,0 +1,3 @@
+[submodule "GEMM"]
+	path = GEMM
+	url = git@github.com:iVishalr/GEMM.git
