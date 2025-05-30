@@ -9,6 +9,7 @@
 !/npc-chisel/*
 !/digital-design-lab/*
 !Makefile
+!Justfile
 !README.md
 !REPORT.md
 !.gitignore
