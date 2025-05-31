@@ -94,6 +94,7 @@
         export NVBOARD_HOME=`readlink -f nvboard`
         export LAB_HOME=`readlink -f digital-design-lab`
         export YOSYS_STA_HOME=`readlink -f yosys-sta`
+        export GEMM_HOME=`readlink -f GEMM`
         export PATH="$NPC_CHISEL/out/bin:$NPC_HOME/build/bin:$PATH"
         export CHISEL_FIRTOOL_PATH=${stdpkgs.circt}/bin
         alias npcmake="make -C $NPC_HOME"
