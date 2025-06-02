@@ -1,6 +1,7 @@
 #include <common.h>
 #include <cpu/difftest.h>
 #include <device/device.h>
+#include <v-simd/v-simd.h>
 
 word_t mmio_read(paddr_t addr, int len) {
 
@@ -11,6 +12,9 @@ word_t mmio_read(paddr_t addr, int len) {
     break;
   case CONFIG_RTC_MMIO + 4:
     return npc_time.sec;
+    break;
+  case CONFIG_VSIMD_MMIO:
+    return vsimd_sender(addr, len);
     break;
   default:
     break;
@@ -23,6 +27,9 @@ void mmio_write(paddr_t addr, int len, word_t data) {
   case CONFIG_SERIAL_MMIO:
     putchar((char)data);
     break;
+  case CONFIG_VSIMD_MMIO:
+    vsimd_receiver(addr, len, data);
+    break;
   default:
     break;
   }
@@ -34,6 +41,7 @@ bool in_mmio(paddr_t addr) {
   case CONFIG_RTC_MMIO:
   case CONFIG_RTC_MMIO + 4:
   case CONFIG_SERIAL_MMIO:
+  case CONFIG_VSIMD_MMIO:
     return true;
     break;
   default:
