@@ -17,6 +17,11 @@ static const char mainargs[] = MAINARGS;
 
 void putch(char ch) { outb(SERIAL_PORT, ch); }
 
+void send_vsimd(uint32_t data) {
+  // Send instruction to the virtual SIMD device
+  outl(VIRTYUAL_SIMED_ADDR, data);
+}
+
 void halt(int code) {
   npc_trap(code);
   while (1)
