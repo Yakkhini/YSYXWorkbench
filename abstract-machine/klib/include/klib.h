@@ -4,6 +4,7 @@
 #include <am.h>
 #include <stddef.h>
 #include <stdarg.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,6 +38,11 @@ int    sprintf   (char *str, const char *format, ...);
 int    snprintf  (char *str, size_t size, const char *format, ...);
 int    vsprintf  (char *str, const char *format, va_list ap);
 int    vsnprintf (char *str, size_t size, const char *format, va_list ap);
+
+// vsimd.h
+void   simd_setzero(uintptr_t ptr3, uintptr_t ptr2, uintptr_t ptr1);
+void   simd_loaddup(uintptr_t dest, uintptr_t src);
+void   simd_mul_add(uintptr_t dest, uintptr_t src1, uintptr_t src2);
 
 // assert.h
 #ifdef NDEBUG
