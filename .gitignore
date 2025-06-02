@@ -12,6 +12,7 @@
 !Justfile
 !README.md
 !REPORT.md
+!Virtual-SIMD-Spec.md
 !.gitignore
 !init.sh
 !flake.lock
