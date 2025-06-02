@@ -19,3 +19,7 @@
 // define the address of the memory-mapped I/O devices
 #define CONFIG_SERIAL_MMIO 0xa00003f8
 #define CONFIG_RTC_MMIO 0xa0000048
+
+// define the address of the virtual SIMD device
+// Range: [0xa2000000, 0xa2ffffff]
+#define CONFIG_VSIMD_MMIO 0xa2000000
