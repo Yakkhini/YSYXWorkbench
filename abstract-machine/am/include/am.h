@@ -47,6 +47,7 @@ extern "C" {
 extern   Area        heap;
 void     putch       (char ch);
 void     halt        (int code) __attribute__((__noreturn__));
+void     send_vsimd  (uint32_t data);
 
 // -------------------- IOE: Input/Output Devices --------------------
 bool     ioe_init    (void);
