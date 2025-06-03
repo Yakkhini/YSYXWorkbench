@@ -66,6 +66,8 @@ void single_clock() {
   tfp->dump(contextp->time());
 #endif
 
+  cpu.total_cycle++;
+
   cpu_sync();
   if (cpu.check_cycle) {
     cpu_check();
@@ -131,6 +133,7 @@ void cpu_init(int argc, char **argv) {
 
   cpu.top = new VTaoHe(contextp);
   cpu.iCount = 0;
+  cpu.total_cycle = 0;
   cpu.check_cycle = false;
   Log("Welcome to TaoHe Processor Core Verilating Model.");
 
@@ -236,15 +239,19 @@ void finish() {
     Log("TCHE: " ANSI_FMT("ABORT", ANSI_FG_RED) ANSI_FG_BLUE
         " at pc = 0x%08X " ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED),
         cpu.pc);
-    return;
+    break;
   case TCHE_HALT:
     Log("TCHE: " ANSI_FMT("QUIT", ANSI_FG_GREEN) ANSI_FG_BLUE
         " at pc = 0x%08X " ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN),
         cpu.pc);
-    return;
+    break;
   default:
     return;
   }
+
+  Log("TCHE: " ANSI_FMT("Total Cycle: %d", ANSI_FG_YELLOW) ANSI_FG_BLUE
+      " at pc = 0x%08X",
+      cpu.total_cycle, cpu.pc);
 }
 
 void cpu_exit() {
