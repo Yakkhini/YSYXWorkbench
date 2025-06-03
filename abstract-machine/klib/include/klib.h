@@ -41,6 +41,7 @@ int    vsnprintf (char *str, size_t size, const char *format, va_list ap);
 
 // vsimd.h
 void   simd_setzero(uintptr_t ptr3, uintptr_t ptr2, uintptr_t ptr1);
+void   simd_load(uintptr_t dest, uintptr_t src);
 void   simd_loaddup(uintptr_t dest, uintptr_t src);
 void   simd_mul_add(uintptr_t dest, uintptr_t src1, uintptr_t src2);
 
