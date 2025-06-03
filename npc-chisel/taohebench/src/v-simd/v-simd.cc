@@ -44,17 +44,17 @@ void vsimd_receiver(paddr_t addr, int len, word_t data) {
     vsimd.state = (enum VSIMDState)data;
     vsimd_execute();
     break;
-  case 0x01: // ptr[0]
+  case 0x04: // ptr[0]
     vsimd.ptr[0] = data;
     vsimd.vreg[0] = fixedpt_fromint(paddr_read(vsimd.ptr[0], len));
     Log("VSIMD ptr[0] set to %p", (void *)vsimd.ptr[0]);
     break;
-  case 0x02: // ptr[1]
+  case 0x08: // ptr[1]
     vsimd.ptr[1] = data;
     vsimd.vreg[1] = fixedpt_fromint(paddr_read(vsimd.ptr[1], len));
     Log("VSIMD ptr[1] set to %p", (void *)vsimd.ptr[1]);
     break;
-  case 0x03: // ptr[2]
+  case 0x0C: // ptr[2]
     vsimd.ptr[2] = data;
     vsimd.vreg[2] = fixedpt_fromint(paddr_read(vsimd.ptr[2], len));
     Log("VSIMD ptr[2] set to %p", (void *)vsimd.ptr[2]);
