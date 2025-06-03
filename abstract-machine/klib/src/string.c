@@ -96,32 +96,38 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 }
 
 void *memset(void *s, int c, size_t n) {
-  char *dst = s;
-  int i = 0;
-  while (i < n) {
-    dst[i] = c;
-    i++;
-  }
+  // char *dst = s;
+  // int i = 0;
+  // while (i < n) {
+  //   dst[i] = c;
+  //   i++;
+  // }
+
+  simd_memset((uintptr_t)s, c, n);
 
   return s;
 }
 
 void *memmove(void *dst, const void *src, size_t n) {
-  uintptr_t offset = 0;
-  while (dst + offset != src && offset < n) {
-    ((char *)dst)[offset] = ((char *)src)[offset];
-    offset++;
-  }
+  // uintptr_t offset = 0;
+  // while (dst + offset != src && offset < n) {
+  //   ((char *)dst)[offset] = ((char *)src)[offset];
+  //   offset++;
+  // }
+
+  simd_memmove((uintptr_t)dst, (uintptr_t)src, n);
 
   return dst;
 }
 
 void *memcpy(void *out, const void *in, size_t n) {
-  uintptr_t offset = 0;
-  while (offset < n) {
-    ((char *)out)[offset] = ((char *)in)[offset];
-    offset++;
-  }
+  // uintptr_t offset = 0;
+  // while (offset < n) {
+  //   ((char *)out)[offset] = ((char *)in)[offset];
+  //   offset++;
+  // }
+
+  simd_memcpy((uintptr_t)out, (uintptr_t)in, n);
 
   return out;
 }

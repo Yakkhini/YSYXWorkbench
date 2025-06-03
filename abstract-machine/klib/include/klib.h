@@ -44,6 +44,9 @@ void   simd_setzero(uintptr_t ptr3, uintptr_t ptr2, uintptr_t ptr1);
 void   simd_load(uintptr_t dest, uintptr_t src);
 void   simd_loaddup(uintptr_t dest, uintptr_t src);
 void   simd_mul_add(uintptr_t dest, uintptr_t src1, uintptr_t src2);
+void   simd_memset(uintptr_t dest, uintptr_t value, size_t size);
+void   simd_memmove(uintptr_t dest, uintptr_t src, size_t size);
+void   simd_memcpy(uintptr_t dest, uintptr_t src, size_t size);
 
 // assert.h
 #ifdef NDEBUG
