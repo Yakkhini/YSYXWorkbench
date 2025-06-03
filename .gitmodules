@@ -1,3 +1,3 @@
 [submodule "GEMM"]
 	path = GEMM
-	url = git@github.com:iVishalr/GEMM.git
+	url = git@github.com:Yakkhini/GEMMToAM.git
