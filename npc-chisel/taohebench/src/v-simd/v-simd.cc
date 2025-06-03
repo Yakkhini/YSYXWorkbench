@@ -21,7 +21,7 @@ enum VSIMDState {
 
 typedef struct {
   enum VSIMDState state;
-  uintptr_t ptr[3];
+  paddr_t ptr[3];
   fixedpt vreg[3];
 } VSIMD;
 
@@ -29,6 +29,7 @@ VSIMD vsimd;
 
 // Inner functions
 void vsimd_execute();
+fixedpt *vsimd_ptr_to_fixedpt(paddr_t ptr);
 
 void vsimd_init() {
   vsimd.state = VSIMD_IDLE;
@@ -46,23 +47,37 @@ void vsimd_receiver(paddr_t addr, int len, word_t data) {
     break;
   case 0x04: // ptr[0]
     vsimd.ptr[0] = data;
-    vsimd.vreg[0] = fixedpt_fromint(paddr_read(vsimd.ptr[0], len));
-    Log("VSIMD ptr[0] set to %p", (void *)vsimd.ptr[0]);
+    vsimd.vreg[0] = *(fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[0]);
+    Log("VSIMD ptr[0] set to 0x%08x", vsimd.ptr[0]);
     break;
   case 0x08: // ptr[1]
     vsimd.ptr[1] = data;
-    vsimd.vreg[1] = fixedpt_fromint(paddr_read(vsimd.ptr[1], len));
-    Log("VSIMD ptr[1] set to %p", (void *)vsimd.ptr[1]);
+    vsimd.vreg[1] = *(fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[1]);
+    Log("VSIMD ptr[1] set to 0x%08x", vsimd.ptr[1]);
     break;
   case 0x0C: // ptr[2]
     vsimd.ptr[2] = data;
-    vsimd.vreg[2] = fixedpt_fromint(paddr_read(vsimd.ptr[2], len));
-    Log("VSIMD ptr[2] set to %p", (void *)vsimd.ptr[2]);
+    vsimd.vreg[2] = *(fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[2]);
+    Log("VSIMD ptr[2] set to 0x%08x", vsimd.ptr[2]);
     break;
   default:
     Log("VSIMD receiver: Invalid address 0x%08x", addr);
     assert(0);
     break;
+  }
+}
+
+fixedpt *vsimd_ptr_to_fixedpt(paddr_t ptr) {
+  if (ptr == 0) {
+    return 0;
+  }
+
+  if (in_pmem(ptr)) {
+    return (fixedpt *)guest_to_host(ptr);
+  } else {
+    Log("VSIMD pointer to fixedpt: Invalid address 0x%08x", ptr);
+    assert(0);
+    return 0;
   }
 }
 
