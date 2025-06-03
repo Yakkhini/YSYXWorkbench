@@ -90,11 +90,22 @@ word_t vsimd_sender(paddr_t addr, int len) {
 
 void vsimd_execute() {
   Log("VSIMD execute: %d", vsimd.state);
-  Log("VSIMD ptr[0]: %p, ptr[1]: %p, ptr[2]: %p", (void *)vsimd.ptr[0],
-      (void *)vsimd.ptr[1], (void *)vsimd.ptr[2]);
-  // Log("VSIMD vreg[0]: %d, vreg[1]: %d, vreg[2]: %d",
-  //     vsimd.vreg[0], vsimd.vreg[1], vsimd.vreg[2]);
+  Log("VSIMD ptr[0]: 0x%08x, ptr[1]: 0x%08x, ptr[2]: 0x%08x", vsimd.ptr[0],
+      vsimd.ptr[1], vsimd.ptr[2]);
+  Log("VSIMD vreg[0]: %s, vreg[1]: %s, vreg[2]: %s",
+      fixedpt_cstr(vsimd.vreg[0], -1), fixedpt_cstr(vsimd.vreg[1], -1),
+      fixedpt_cstr(vsimd.vreg[2], -1));
 
   Log("VSIMD exectute function not implemented yet");
   assert(0);
+}
+
+void vsimd_setzero() {
+  for (int i = 0; i < 3; i++) {
+    if (vsimd.ptr[i] == 0) {
+      continue;
+    }
+    *(fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[i]) = fixedpt_fromint(0);
+    *((fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[i]) + 1) = fixedpt_fromint(0);
+  }
 }
