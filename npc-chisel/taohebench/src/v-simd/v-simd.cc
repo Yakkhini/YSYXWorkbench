@@ -31,7 +31,9 @@ fixedpt fixedpt_none = fixedpt_fromint(0);
 // Inner functions
 void vsimd_execute();
 void vsimd_setzero();
+void vsimd_loaddup();
 void vsimd_load();
+void vsimd_mul_add();
 fixedpt *vsimd_ptr_to_fixedpt(paddr_t ptr);
 
 void vsimd_init() {
@@ -104,8 +106,14 @@ void vsimd_execute() {
   case VSIMD_SETZERO:
     vsimd_setzero();
     break;
+  case VSIMD_LOADDUP:
+    vsimd_loaddup();
+    break;
   case VSIMD_LOAD:
     vsimd_load();
+    break;
+  case VSIMD_MUL_ADD:
+    vsimd_mul_add();
     break;
   default:
     Log("VSIMD exectute function not implemented yet, state: %d", vsimd.state);
@@ -125,7 +133,30 @@ void vsimd_setzero() {
 }
 
 // [2] to [0]
+void vsimd_loaddup() {
+  Log("VSIMD loaddup %s to 0x%08x", fixedpt_cstr(vsimd.vreg[2], -1),
+      vsimd.ptr[0]);
+  *(fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[0]) = vsimd.vreg[2];
+  *((fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[0]) + 1) = vsimd.vreg[2];
+}
+
+// [2] to [0]
 void vsimd_load() {
   Log("VSIMD load %s to 0x%08x", fixedpt_cstr(vsimd.vreg[2], -1), vsimd.ptr[0]);
   *(fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[0]) = vsimd.vreg[2];
+  *((fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[0]) + 1) =
+      *(fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[2]);
+}
+
+// [0] = [0] + [1] * [2]
+void vsimd_mul_add() {
+  Log("VSIMD mul_add %s * %s + %s to 0x%08x", fixedpt_cstr(vsimd.vreg[1], -1),
+      fixedpt_cstr(vsimd.vreg[2], -1), fixedpt_cstr(vsimd.vreg[0], -1),
+      vsimd.ptr[0]);
+  fixedpt *dest = (fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[0]);
+  fixedpt *src1 = (fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[1]);
+  fixedpt *src2 = (fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[2]);
+
+  *dest = fixedpt_add(*dest, fixedpt_mul(*src1, *src2));
+  *(dest + 1) = fixedpt_add(*(dest + 1), fixedpt_mul(*(src1 + 1), *(src2 + 1)));
 }
