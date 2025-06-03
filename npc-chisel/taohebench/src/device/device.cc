@@ -14,6 +14,9 @@ word_t mmio_read(paddr_t addr, int len) {
     return npc_time.sec;
     break;
   case CONFIG_VSIMD_MMIO:
+  case CONFIG_VSIMD_MMIO + 0x04:
+  case CONFIG_VSIMD_MMIO + 0x08:
+  case CONFIG_VSIMD_MMIO + 0x0C:
     return vsimd_sender(addr, len);
     break;
   default:
@@ -28,6 +31,9 @@ void mmio_write(paddr_t addr, int len, word_t data) {
     putchar((char)data);
     break;
   case CONFIG_VSIMD_MMIO:
+  case CONFIG_VSIMD_MMIO + 0x04:
+  case CONFIG_VSIMD_MMIO + 0x08:
+  case CONFIG_VSIMD_MMIO + 0x0C:
     vsimd_receiver(addr, len, data);
     break;
   default:
@@ -42,6 +48,9 @@ bool in_mmio(paddr_t addr) {
   case CONFIG_RTC_MMIO + 4:
   case CONFIG_SERIAL_MMIO:
   case CONFIG_VSIMD_MMIO:
+  case CONFIG_VSIMD_MMIO + 0x04:
+  case CONFIG_VSIMD_MMIO + 0x08:
+  case CONFIG_VSIMD_MMIO + 0x0C:
     return true;
     break;
   default:
