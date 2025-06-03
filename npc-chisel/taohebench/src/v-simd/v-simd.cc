@@ -26,9 +26,11 @@ typedef struct {
 } VSIMD;
 
 VSIMD vsimd;
+fixedpt fixedpt_none = fixedpt_fromint(0);
 
 // Inner functions
 void vsimd_execute();
+void vsimd_setzero();
 fixedpt *vsimd_ptr_to_fixedpt(paddr_t ptr);
 
 void vsimd_init() {
@@ -68,8 +70,9 @@ void vsimd_receiver(paddr_t addr, int len, word_t data) {
 }
 
 fixedpt *vsimd_ptr_to_fixedpt(paddr_t ptr) {
+  Log("VSIMD pointer to fixedpt: 0x%08x", ptr);
   if (ptr == 0) {
-    return 0;
+    return &fixedpt_none;
   }
 
   if (in_pmem(ptr)) {
@@ -96,8 +99,15 @@ void vsimd_execute() {
       fixedpt_cstr(vsimd.vreg[0], -1), fixedpt_cstr(vsimd.vreg[1], -1),
       fixedpt_cstr(vsimd.vreg[2], -1));
 
-  Log("VSIMD exectute function not implemented yet");
-  assert(0);
+  switch (vsimd.state) {
+  case VSIMD_SETZERO:
+    vsimd_setzero();
+    break;
+  default:
+    Log("VSIMD exectute function not implemented yet, state: %d", vsimd.state);
+    assert(0);
+    break;
+  }
 }
 
 void vsimd_setzero() {
