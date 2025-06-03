@@ -31,6 +31,7 @@ fixedpt fixedpt_none = fixedpt_fromint(0);
 // Inner functions
 void vsimd_execute();
 void vsimd_setzero();
+void vsimd_load();
 fixedpt *vsimd_ptr_to_fixedpt(paddr_t ptr);
 
 void vsimd_init() {
@@ -103,6 +104,9 @@ void vsimd_execute() {
   case VSIMD_SETZERO:
     vsimd_setzero();
     break;
+  case VSIMD_LOAD:
+    vsimd_load();
+    break;
   default:
     Log("VSIMD exectute function not implemented yet, state: %d", vsimd.state);
     assert(0);
@@ -118,4 +122,10 @@ void vsimd_setzero() {
     *(fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[i]) = fixedpt_fromint(0);
     *((fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[i]) + 1) = fixedpt_fromint(0);
   }
+}
+
+// [2] to [0]
+void vsimd_load() {
+  Log("VSIMD load %s to 0x%08x", fixedpt_cstr(vsimd.vreg[2], -1), vsimd.ptr[0]);
+  *(fixedpt *)vsimd_ptr_to_fixedpt(vsimd.ptr[0]) = vsimd.vreg[2];
 }
