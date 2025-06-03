@@ -61,5 +61,6 @@ bool in_mmio(paddr_t addr) {
 
 void device_init() {
   timer_init();
+  vsimd_init();
   return;
 }
