@@ -14,6 +14,7 @@
 !.gitignore
 !init.sh
 !flake.lock
+!flake.nix
 /fceux-am
 /am-kernels
 /yosys-sta
