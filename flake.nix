@@ -1,5 +1,5 @@
 {
-  description = "Flake for ysyx";
+  description = "Flake for One Student One Chip Project";
   inputs = {
     yamlcpp07pkgs.url = "github:NixOS/nixpkgs/c9b4c7dccdbf196fbe1113ef27da7da17f84b994";
     pkgsunstable.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -38,7 +38,7 @@
     };
 
     devShells.x86_64-linux.default = pkgs.legacyPackages.x86_64-linux.mkShell {
-      name = "ysyx-shell";
+      name = "osoc-shell";
       packages = [
         stdpkgs.verilator
         stdpkgs.gtkwave
