@@ -1,43 +1,45 @@
 ENTRY(_start)
-PHDRS { text PT_LOAD; data PT_LOAD; }
+PHDRS { code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; }
 
 MEMORY {
-  mrom : ORIGIN = 0x20000000, LENGTH = 4K
   sram : ORIGIN = 0x0f000000, LENGTH = 8K
+  mrom : ORIGIN = 0x20000000, LENGTH = 4K
 }
 
 SECTIONS {
-  /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
-  _heap_start = 0x0f000000;
-  _stack_top = 0x0f000000;
-  _stack_pointer = _stack_top + 0x1ffc;
-  /* _pmem_start and _entry_offset are defined in LDFLAGS */
   . = ORIGIN(mrom);
   .text : {
     *(entry)
     *(.text*)
     etext = .;
     _etext = .;
-  } AT> mrom :text
+  } > mrom AT> mrom : code
+  . = ALIGN(0x10);
   .rodata : {
     *(.rodata*)
-  } AT> mrom
+    *(.srodata*)
+  } > mrom AT> mrom : rodata
+  /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
+  . = ORIGIN(sram);
+  _heap_start = ORIGIN(sram);
+  _stack_top = ORIGIN(sram) + LENGTH(sram) - 0x1000;
   .data : {
     _data_start = .;
     *(.data*)
     *(.sdata*)
     edata = .;
     _edata = .;
-  } > sram AT> mrom : data
-  _data_size = SIZEOF(.data);
-  _data_load_start = LOADADDR(.data);
+  } > sram AT> mrom : rwdata
+  _rwdata_size = SIZEOF(.data);
+  _rwdata_load_start = LOADADDR(.data);
   .bss : {
     _bss_start = .;
     *(.bss*)
     *(.sbss*)
     *(.scommon)
-    _bss_end = .;
-  } > sram AT> mrom
+  } > sram : rwdata
+
+  _stack_pointer = ORIGIN(sram) + LENGTH(sram) - 0x100;
   end = .;
   _end = .;
 }
