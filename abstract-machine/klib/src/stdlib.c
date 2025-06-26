@@ -37,6 +37,7 @@ void *malloc(size_t size) {
 
   void *ret = heap.start + malloc_offset;
   malloc_offset += size;
+  malloc_offset = (malloc_offset + 15) & ~0xF; // Align to 16 bytes
 
   return ret;
 }
