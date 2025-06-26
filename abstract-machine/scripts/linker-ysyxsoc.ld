@@ -41,6 +41,6 @@ SECTIONS {
   _rwdata_size = SIZEOF(.data);
 
   _stack_pointer = ORIGIN(sram) + LENGTH(sram) - 0x100;
-  end = .;
-  _end = .;
+  end = 0x0f001fff;
+  _end = 0x0f001fff;
 }
