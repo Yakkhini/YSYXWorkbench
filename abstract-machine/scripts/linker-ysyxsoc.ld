@@ -8,6 +8,8 @@ MEMORY {
 
 SECTIONS {
   . = ORIGIN(mrom);
+  _entry_offset = 0x0;
+  _pmem_start = .;
   .text : {
     *(entry)
     *(.text*)
