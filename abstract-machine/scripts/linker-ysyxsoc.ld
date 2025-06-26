@@ -22,7 +22,7 @@ SECTIONS {
     *(.srodata*)
   } > mrom AT> mrom : rodata
   /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
-  . = ORIGIN(sram);
+  _rwdata_load_start = .;
   _heap_start = ORIGIN(sram);
   _stack_top = ORIGIN(sram) + LENGTH(sram) - 0x1000;
   .data : {
@@ -32,14 +32,13 @@ SECTIONS {
     edata = .;
     _edata = .;
   } > sram AT> mrom : rwdata
-  _rwdata_size = SIZEOF(.data);
-  _rwdata_load_start = LOADADDR(.data);
   .bss : {
     _bss_start = .;
     *(.bss*)
     *(.sbss*)
     *(.scommon)
   } > sram : rwdata
+  _rwdata_size = SIZEOF(.data);
 
   _stack_pointer = ORIGIN(sram) + LENGTH(sram) - 0x100;
   end = .;
