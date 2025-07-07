@@ -1,5 +1,5 @@
 ENTRY(_start)
-PHDRS { code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; }
+PHDRS { code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; bss PT_LOAD; }
 
 MEMORY {
   sram : ORIGIN = 0x0f000000, LENGTH = 8K
@@ -8,8 +8,8 @@ MEMORY {
 }
 
 SECTIONS {
-  . = ORIGIN(flash);
   _entry_offset = 0x0;
+  . = ORIGIN(flash);
   _pmem_start = .;
   .text : {
     *(entry)
@@ -22,10 +22,11 @@ SECTIONS {
     *(.rodata*)
     *(.srodata*)
   } > flash AT> flash : rodata
-  /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
   _rwdata_load_start = .;
+  _rwdata_load_end = _rwdata_load_start + SIZEOF(.data) + SIZEOF(.bss);
+  /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
+  . = ORIGIN(sram);
   _heap_start = ORIGIN(sram);
-  _stack_top = ORIGIN(sram) + LENGTH(sram) - 0x1000;
   .data : {
     _data_start = .;
     *(.data*)
@@ -38,10 +39,12 @@ SECTIONS {
     *(.bss*)
     *(.sbss*)
     *(.scommon)
-  } > sram : rwdata
-  _rwdata_size = SIZEOF(.data);
+    ebss = .;
+  } > sram AT > flash : bss
 
-  _stack_pointer = ORIGIN(sram) + LENGTH(sram) - 0x100;
-  end = 0x0f001fff;
-  _end = 0x0f001fff;
+  . = . + 0x10;
+  _stack_top = ALIGN(0x4);
+  _stack_pointer = . + 0x200;
+  end = .;
+  _end = .;
 }
