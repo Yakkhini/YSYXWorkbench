@@ -44,7 +44,7 @@ SECTIONS {
 
   . = . + 0x10;
   _stack_top = ALIGN(0x4);
-  _stack_pointer = . + 0x200;
+  _stack_pointer = . + 0x800;
   end = .;
   _end = .;
 }
