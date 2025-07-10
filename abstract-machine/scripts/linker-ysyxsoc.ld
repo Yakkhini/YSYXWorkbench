@@ -26,7 +26,7 @@ SECTIONS {
   _rwdata_load_end = _rwdata_load_start + SIZEOF(.data) + SIZEOF(.bss);
   /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
   . = ORIGIN(sram);
-  _heap_start = ORIGIN(sram);
+  _sram_start = .;
   .data : {
     _data_start = .;
     *(.data*)
@@ -43,8 +43,9 @@ SECTIONS {
   } > sram AT > flash : bss
 
   . = . + 0x10;
+  _heap_start = ALIGN(0x4);
   _stack_top = ALIGN(0x4);
-  _stack_pointer = . + 0x800;
+  _stack_pointer = 0x0F001FF0;
   end = .;
   _end = .;
 }

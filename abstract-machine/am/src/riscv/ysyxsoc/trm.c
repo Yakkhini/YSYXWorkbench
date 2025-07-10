@@ -28,16 +28,14 @@ void halt(int code) {
     ;
 }
 
-extern char _rwdata_load_start, _rwdata_load_end;
+extern char _sram_start, _rwdata_load_start, _rwdata_load_end;
 
 void _trm_init() {
   // Bootloader
   // The malloc just to adjust the heap start address
 
   uint32_t rwdata_size = (uintptr_t)&_rwdata_load_end - (uintptr_t)&_rwdata_load_start;
-  void *lma_start = malloc(rwdata_size);
-  lma_start = &_heap_start;
-  memcpy(lma_start, &_rwdata_load_start, rwdata_size);
+  memcpy(&_sram_start, &_rwdata_load_start, rwdata_size);
 
   // Initialize UART
   // Line Control Register: Offset 3
@@ -48,7 +46,7 @@ void _trm_init() {
   outb(SERIAL_PORT + 3, 0B00000011); // RESET LCR & DISABLE DLAB
 
   printf("Bootload Finish. Source start address: 0x%08X, Source end address: 0x%08X, Dest start address: 0x%08X, size: %ld\n",
-         &_rwdata_load_start, &_rwdata_load_end, lma_start, rwdata_size);
+         &_rwdata_load_start, &_rwdata_load_end, &_sram_start, rwdata_size);
 
   int ret = main(mainargs);
   halt(ret);
