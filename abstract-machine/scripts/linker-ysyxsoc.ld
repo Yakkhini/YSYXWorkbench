@@ -23,21 +23,25 @@ SECTIONS {
   /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
   . = ORIGIN(sram);
   _sram_start = .;
-  .text : {
-    *(.text*)
-    etext = .;
-    _etext = .;
-  } > sram AT> flash : code
-  . = ALIGN(0x10);
-  .rodata : {
-    *(.rodata*)
-    *(.srodata*)
-  } > sram AT> flash : rodata
+  _stack_top = ALIGN(0x4);
+  _stack_pointer = 0x0f001ff0;
 
   /* psram address: [0x80_00_0000, 0x80_3f_ffff) */
   . = ORIGIN(psram);
   _psram_start = .;
+  .text : {
+    _rxdate_dest_start = .;
+    *(.text*)
+    etext = .;
+    _etext = .;
+  } > psram AT> flash : code
+  .rodata : {
+    *(.rodata*)
+    *(.srodata*)
+    *(.rela*)
+  } > psram AT> flash : rodata
   .data : {
+    _rwdata_dest_start = .;
     _data_start = .;
     *(.data*)
     *(.sdata*)
@@ -54,8 +58,7 @@ SECTIONS {
 
   . = . + 0x10;
   _heap_start = ALIGN(0x4);
-  _stack_top = ALIGN(0x4);
-  _stack_pointer = 0x803ffff0;
+  _heap_end = 0x803ffff0;
   end = .;
   _end = .;
 }
