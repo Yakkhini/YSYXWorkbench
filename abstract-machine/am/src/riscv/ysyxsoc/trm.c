@@ -68,9 +68,9 @@ void _trm_init() {
   uint32_t rxdata_size = (uintptr_t)&_rxdata_load_end - (uintptr_t)&_rxdata_load_start;
   uint32_t rwdata_size = (uintptr_t)&_rwdata_load_end - (uintptr_t)&_rwdata_load_start;
   printf("RX Bootload Finish. Source start address: 0x%08X, Source end address: 0x%08X, Dest start address: 0x%08X, size: %ld\n",
-         &_rxdata_load_start, &_rxdata_load_end, &_psram_start, rxdata_size);
+         &_rxdata_load_start, &_rxdata_load_end, &_sram_start, rxdata_size);
   printf("RW Bootload Finish. Source start address: 0x%08X, Source end address: 0x%08X, Dest start address: 0x%08X, size: %ld\n",
-         &_rwdata_load_start, &_rwdata_load_end, &_sram_start, rwdata_size);
+         &_rwdata_load_start, &_rwdata_load_end, &_psram_start, rwdata_size);
   printf("Heap range: [0x%08X, 0x%08X)\n", heap.start, heap.end);
 
   int ret = main(mainargs);
