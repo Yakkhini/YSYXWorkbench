@@ -1,5 +1,5 @@
 ENTRY(_start)
-PHDRS { boot PT_LOAD; code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; bss PT_LOAD; }
+PHDRS { boot PT_LOAD; code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; }
 
 MEMORY {
   sram : ORIGIN = 0x0f000000, LENGTH = 8K
@@ -17,8 +17,10 @@ SECTIONS {
   } > flash AT > flash : boot
   _rxdata_load_start = .;
   _rxdata_load_end = _rxdata_load_start + SIZEOF(.text) + SIZEOF(.rodata);
-  _rwdata_load_start = _rxdata_load_end;
-  _rwdata_load_end = _rwdata_load_start + SIZEOF(.data) + SIZEOF(.bss);
+  . = _rxdata_load_end;
+
+  _rwdata_load_start = .;
+  _rwdata_load_end = _rwdata_load_start + (ebss - _rwdata_dest_start);
 
   /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
   . = ORIGIN(sram);
@@ -40,25 +42,29 @@ SECTIONS {
     *(.srodata*)
     *(.rela*)
   } > psram AT> flash : rodata
-  .data : {
-    _rwdata_dest_start = .;
+
+  . = ALIGN(0x8);
+  _rwdata_dest_start = .;
+  .data BLOCK(0x8) : {
     _data_start = .;
     *(.data*)
     *(.sdata*)
     edata = .;
     _edata = .;
+    . = ALIGN(0x8);
   } > psram AT> flash : rwdata
-  .bss : {
+  .bss BLOCK(0x8) : {
     _bss_start = .;
     *(.bss*)
     *(.sbss*)
     *(.scommon)
     ebss = .;
-  } > psram AT > flash : bss
+  } > psram AT> flash : rwdata
 
   . = . + 0x10;
-  _heap_start = ALIGN(0x4);
-  _heap_end = 0x803ffff0;
+  _heap_start = ALIGN(0x8);
+  . = 0x803fffe0;
+  _heap_end = .;
   end = .;
   _end = .;
 }
