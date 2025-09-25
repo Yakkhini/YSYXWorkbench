@@ -13,18 +13,15 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "local-include/reg.h"
 #include <isa.h>
 #include <stdio.h>
 #include <string.h>
-#include "debug.h"
-#include "local-include/reg.h"
 
-const char *regs[] = {
-  "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
-  "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
-  "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
-  "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
-};
+const char *regs[] = {"$0", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
+                      "s0", "s1", "a0",  "a1",  "a2", "a3", "a4", "a5",
+                      "a6", "a7", "s2",  "s3",  "s4", "s5", "s6", "s7",
+                      "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
 void isa_reg_display() {
   printf("pc 0x%X\n", cpu.pc);
@@ -33,18 +30,21 @@ void isa_reg_display() {
   printf("%s 0x%X;   ", regs[1], cpu.gpr[1]);
   printf("%s 0x%X;   ", regs[2], cpu.gpr[2]);
   printf("%s 0x%X;\n", regs[3], cpu.gpr[3]);
- 
-  for (int i=4; i<29; i+=4) {
+
+  for (int i = 4; i < 29; i += 4) {
     printf("%s 0x%X;   ", regs[i], cpu.gpr[i]);
-    printf("%s 0x%X;   ", regs[i+1], cpu.gpr[i+1]);
-    printf("%s 0x%X;   ", regs[i+2], cpu.gpr[i+2]);
-    printf("%s 0x%X;\n", regs[i+3], cpu.gpr[i+3]);
+    printf("%s 0x%X;   ", regs[i + 1], cpu.gpr[i + 1]);
+    printf("%s 0x%X;   ", regs[i + 2], cpu.gpr[i + 2]);
+    printf("%s 0x%X;\n", regs[i + 3], cpu.gpr[i + 3]);
   }
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
+  if (strcmp(s, "$pc") == 0) {
+    *success = true;
+    return cpu.pc;
+  }
   if ((strcmp(s, "$0") == 0) || strcmp(s, "$zero") == 0) {
-    Log("REG Zero...\n");
     *success = true;
     return 0;
   }
@@ -52,7 +52,6 @@ word_t isa_reg_str2val(const char *s, bool *success) {
   for (int i = 1; i < 30; i++) {
     if (strcmp(s, regs[i]) == 0) {
       *success = true;
-      Log("Get value %u at %s...", cpu.gpr[i], s);
       return cpu.gpr[i];
     }
   }
