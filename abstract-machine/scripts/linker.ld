@@ -1,5 +1,5 @@
 ENTRY(_start)
-PHDRS { text PT_LOAD; data PT_LOAD; }
+PHDRS { text PT_LOAD; rodata PT_LOAD; data PT_LOAD; }
 
 SECTIONS {
   /* _pmem_start and _entry_offset are defined in LDFLAGS */
@@ -7,23 +7,26 @@ SECTIONS {
   .text : {
     *(entry)
     *(.text*)
+    etext = .;
+    _etext = .;
   } : text
-  etext = .;
-  _etext = .;
   .rodata : {
     *(.rodata*)
-  }
+    *(.srodata*)
+  } : rodata
   .data : {
-    *(.data)
+    *(.data*)
+    *(.sdata*)
+    edata = .;
+    _edata = .;
   } : data
-  edata = .;
-  _data = .;
   .bss : {
 	_bss_start = .;
     *(.bss*)
     *(.sbss*)
     *(.scommon)
-  }
+    ebss = .;
+  } : data
   _stack_top = ALIGN(0x1000);
   . = _stack_top + 0x8000;
   _stack_pointer = .;
