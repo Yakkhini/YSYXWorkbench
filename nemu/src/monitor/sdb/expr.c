@@ -31,6 +31,7 @@ enum {
   TK_NOTYPE = 256,
   TK_EQ,
   TK_NEQ,
+  TK_GT,
   TK_AND,
   TK_REG,
   TK_DEREF,
@@ -62,6 +63,7 @@ static struct rule {
     {"\\)", ')'},                // right bracket
     {"==", TK_EQ},               // equal
     {"!=", TK_NEQ},              // not equal
+    {">", TK_GT},               // greater than
     {"&&", TK_AND},              // and
 };
 
@@ -217,7 +219,7 @@ uint32_t eval(int p, int q) {
     int bmux = 0;
     bool lmux = false;
     for (int i = p; i < q + 1; i++) {
-      if ((tokens[i].type == TK_EQ || tokens[i].type == TK_NEQ ||
+      if ((tokens[i].type == TK_EQ || tokens[i].type == TK_NEQ || tokens[i].type == TK_GT ||
            tokens[i].type == TK_AND) &&
           bmux == 0) {
         op = i;
@@ -258,6 +260,8 @@ uint32_t eval(int p, int q) {
       return val1 == val2;
     case TK_NEQ:
       return val1 != val2;
+    case TK_GT:
+      return val1 > val2;
     case TK_AND:
       return val1 && val2;
     default:
