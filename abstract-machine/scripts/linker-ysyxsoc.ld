@@ -1,5 +1,6 @@
 ENTRY(_start)
-PHDRS { boot PT_LOAD; code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; }
+
+PHDRS { boot PT_LOAD; code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; bss PT_LOAD; }
 
 MEMORY {
   sram : ORIGIN = 0x0f000000, LENGTH = 8K
@@ -20,7 +21,7 @@ SECTIONS {
   . = _rxdata_load_end;
 
   _rwdata_load_start = .;
-  _rwdata_load_end = _rwdata_load_start + (ebss - _rwdata_dest_start);
+  _rwdata_load_end = _rwdata_load_start + (edata - _rwdata_dest_start);
 
   /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
   . = ORIGIN(sram);

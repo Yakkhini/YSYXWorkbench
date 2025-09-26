@@ -29,8 +29,9 @@ void halt(int code) {
 __attribute__ ((section (".bootloader")))
 void *bootloader_memcpy(void *out, const void *in, size_t n) {
   uintptr_t offset = 0;
-  while (offset < n) {
-    ((char *)out)[offset] = ((char *)in)[offset];
+  uintptr_t total_words = n / 4;
+  while (offset < total_words) {
+    ((uint64_t *)out)[offset] = ((uint64_t *)in)[offset];
     offset++;
   }
 
@@ -39,7 +40,7 @@ void *bootloader_memcpy(void *out, const void *in, size_t n) {
 
 extern char _psram_start, _rwdata_load_start, _rwdata_load_end;
 extern char _sram_start, _rxdata_load_start, _rxdata_load_end;
-extern char _rxdate_dest_start, _rwdata_dest_start;
+extern char _rxdata_dest_start, _rwdata_dest_start;
 
 __attribute__ ((section (".bootloader")))
 void bootloader() {
@@ -47,7 +48,7 @@ void bootloader() {
   // Bootloader
   uint32_t rxdata_size = (uintptr_t)&_rxdata_load_end - (uintptr_t)&_rxdata_load_start;
   uint32_t rwdata_size = (uintptr_t)&_rwdata_load_end - (uintptr_t)&_rwdata_load_start;
-  bootloader_memcpy(&_rxdate_dest_start, &_rxdata_load_start, rxdata_size);
+  bootloader_memcpy(&_rxdata_dest_start, &_rxdata_load_start, rxdata_size);
   bootloader_memcpy(&_rwdata_dest_start, &_rwdata_load_start, rwdata_size);
 
   heap.start = &_heap_start;
@@ -70,7 +71,7 @@ void _trm_init() {
   uint32_t rxdata_size = (uintptr_t)&_rxdata_load_end - (uintptr_t)&_rxdata_load_start;
   uint32_t rwdata_size = (uintptr_t)&_rwdata_load_end - (uintptr_t)&_rwdata_load_start;
   printf("RX Bootload Finish. Source start address: 0x%08X, Source end address: 0x%08X, Dest start address: 0x%08X, size: %ld\n",
-         &_rxdata_load_start, &_rxdata_load_end, &_rxdate_dest_start, rxdata_size);
+         &_rxdata_load_start, &_rxdata_load_end, &_rxdata_dest_start, rxdata_size);
   printf("RW Bootload Finish. Source start address: 0x%08X, Source end address: 0x%08X, Dest start address: 0x%08X, size: %ld\n",
          &_rwdata_load_start, &_rwdata_load_end, &_rwdata_dest_start, rwdata_size);
   printf("Heap range: [0x%08X, 0x%08X)\n", heap.start, heap.end);
