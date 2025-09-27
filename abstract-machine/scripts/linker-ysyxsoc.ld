@@ -52,6 +52,7 @@ SECTIONS {
     _data_start = .;
     *(.data*)
     *(.sdata*)
+    LONG(0)
     . = ALIGN(0x8);
     PROVIDE (edata = .);
     PROVIDE (_edata = .);
