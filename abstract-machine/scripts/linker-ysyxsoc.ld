@@ -1,6 +1,6 @@
 ENTRY(_start)
 
-PHDRS { boot PT_LOAD; code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; bss PT_LOAD; }
+PHDRS { boot PT_LOAD; code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; }
 
 MEMORY {
   sram : ORIGIN = 0x0f000000, LENGTH = 8K
@@ -15,57 +15,61 @@ SECTIONS {
   . = ORIGIN(flash);
   .bootloader : {
     *(entry)
+    *(bootloader)
   } > flash AT > flash : boot
-  _rxdata_load_start = .;
+
+  _rxdata_load_start = LOADADDR(.text);
   _rxdata_load_end = _rxdata_load_start + SIZEOF(.text) + SIZEOF(.rodata);
   . = _rxdata_load_end;
 
-  _rwdata_load_start = .;
+  _rwdata_load_start = LOADADDR(.data);
   _rwdata_load_end = _rwdata_load_start + (edata - _rwdata_dest_start);
 
   /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
   . = ORIGIN(sram);
-  _sram_start = .;
   _stack_top = ALIGN(0x4);
   _stack_pointer = 0x0f001ff0;
 
   /* psram address: [0x80_00_0000, 0x80_3f_ffff) */
   . = ORIGIN(psram);
-  _psram_start = .;
-  .text : {
-    _rxdate_dest_start = .;
+  .text : ALIGN(0x8) {
+    _rxdata_dest_start = .;
     *(.text*)
+    . = ALIGN(0x8);
     etext = .;
     _etext = .;
   } > psram AT> flash : code
-  .rodata : {
+  .rodata : ALIGN(0x8) {
     *(.rodata*)
     *(.srodata*)
+    . = ALIGN(0x8);
     *(.rela*)
+    . = ALIGN(0x8);
   } > psram AT> flash : rodata
 
-  . = ALIGN(0x8);
-  _rwdata_dest_start = .;
-  .data BLOCK(0x8) : {
+  .data : ALIGN(0x8) {
+    _rwdata_dest_start = .;
     _data_start = .;
     *(.data*)
     *(.sdata*)
-    edata = .;
-    _edata = .;
     . = ALIGN(0x8);
+    PROVIDE (edata = .);
+    PROVIDE (_edata = .);
   } > psram AT> flash : rwdata
-  .bss BLOCK(0x8) : {
+
+  .bss edata : ALIGN(0x8) {
     _bss_start = .;
     *(.bss*)
     *(.sbss*)
     *(.scommon)
-    ebss = .;
-  } > psram AT> flash : rwdata
+    . = ALIGN(0x8);
+    PROVIDE (ebss = .);
+  } > psram
 
-  . = . + 0x10;
-  _heap_start = ALIGN(0x8);
-  . = 0x803fffe0;
-  _heap_end = .;
-  end = .;
-  _end = .;
+  . = ALIGN(0x8);
+  _heap_start = ebss;
+  _heap_end = 0x803ffff0;
+  end = _heap_end;
+  _end = _heap_end;
+
 }

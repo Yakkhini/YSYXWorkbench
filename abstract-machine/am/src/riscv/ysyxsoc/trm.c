@@ -38,8 +38,8 @@ void *bootloader_memcpy(void *out, const void *in, size_t n) {
   return out;
 }
 
-extern char _psram_start, _rwdata_load_start, _rwdata_load_end;
-extern char _sram_start, _rxdata_load_start, _rxdata_load_end;
+extern char _rwdata_load_start, _rwdata_load_end;
+extern char _rxdata_load_start, _rxdata_load_end;
 extern char _rxdata_dest_start, _rwdata_dest_start;
 
 __attribute__ ((section (".bootloader")))
