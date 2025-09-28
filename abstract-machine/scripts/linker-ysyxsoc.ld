@@ -1,6 +1,6 @@
 ENTRY(_start)
 
-PHDRS { boot PT_LOAD; code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; }
+PHDRS { fsbl PT_LOAD; ssbl PT_LOAD; code PT_LOAD; rodata PT_LOAD; rwdata PT_LOAD; }
 
 MEMORY {
   sram : ORIGIN = 0x0f000000, LENGTH = 8K
@@ -13,10 +13,13 @@ SECTIONS {
   _entry_offset = 0x0;
 
   . = ORIGIN(flash);
-  .bootloader : {
+  .fsbl : {
     *(entry)
-    *(bootloader)
-  } > flash AT > flash : boot
+    *(fsbl)
+  } > flash AT > flash : fsbl
+
+  _ssbl_load_start = LOADADDR(.ssbl);
+  _ssbl_load_end = _ssbl_load_start + SIZEOF(.ssbl);
 
   _rxdata_load_start = LOADADDR(.text);
   _rxdata_load_end = _rxdata_load_start + SIZEOF(.text) + SIZEOF(.rodata);
@@ -32,6 +35,11 @@ SECTIONS {
 
   /* psram address: [0x80_00_0000, 0x80_3f_ffff) */
   . = ORIGIN(psram);
+  .ssbl : ALIGN(0x8) {
+    _ssbl_dest_start = .;
+    *(ssbl)
+  } > psram AT> flash : ssbl
+
   .text : ALIGN(0x8) {
     _rxdata_dest_start = .;
     *(.text*)
