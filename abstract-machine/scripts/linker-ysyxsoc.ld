@@ -30,16 +30,16 @@ SECTIONS {
 
   /* sram address: [0x0f00_0000, 0x0f00_1fff)  */
   . = ORIGIN(sram);
+  .ssbl : ALIGN(0x8) {
+    _ssbl_dest_start = .;
+    *(ssbl)
+  } > sram AT> flash : ssbl
+
   _stack_top = ALIGN(0x4);
   _stack_pointer = 0x0f001ff0;
 
   /* psram address: [0x80_00_0000, 0x80_3f_ffff) */
   . = ORIGIN(psram);
-  .ssbl : ALIGN(0x8) {
-    _ssbl_dest_start = .;
-    *(ssbl)
-  } > psram AT> flash : ssbl
-
   .text : ALIGN(0x8) {
     _rxdata_dest_start = .;
     *(.text*)
