@@ -53,11 +53,14 @@ __attribute__((section(".fsbl"))) void fsbl() {
 
 __attribute__((section(".ssbl"))) void *
 bootloader_memcpy(void *out, const void *in, size_t n) {
-  uintptr_t offset = 0;
-  uintptr_t total_words = n / 4;
-  while (offset < total_words) {
-    ((uint64_t *)out)[offset] = ((uint64_t *)in)[offset];
-    offset++;
+  uint32_t size = n;
+  uint32_t *src = (uint32_t *)in;
+  uint32_t *dest = (uint32_t *)out;
+  while (size > 0) {
+    *dest = *src;
+    dest++;
+    src++;
+    size -= 4;
   }
 
   return out;
