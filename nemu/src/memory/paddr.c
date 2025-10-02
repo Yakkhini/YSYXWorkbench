@@ -15,10 +15,10 @@
 
 #include "debug.h"
 #include "macro.h"
-#include <memory/host.h>
-#include <memory/paddr.h>
 #include <device/mmio.h>
 #include <isa.h>
+#include <memory/host.h>
+#include <memory/paddr.h>
 
 #if   defined(CONFIG_PMEM_MALLOC)
 static uint8_t *pmem = NULL;
@@ -26,7 +26,10 @@ static uint8_t *pmem = NULL;
 static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 #endif
 
-static uint8_t SRAM[0xffffff] PG_ALIGN = {};
+#ifdef CONFIG_TARGET_SHARE
+static uint8_t SRAM[0x2000] PG_ALIGN = {};
+static uint8_t SDRAM[0x2000000] PG_ALIGN = {};
+#endif
 
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }
 paddr_t host_to_guest(uint8_t *haddr) { return haddr - pmem + CONFIG_MBASE; }
@@ -65,9 +68,14 @@ word_t paddr_read(paddr_t addr, int len) {
   if (likely(in_pmem(addr))) return pmem_read(addr, len);
   IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
 
-  if (addr >= 0x0f000000 && addr <= 0x0fffffff) {
+#ifdef CONFIG_TARGET_SHARE
+  if (addr >= 0x0f000000 && addr <= 0x0f001fff) {
     return host_read(SRAM + addr - 0x0f000000, len);
   }
+  if (addr >= 0xa0000000 && addr <= 0xa1ffffff) {
+    return host_read(SDRAM + addr - 0xa0000000, len);
+  }
+#endif
 
   out_of_bound(addr);
   return 0;
@@ -78,10 +86,16 @@ void paddr_write(paddr_t addr, int len, word_t data) {
   if (likely(in_pmem(addr))) { pmem_write(addr, len, data); return; }
   IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
 
-  if (addr >= 0x0f000000 && addr <= 0x0fffffff) {
+#ifdef CONFIG_TARGET_SHARE
+  if (addr >= 0x0f000000 && addr <= 0x0f001fff) {
     host_write(SRAM + addr - 0x0f000000, len, data);
     return;
   }
+  if (addr >= 0xa0000000 && addr <= 0xa1ffffff) {
+    host_write(SDRAM + addr - 0xa0000000, len, data);
+    return;
+  };
+#endif
 
   out_of_bound(addr);
 }
