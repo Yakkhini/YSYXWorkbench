@@ -1,7 +1,7 @@
 {
   description = "Flake for One Student One Chip Project";
   inputs = {
-    yamlcpp07pkgs.url = "github:NixOS/nixpkgs/c9b4c7dccdbf196fbe1113ef27da7da17f84b994";
+    mill01214pkgs.url = "github:NixOS/nixpkgs/4907750a173268bf52f55bd16f3669bf2edeac30";
     pkgsunstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     pkgs.url = "nixpkgs";
   };
@@ -9,7 +9,7 @@
     self,
     pkgs,
     pkgsunstable,
-    yamlcpp07pkgs,
+    mill01214pkgs
   }: let
     stdpkgs = pkgs.legacyPackages.x86_64-linux;
     npcmake = stdpkgs.writeScriptBin "npcmake" ''make -C $NPC_HOME $1'';
@@ -75,7 +75,7 @@
         stdpkgs.just
         stdpkgs.scalafmt
         stdpkgs.scalafix
-        (stdpkgs.mill.override {jre = stdpkgs.temurin-jre-bin-17;}) # scala project builder
+        (mill01214pkgs.legacyPackages."x86_64-linux".mill.override {jre = stdpkgs.temurin-jre-bin-17;}) # scala project builder
         (stdpkgs.sbt.override {jre = stdpkgs.temurin-jre-bin-17;}) # scala project builder
         stdpkgs.temurin-bin
         stdpkgs.circt

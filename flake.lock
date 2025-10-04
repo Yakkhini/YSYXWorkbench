@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "mill01214pkgs": {
+      "locked": {
+        "lastModified": 1747977070,
+        "narHash": "sha256-UlaDr2s/64vedJHPqIBNvHMlROxuHGAT1mrnBPAFXtk=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "4907750a173268bf52f55bd16f3669bf2edeac30",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "4907750a173268bf52f55bd16f3669bf2edeac30",
+        "type": "github"
+      }
+    },
     "pkgs": {
       "locked": {
         "lastModified": 1759417375,
@@ -32,25 +48,9 @@
     },
     "root": {
       "inputs": {
+        "mill01214pkgs": "mill01214pkgs",
         "pkgs": "pkgs",
-        "pkgsunstable": "pkgsunstable",
-        "yamlcpp07pkgs": "yamlcpp07pkgs"
-      }
-    },
-    "yamlcpp07pkgs": {
-      "locked": {
-        "lastModified": 1675178574,
-        "narHash": "sha256-NjpHBlqAmKijt9dZh+wRovklw+JPIOzFXu/kW0Eu6bc=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "c9b4c7dccdbf196fbe1113ef27da7da17f84b994",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "c9b4c7dccdbf196fbe1113ef27da7da17f84b994",
-        "type": "github"
+        "pkgsunstable": "pkgsunstable"
       }
     }
   },
