@@ -57,8 +57,7 @@
         stdpkgs.yosys-synlig
         stdpkgs.surelog
         stdpkgs.verible
-        stdpkgs.coursier
-        stdpkgs.metals # scala lsp
+        stdpkgs.metals
         stdpkgs.ieda
         stdpkgs.capstone
         npcmake
