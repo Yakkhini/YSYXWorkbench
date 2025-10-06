@@ -7,7 +7,7 @@ MEMORY {
   mrom : ORIGIN = 0x20000000, LENGTH = 4K
   flash : ORIGIN = 0x30000000, LENGTH = 16M
   psram : ORIGIN = 0x80000000, LENGTH = 4M
-  sdram : ORIGIN = 0xa0000000, LENGTH = 64M
+  sdram : ORIGIN = 0xa0000000, LENGTH = 128M
 }
 
 SECTIONS {
@@ -39,7 +39,7 @@ SECTIONS {
   _stack_top = ALIGN(0x4);
   _stack_pointer = 0x0f001ff0;
 
-  /* sdram address: [0xa000_0000, 0xa3ff_ffff) */
+  /* sdram address: [0xa000_0000, 0xa7ff_ffff) */
   . = ORIGIN(sdram);
   .text : ALIGN(0x8) {
     _rxdata_dest_start = .;
@@ -78,7 +78,7 @@ SECTIONS {
 
   . = ALIGN(0x8);
   _heap_start = ebss;
-  _heap_end = 0xa3fffff0;
+  _heap_end = 0xa7fffff0;
   end = _heap_end;
   _end = _heap_end;
 
