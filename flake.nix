@@ -103,7 +103,7 @@
         export PATH="$NPC_CHISEL/out/bin:$NPC_HOME/build/bin:$PATH"
         export CHISEL_FIRTOOL_PATH=${stdpkgs.circt}/bin
         export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
-        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/include"
+        export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/usr/include"
         alias npcmake="make -C $NPC_HOME"
       '';
     };
