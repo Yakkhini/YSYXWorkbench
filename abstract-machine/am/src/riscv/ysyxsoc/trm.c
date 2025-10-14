@@ -1,3 +1,4 @@
+#include "include/ysyxsoc.h"
 #include <am.h>
 #include <klib-macros.h>
 #include <klib.h>
@@ -15,9 +16,9 @@ Area heap;
 static const char mainargs[] = MAINARGS;
 
 void putch(char ch) {
-  while ((inb(SERIAL_PORT + 5) & 0B00100000) == 0)
+  while ((inb(UART_ADDR + 5) & 0B00100000) == 0)
     ;
-  outb(SERIAL_PORT, ch);
+  outb(UART_ADDR, ch);
 }
 
 void halt(int code) {
@@ -86,11 +87,11 @@ void _trm_init() {
 
   // Initialize UART
   // Line Control Register: Offset 3
-  outb(SERIAL_PORT + 3, 0B00000011); // RESET LCR
-  outb(SERIAL_PORT + 3, 0B10000011); // ENABLE DLAB
-  outb(SERIAL_PORT + 1, 0x00);       // Set Baud rate to 9600, MSB first
-  outb(SERIAL_PORT + 0, 0x0C);       // Set Baud rate to 9600, LSB next
-  outb(SERIAL_PORT + 3, 0B00000011); // RESET LCR & DISABLE DLAB
+  outb(UART_ADDR + 3, 0B00000011); // RESET LCR
+  outb(UART_ADDR + 3, 0B10000011); // ENABLE DLAB
+  outb(UART_ADDR + 1, 0x00);       // Set Baud rate to 9600, MSB first
+  outb(UART_ADDR + 0, 0x0C);       // Set Baud rate to 9600, LSB next
+  outb(UART_ADDR + 3, 0B00000011); // RESET LCR & DISABLE DLAB
 
   uint32_t rxdata_size =
       (uintptr_t)&_rxdata_load_end - (uintptr_t)&_rxdata_load_start;
