@@ -34,7 +34,7 @@ AM_DEVREG(24, NET_RX,       WR, Area buf);
 
 AM_DEVREG(25, SOC_LEDS,    WR, uint16_t value);
 AM_DEVREG(26, SOC_SWITCHES, RD, uint16_t value);
-AM_DEVREG(27, SOC_7SEGS,   WR, uint32_t value);
+AM_DEVREG(27, SOC_7SEGS,   WR, uint16_t value);
 
 // Input
 
