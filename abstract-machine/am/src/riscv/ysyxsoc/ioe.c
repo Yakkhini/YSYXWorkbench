@@ -10,6 +10,10 @@ void __am_input_keybrd(AM_INPUT_KEYBRD_T *);
 static void __am_timer_config(AM_TIMER_CONFIG_T *cfg) { cfg->present = true; cfg->has_rtc = true; }
 static void __am_input_config(AM_INPUT_CONFIG_T *cfg) { cfg->present = true;  }
 
+void __am_set_light(AM_SOC_LEDS_T *am_leds);
+void __am_read_switch(AM_SOC_SWITCHES_T *am_switches);
+void __am_set_seg(AM_SOC_7SEGS_T am_7segs);
+
 typedef void (*handler_t)(void *buf);
 static void *lut[128] = {
   [AM_TIMER_CONFIG] = __am_timer_config,
@@ -17,6 +21,9 @@ static void *lut[128] = {
   [AM_TIMER_UPTIME] = __am_timer_uptime,
   [AM_INPUT_CONFIG] = __am_input_config,
   [AM_INPUT_KEYBRD] = __am_input_keybrd,
+  [AM_SOC_LEDS   ] = __am_set_light,
+  [AM_SOC_SWITCHES] = __am_read_switch,
+  [AM_SOC_7SEGS ] = __am_set_seg,
 };
 
 static void fail(void *buf) { panic("access nonexist register"); }
