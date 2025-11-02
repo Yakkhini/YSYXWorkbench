@@ -1,5 +1,6 @@
 #include <am.h>
 #include <klib-macros.h>
+#include <ysyxsoc.h>
 
 void __am_timer_init();
 
@@ -12,7 +13,11 @@ static void __am_timer_config(AM_TIMER_CONFIG_T *cfg) {
   cfg->has_rtc = true;
 }
 static void __am_input_config(AM_INPUT_CONFIG_T *cfg) { cfg->present = true; }
-static void __am_uart_config(AM_UART_CONFIG_T *cfg) { cfg->present = false; }
+static void __am_uart_config(AM_UART_CONFIG_T *cfg) { cfg->present = true; }
+static void __am_uart_rx(AM_UART_RX_T *uart_rx) {
+  bool data_ready = (inb(UART_ADDR + 5) & 0B00000001) != 0;
+  uart_rx->data = data_ready ? inb(UART_ADDR) : (char)-1;
+}
 
 void __am_set_light(AM_SOC_LEDS_T *am_leds);
 void __am_read_switch(AM_SOC_SWITCHES_T *am_switches);
@@ -26,6 +31,7 @@ static void *lut[128] = {
     [AM_INPUT_CONFIG] = __am_input_config,
     [AM_INPUT_KEYBRD] = __am_input_keybrd,
     [AM_UART_CONFIG] = __am_uart_config,
+    [AM_UART_RX] = __am_uart_rx,
     [AM_SOC_LEDS] = __am_set_light,
     [AM_SOC_SWITCHES] = __am_read_switch,
     [AM_SOC_7SEGS] = __am_set_seg,
