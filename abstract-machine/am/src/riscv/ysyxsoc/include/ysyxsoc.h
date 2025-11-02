@@ -10,6 +10,7 @@
 
 #define RTC_ADDR (0x02000000)
 #define UART_ADDR (0x10000000)
+#define KBD_ADDR (0x10011000)
 
 #define LED_ADDR (GPIO_BASE + 0x0000)
 #define SWITCH_ADDR (GPIO_BASE + 0x0004)
