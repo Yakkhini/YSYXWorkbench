@@ -19,6 +19,10 @@ static void __am_uart_rx(AM_UART_RX_T *uart_rx) {
   uart_rx->data = data_ready ? inb(UART_ADDR) : (char)-1;
 }
 
+void __am_gpu_config(AM_GPU_CONFIG_T *);
+void __am_gpu_status(AM_GPU_STATUS_T *);
+void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *);
+
 void __am_set_light(AM_SOC_LEDS_T *am_leds);
 void __am_read_switch(AM_SOC_SWITCHES_T *am_switches);
 void __am_set_seg(AM_SOC_7SEGS_T *am_7segs);
@@ -32,6 +36,9 @@ static void *lut[128] = {
     [AM_INPUT_KEYBRD] = __am_input_keybrd,
     [AM_UART_CONFIG] = __am_uart_config,
     [AM_UART_RX] = __am_uart_rx,
+    [AM_GPU_CONFIG] = __am_gpu_config,
+    [AM_GPU_STATUS] = __am_gpu_status,
+    [AM_GPU_FBDRAW] = __am_gpu_fbdraw,
     [AM_SOC_LEDS] = __am_set_light,
     [AM_SOC_SWITCHES] = __am_read_switch,
     [AM_SOC_7SEGS] = __am_set_seg,
