@@ -59,7 +59,6 @@
         stdpkgs.verible
         stdpkgs.metals
         stdpkgs.ieda
-        stdpkgs.capstone
         npcmake
         nemumake
         ista-run
@@ -71,6 +70,8 @@
 
       buildInputs = [
         stdpkgs.clang-tools
+        stdpkgs.capstone
+        stdpkgs.tomlplusplus
         stdpkgs.gnumake
         stdpkgs.just
         stdpkgs.scalafmt
