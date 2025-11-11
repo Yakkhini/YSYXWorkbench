@@ -50,6 +50,7 @@
         stdpkgs.readline
         stdpkgs.llvm
         stdpkgs.gdb
+        stdpkgs.perf
         stdpkgs.python3
         stdpkgs.perl
         stdpkgs.libunwind
