@@ -25,3 +25,4 @@ image: $(IMAGE).elf
 run: image
 	@just -f $(NPC_CHISEL)/Justfile -d $(NPC_CHISEL) sim
 	@taohe -f $(IMAGE).elf $(IMAGE).bin
+	@just -f $(NPC_CHISEL)/Justfile -d $(NPC_CHISEL) perf
