@@ -23,6 +23,6 @@ image: $(IMAGE).elf
 	@$(OBJCOPY) -S --set-section-flags .bss=alloc,contents -O binary $(IMAGE).elf $(IMAGE).bin
 
 run: image
-	@just -f $(NPC_CHISEL)/Justfile -d $(NPC_CHISEL) sim
+	@just -f $(NPC_CHISEL)/Justfile -d $(NPC_CHISEL) soc-sim
 	@taohe -f $(IMAGE).elf $(IMAGE).bin
 	@just -f $(NPC_CHISEL)/Justfile -d $(NPC_CHISEL) perf
