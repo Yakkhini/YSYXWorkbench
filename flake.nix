@@ -73,6 +73,7 @@
         stdpkgs.clang-tools
         stdpkgs.capstone
         stdpkgs.tomlplusplus
+        stdpkgs.sqlite
         stdpkgs.gnumake
         stdpkgs.just
         stdpkgs.scalafmt
