@@ -51,6 +51,7 @@
         stdpkgs.llvm
         stdpkgs.gdb
         stdpkgs.perf
+        stdpkgs.julia-bin
         stdpkgs.python3
         stdpkgs.perl
         stdpkgs.libunwind
