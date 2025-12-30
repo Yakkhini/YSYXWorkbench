@@ -2,20 +2,18 @@
   description = "Flake for One Student One Chip Project";
   inputs = {
     mill01214pkgs.url = "github:NixOS/nixpkgs/4907750a173268bf52f55bd16f3669bf2edeac30";
-    pkgsunstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    pkgs.url = "nixpkgs";
+    pkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
   outputs = {
     self,
     pkgs,
-    pkgsunstable,
-    mill01214pkgs
+    mill01214pkgs,
   }: let
     stdpkgs = pkgs.legacyPackages.x86_64-linux;
     npcmake = stdpkgs.writeScriptBin "npcmake" ''make -C $NPC_HOME $1'';
     nemumake = stdpkgs.writeScriptBin "nemumake" ''make -C $NEMU_HOME $1'';
     ista-run = stdpkgs.writeScriptBin "ista-run" ''LD_LIBRARY_PATH=bin/ ista-bin'';
-    riscv-toolchain = import pkgsunstable {
+    riscv-toolchain = import pkgs {
       localSystem = "x86_64-linux";
       crossSystem = {
         config = "riscv64-unknown-linux-gnu";
