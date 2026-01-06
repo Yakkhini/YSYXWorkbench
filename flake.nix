@@ -54,6 +54,8 @@
         stdpkgs.perl
         stdpkgs.libunwind
         stdpkgs.yosys
+        stdpkgs.sby
+        stdpkgs.z3
         stdpkgs.yosys-synlig
         stdpkgs.surelog
         stdpkgs.verible
