@@ -68,6 +68,7 @@
 
       nativeBuildInputs = [
         stdpkgs.pkg-config
+        stdpkgs.rustPlatform.bindgenHook
       ];
 
       buildInputs = [
@@ -104,7 +105,8 @@
         export NVBOARD_HOME=`readlink -f nvboard`
         export LAB_HOME=`readlink -f digital-design-lab`
         export YOSYS_STA_HOME=`readlink -f yosys-sta`
-        export PATH="$NPC_CHISEL/out/bin:$NPC_HOME/build/bin:$PATH"
+        export RUSTUP_HOME="$HOME/.rustup"
+        export PATH="$RUSTUP_HOME/stable-${stdpkgs.stdenv.hostPlatform.rust.rustcTarget}/bin:$NPC_CHISEL/out/bin:$NPC_HOME/build/bin:$PATH"
         export CHISEL_FIRTOOL_PATH=${stdpkgs.circt}/bin
         export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
         export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/usr/include"
