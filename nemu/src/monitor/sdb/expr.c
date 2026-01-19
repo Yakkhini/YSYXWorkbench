@@ -147,7 +147,7 @@ static bool make_token(char *e) {
   return true;
 }
 
-uint32_t eval(int p, int q);
+int32_t eval(int p, int q);
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -188,7 +188,7 @@ bool check_parentheses(int p, int q) {
   return true;
 }
 
-uint32_t eval(int p, int q) {
+int32_t eval(int p, int q) {
   if (p > q) {
     /* Bad expression */
   } else if (p == q) {
@@ -240,8 +240,8 @@ uint32_t eval(int p, int q) {
     if (op == -1) {
       return 77777; // Magic number 77777 for debug.
     }
-    uint32_t val1 = eval(p, op - 1);
-    uint32_t val2 = eval(op + 1, q);
+    int32_t val1 = eval(p, op - 1);
+    int32_t val2 = eval(op + 1, q);
 
     switch (tokens[op].type) {
     case '+':
