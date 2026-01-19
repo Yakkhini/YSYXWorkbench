@@ -17,6 +17,7 @@
 
 extern uint64_t g_nr_guest_inst;
 FILE *log_fp = NULL;
+FILE *log_itrace_fp = NULL;
 
 void init_log(const char *log_file) {
   log_fp = stdout;
@@ -26,6 +27,15 @@ void init_log(const char *log_file) {
     log_fp = fp;
   }
   Log("Log is written to %s", log_file ? log_file : "stdout");
+}
+
+void init_itrace_log(const char *itrace_file) {
+  if (itrace_file != NULL) {
+    FILE *fp = fopen(itrace_file, "w");
+    Assert(fp, "Can not open '%s'", itrace_file);
+    log_itrace_fp = fp;
+  }
+  Log("Instruction trace is written to %s", itrace_file);
 }
 
 bool log_enable() {
