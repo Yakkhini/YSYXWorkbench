@@ -60,6 +60,7 @@
         stdpkgs.surelog
         stdpkgs.verible
         stdpkgs.metals
+        stdpkgs.taplo
         stdpkgs.ieda
         npcmake
         nemumake
