@@ -37,7 +37,9 @@ PLATFORM   = $(word 2,$(ARCH_SPLIT))
 
 ### Check if there is something to build
 ifeq ($(flavor SRCS), undefined)
-  $(error Nothing to build)
+	ifeq ($(flavor ZIG_LIB), undefined)
+		$(error Nothing to build)
+	endif
 endif
 
 ### Checks end here
@@ -131,7 +133,7 @@ $(LIBS): %:
 ### Rule (link): objects (`*.o`) and libraries (`*.a`) -> `IMAGE.elf`, the final ELF binary to be packed into image (ld)
 $(IMAGE).elf: $(OBJS) am $(LIBS)
 	@echo + LD "->" $(IMAGE_REL).elf
-	@$(LD) $(LDFLAGS) -o $(IMAGE).elf --start-group $(LINKAGE) --end-group -Map=$(IMAGE).map
+	@$(LD) $(LDFLAGS) -o $(IMAGE).elf --start-group $(ZIG_LIB) $(LINKAGE) --end-group -Map=$(IMAGE).map
 
 ### Rule (archive): objects (`*.o`) -> `ARCHIVE.a` (ar)
 $(ARCHIVE): $(OBJS)

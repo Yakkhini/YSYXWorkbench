@@ -89,6 +89,7 @@
         stdpkgs.scons
         stdpkgs.bear
         riscv-toolchain.buildPackages.gcc
+        stdpkgs.zig
         stdpkgs.SDL2
         stdpkgs.SDL2_image
         stdpkgs.SDL2_ttf
