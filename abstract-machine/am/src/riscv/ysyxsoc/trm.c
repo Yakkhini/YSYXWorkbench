@@ -77,6 +77,8 @@ __attribute__((section(".ssbl"))) void ssbl() {
   bootloader_memcpy(&_rxdata_dest_start, &_rxdata_load_start, rxdata_size);
   bootloader_memcpy(&_rwdata_dest_start, &_rwdata_load_start, rwdata_size);
 
+  asm volatile("fence.i");
+
   heap.start = &_heap_start;
   heap.end = &_heap_end;
 
