@@ -6,6 +6,7 @@ import chisel3.util.{switch, is}
 
 import taohe.util.EXUBundle
 import taohe.util.enum._
+import taohe.util.PerformanceCounter
 
 import chisel3.util.Fill
 
@@ -29,6 +30,9 @@ class EXU extends Module {
     exuState === EXUState.sLS && (!io.fromIDU.bits.lsuReadEnable || clint.io.clintChosen) && !io.fromIDU.bits.lsuWriteEnable
   io.toLSU.valid := exuState === EXUState.sLS && !skipLSState
   io.fromLSU.ready := exuState === EXUState.sLS
+
+  val difftestSkip = io.fromIDU.bits.lsuReadEnable && clint.io.clintChosen
+  dontTouch(difftestSkip)
 
   // State 3
   io.toRegisterFile.valid := exuState === EXUState.sWB || skipLSState
@@ -146,6 +150,14 @@ class EXU extends Module {
     true.B
   )
 
+  // Performance Counter
+  val arithmeticDoneCounter = PerformanceCounter(
+    io.toRegisterFile.valid &&
+      io.toRegisterFile.bits.writeEnable &&
+      io.fromIDU.bits.registerWriteType === RegWriteDataType.RESULT.asUInt,
+    32
+  )
+
   switch(exuState) {
     is(EXUState.sIdle) {
       when(io.fromIDU.fire) {
@@ -164,8 +176,8 @@ class EXU extends Module {
     }
   }
 
-  val powerManager = Module(new PowerManager())
-  powerManager.io.reset := reset
-  powerManager.io.breakSignal := io.fromIDU.bits.break
-  powerManager.io.code := data1
+  val haltUnit = Module(new HaltUnit())
+  haltUnit.io.reset := reset
+  haltUnit.io.breakSignal := io.fromIDU.bits.break
+  haltUnit.io.code := data1
 }

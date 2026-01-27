@@ -32,12 +32,17 @@ uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 
+#ifdef CONFIG_ITRACE_COND
+static uint32_t itrace_count = 0;
+#endif
+
 void device_update();
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND) {
     log_write("%s\n", _this->logbuf);
+    log_itrace_write("%s\n", _this->logbuf);
   }
 #endif
   if (g_print_step) {
@@ -94,6 +99,12 @@ static void execute(uint64_t n) {
 }
 
 static void statistic() {
+
+#ifdef CONFIG_ITRACE_COND
+  extern FILE *log_itrace_fp;
+  fflush(log_itrace_fp);
+#endif
+
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);

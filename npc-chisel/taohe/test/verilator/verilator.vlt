@@ -12,4 +12,8 @@ public -module "IFU" -var "*inst"
 public -module "IFU" -var "iCount"
 public -module "IFU" -var "pc"
 public -module "IDU" -var "decodeSupport"
-public -module "CrossBar" -var "difftestSkip"
+public -module "EXU" -var "difftestSkip"
+
+public -module "HaltUnit" -var "*"
+
+public -module "*" -var "*Counter"

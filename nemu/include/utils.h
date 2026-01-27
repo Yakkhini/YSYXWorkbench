@@ -67,6 +67,19 @@ uint64_t get_time();
   } while (0) \
 )
 
+#define log_itrace_write(...) IFDEF(CONFIG_TARGET_NATIVE_ELF, \
+  do { \
+    extern uint32_t itrace_count; \
+    extern FILE* log_itrace_fp; \
+      fprintf(log_itrace_fp, __VA_ARGS__); \
+      itrace_count++; \
+    if (itrace_count == 1000) { \
+      fflush(log_itrace_fp); \
+      itrace_count = 0; \
+    } \
+  } while (0) \
+)
+
 #define _Log(...) \
   do { \
     printf(__VA_ARGS__); \

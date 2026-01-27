@@ -1,14 +1,17 @@
 package taohe
 
 import chisel3._
-import circt.stage.ChiselStage
-
 import chisel3.experimental.dataview._
+
+import circt.stage.ChiselStage
 
 import taohe.idu.IDU
 import taohe.util.{YSYXSoCAXI4Bundle, AXI4Bundle}
 
-class TaoHe extends Module {
+class TaoHe(physicalVersion: Boolean, registerAddrWidth: Int) extends Module {
+
+  override def localModulePrefix = if (physicalVersion) Some("taohe_") else None
+
   val io = IO(new Bundle {
     val interrupt = Input(Bool())
     val master = new YSYXSoCAXI4Bundle()
@@ -24,20 +27,25 @@ class TaoHe extends Module {
     val slave = io.slave.viewAs[AXI4Bundle]
   }
 
-  val registerFile = Module(new RegisterFile())
+  val registerFile = Module(new RegisterFile(registerAddrWidth))
   val csr = Module(new CSR())
+
+  val iCache = Module(new ICache(4, 4))
+
   val lsu = Module(new LSU())
-  val ifu = Module(new IFU())
+  val ifu = Module(new IFU(physicalVersion))
   val idu = Module(new IDU())
   val exu = Module(new EXU())
 
   val axiArbiter = Module(new AXIArbiter())
 
-  // IFU has Connected to the master port
-  axiArbiter.io.ifu <> ifu.io.axi4
-  axiArbiter.io.lsu <> lsu.io.axi4
+  axiArbiter.io.instructionFetch <> iCache.io.axi4
+  axiArbiter.io.loadStore <> lsu.io.axi4
 
   axiArbiter.io.out <> ioView.master
+
+  iCache.io.fromIFU <> ifu.io.toICache
+  iCache.io.toIFU <> ifu.io.fromICache
 
   ifu.io.toIDU <> idu.io.fromIFU
   idu.io.toEXU <> exu.io.fromIDU
@@ -62,17 +70,35 @@ class TaoHe extends Module {
   dontTouch(exu.io.toLSU.bits.writeData)
   dontTouch(exu.io.toLSU.bits.writeEnable)
 
-  dontTouch(ifu.io.axi4.aw.ready)
-  dontTouch(ifu.io.axi4.w.ready)
-  dontTouch(ifu.io.axi4.b.valid)
+  dontTouch(iCache.io.axi4.aw.ready)
+  dontTouch(iCache.io.axi4.w.ready)
+  dontTouch(iCache.io.axi4.b.valid)
 
 }
 
 object Main extends App {
   println("Hello World, I will generate the Verilog file now!")
   ChiselStage.emitSystemVerilogFile(
-    gen = new TaoHe(),
-    args = Array("--target-dir", "out/verilog", "--split-verilog"),
+    gen = new TaoHe(false, 4),
+    args = Array("--target-dir", "out/verilog"),
     firtoolOpts = Array("-preserve-aggregate=1d-vec")
   )
+
+  ChiselStage.emitSystemVerilogFile(
+    gen = new TaoHe(true, 4),
+    args = Array("--target-dir", "out/sta"),
+    firtoolOpts = Array(
+      "--lowering-options=disallowLocalVariables,disallowExpressionInliningInPorts",
+      "-disable-layers=Verification"
+    )
+  )
+
+  ChiselStage.emitSystemVerilogFile(
+    gen = new ICacheTest(),
+    args = Array("--target-dir", "out/formal"),
+    firtoolOpts = Array(
+      "--lowering-options=disallowLocalVariables,disallowExpressionInliningInPorts,disallowPackedArrays"
+    )
+  )
+
 }

@@ -2,10 +2,11 @@ package taohe
 
 import chisel3._
 import chisel3.util.{switch, is}
+import chisel3.util.MuxLookup
 
 import taohe.util.LSUBundle
-import chisel3.util.MuxLookup
 import taohe.util.enum.MemSize
+import taohe.util.PerformanceCounter
 
 object LSUState extends ChiselEnum {
   /*
@@ -102,6 +103,13 @@ class LSU extends Module {
     io.axi4.r.bits.data,
     readData
   ) >> (currentAddress(1, 0) << 3)
+
+  // Performance Counter
+  val loadDataValidCounter = PerformanceCounter(io.axi4.r.fire, 32)
+  val loadWaitingCycleCounter =
+    PerformanceCounter(io.axi4.r.ready && !io.axi4.r.fire, 32)
+  val storeWaitingCycleCounter =
+    PerformanceCounter(io.axi4.b.ready && !io.axi4.b.fire, 32)
 
   switch(lsuState) {
     is(LSUState.sIdle) {

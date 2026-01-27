@@ -12,6 +12,14 @@ class IFUToIDUBundle extends Bundle {
   val inst = UInt(32.W)
 }
 
+class IFUToICacheBundle extends Bundle {
+  val pc = UInt(32.W)
+}
+
+class ICacheToIFUBundle extends Bundle {
+  val readInst = UInt(32.W)
+}
+
 class IDUToEXUBundle extends Bundle {
   val currentPC = UInt(32.W)
   val registerReadData1 = UInt(32.W)
@@ -77,32 +85,6 @@ class EXUToLSUBundle extends Bundle {
   val length = UInt(32.W)
 }
 
-class AXI4LiteAWChannel extends Bundle {
-  val addr = Output(UInt(32.W))
-  // Not required to differentiate between Non-secure and Secure accesses
-  // val prot = Output(UInt(3.W))
-}
-
-class AXI4LiteWChannel extends Bundle {
-  val data = Output(UInt(32.W))
-  val strb = Output(UInt(4.W))
-}
-
-class AXI4LiteBChannel extends Bundle {
-  val resp = Output(UInt(2.W))
-}
-
-class AXI4LiteARChannel extends Bundle {
-  val addr = Output(UInt(32.W))
-  // Not required to differentiate between Non-secure and Secure accesses
-  // val prot = Output(UInt(3.W))
-}
-
-class AXI4LiteRChannel extends Bundle {
-  val data = Output(UInt(32.W))
-  val resp = Output(UInt(2.W))
-}
-
 class AXI4AWChannel extends Bundle {
   val addr = Output(UInt(32.W))
   val id = Output(UInt(4.W))
@@ -138,15 +120,6 @@ class AXI4RChannel extends Bundle {
 }
 
 // Public interfaces
-class AXI4LiteBundle extends Bundle {
-  // Manager to Subordinate
-  val aw = Decoupled(new AXI4LiteAWChannel)
-  val w = Decoupled(new AXI4LiteWChannel)
-  val b = Flipped(Decoupled(new AXI4LiteBChannel))
-  val ar = Decoupled(new AXI4LiteARChannel)
-  val r = Flipped(Decoupled(new AXI4LiteRChannel))
-}
-
 class AXI4Bundle extends Bundle {
   // Manager to Subordinate
   val aw = Decoupled(new AXI4AWChannel)
@@ -173,10 +146,17 @@ class CSRBundle extends Bundle {
   val toEXU = Decoupled(new CSRToEXUBundle)
 }
 
+class ICacheBundle extends Bundle {
+  val fromIFU = Flipped(Decoupled(new IFUToICacheBundle))
+  val toIFU = Decoupled(new ICacheToIFUBundle)
+  val axi4 = new AXI4Bundle
+}
+
 class IFUBundle extends Bundle {
   val fromEXU = Flipped(Decoupled(new EXUToIFUBundle))
   val toIDU = Decoupled(new IFUToIDUBundle)
-  val axi4 = new AXI4Bundle
+  val fromICache = Flipped(Decoupled(new ICacheToIFUBundle))
+  val toICache = Decoupled(new IFUToICacheBundle)
 }
 
 class IDUBundle extends Bundle {

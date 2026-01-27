@@ -2,20 +2,18 @@
   description = "Flake for One Student One Chip Project";
   inputs = {
     mill01214pkgs.url = "github:NixOS/nixpkgs/4907750a173268bf52f55bd16f3669bf2edeac30";
-    pkgsunstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    pkgs.url = "nixpkgs";
+    pkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
   outputs = {
     self,
     pkgs,
-    pkgsunstable,
-    mill01214pkgs
+    mill01214pkgs,
   }: let
     stdpkgs = pkgs.legacyPackages.x86_64-linux;
     npcmake = stdpkgs.writeScriptBin "npcmake" ''make -C $NPC_HOME $1'';
     nemumake = stdpkgs.writeScriptBin "nemumake" ''make -C $NEMU_HOME $1'';
     ista-run = stdpkgs.writeScriptBin "ista-run" ''LD_LIBRARY_PATH=bin/ ista-bin'';
-    riscv-toolchain = import pkgsunstable {
+    riscv-toolchain = import pkgs {
       localSystem = "x86_64-linux";
       crossSystem = {
         config = "riscv64-unknown-linux-gnu";
@@ -50,16 +48,20 @@
         stdpkgs.readline
         stdpkgs.llvm
         stdpkgs.gdb
+        stdpkgs.perf
+        stdpkgs.julia-bin
         stdpkgs.python3
         stdpkgs.perl
         stdpkgs.libunwind
         stdpkgs.yosys
+        stdpkgs.sby
+        stdpkgs.z3
         stdpkgs.yosys-synlig
         stdpkgs.surelog
         stdpkgs.verible
         stdpkgs.metals
+        stdpkgs.taplo
         stdpkgs.ieda
-        stdpkgs.capstone
         npcmake
         nemumake
         ista-run
@@ -67,10 +69,14 @@
 
       nativeBuildInputs = [
         stdpkgs.pkg-config
+        stdpkgs.rustPlatform.bindgenHook
       ];
 
       buildInputs = [
         stdpkgs.clang-tools
+        stdpkgs.capstone
+        stdpkgs.tomlplusplus
+        stdpkgs.sqlite
         stdpkgs.gnumake
         stdpkgs.just
         stdpkgs.scalafmt
@@ -83,6 +89,7 @@
         stdpkgs.scons
         stdpkgs.bear
         riscv-toolchain.buildPackages.gcc
+        stdpkgs.zig
         stdpkgs.SDL2
         stdpkgs.SDL2_image
         stdpkgs.SDL2_ttf
@@ -100,7 +107,8 @@
         export NVBOARD_HOME=`readlink -f nvboard`
         export LAB_HOME=`readlink -f digital-design-lab`
         export YOSYS_STA_HOME=`readlink -f yosys-sta`
-        export PATH="$NPC_CHISEL/out/bin:$NPC_HOME/build/bin:$PATH"
+        export RUSTUP_HOME="$HOME/.rustup"
+        export PATH="$RUSTUP_HOME/stable-${stdpkgs.stdenv.hostPlatform.rust.rustcTarget}/bin:$NPC_CHISEL/micro-sim/target/release:$NPC_CHISEL/out/bin:$NPC_HOME/build/bin:$PATH"
         export CHISEL_FIRTOOL_PATH=${stdpkgs.circt}/bin
         export NIX_CFLAGS_COMPILE="$(pkg-config --cflags sdl2) $(pkg-config --cflags verilator) $NIX_CFLAGS_COMPILE"
         export CPATH="$(pkg-config --cflags-only-I verilator | sed 's/ -I/:/' | sed 's/^..//'):$(readlink -f npc)/build:$NVBOARD_HOME/usr/include"

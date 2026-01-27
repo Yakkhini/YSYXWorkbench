@@ -4,16 +4,26 @@
 #include <cpu/disasm.h>
 #include <cpu/ftrace.h>
 #include <cpu/mtrace.h>
+#include <cpu/perf.h>
 #include <memory/vaddr.h>
 #include <nvboard.h>
 #include <sdb.h>
 #include <signal.h>
 
+#ifdef CONFIG_TARGET_ysyxSoCFull
 #include <VysyxSoCFull.h>
 #include <VysyxSoCFull__Dpi.h>
 #include <VysyxSoCFull__Syms.h>
+#endif
+
+#ifdef CONFIG_TARGET_TaoHe
+#include <VTaoHe.h>
+#include <VTaoHe__Dpi.h>
+#include <VTaoHe__Syms.h>
+#endif
 
 CPU cpu;
+core_symbol_t *cpu_symbol;
 NPCState npc_state = TCHE_INIT;
 
 static char *NPC_CHISEL = getenv("NPC_CHISEL");
@@ -52,7 +62,9 @@ void cpu_sync();
 void cpu_check();
 void single_clock() {
 
+#ifdef CONFIG_TARGET_ysyxSoCFull
   nvboard_update();
+#endif
 
 #if CONFIG_WAVE_RECORD
   contextp->timeInc(1);
@@ -88,7 +100,9 @@ void reset() {
 
   for (int i = 0; i < 15; i++) {
 
+#ifdef CONFIG_TARGET_ysyxSoCFull
     nvboard_update();
+#endif
 
 #if CONFIG_WAVE_RECORD
     tfp->dump(contextp->time());
@@ -143,10 +157,20 @@ void cpu_init(int argc, char **argv) {
   contextp = new VerilatedContext;
   contextp->commandArgs(argc, argv);
 
+#ifdef CONFIG_TARGET_ysyxSoCFull
   cpu.top = new VysyxSoCFull(contextp);
+  cpu_symbol = cpu.top->ysyxSoCFull->asic->cpu->cpu;
+#endif
+
+#ifdef CONFIG_TARGET_TaoHe
+  cpu.top = new VTaoHe(contextp);
+  cpu_symbol = cpu.top->TaoHe;
+#endif
   cpu.iCount = 0;
   cpu.total_cycle = 0;
   cpu.check_cycle = false;
+  perf_init();
+  mtrace_init();
   Log("Welcome to TaoHe Processor Core Verilating Model.");
 
 #if CONFIG_WAVE_RECORD
@@ -179,7 +203,9 @@ void cpu_exec(int n) {
   signal(SIGINT, handle_sigint);
   switch (npc_state) {
   case TCHE_INIT:
+    perf_start_timer();
     reset();
+    perf_end_timer();
     npc_state = TCHE_RUNNING;
     break;
   case TCHE_HALT:
@@ -196,34 +222,39 @@ void cpu_exec(int n) {
 
   switch (n) {
   case -1:
+    perf_start_timer();
     while (npc_state == TCHE_RUNNING) {
       single_clock();
     }
+    perf_end_timer();
     break;
   default:
+    perf_start_timer();
     for (int i = 0; i < n; i++) {
       if (npc_state != TCHE_RUNNING) {
         break;
       }
       single_clock();
     }
+    perf_end_timer();
     break;
+  }
+
+  if (npc_state == TCHE_HALT || npc_state == TCHE_ABORT) {
+    finish();
   }
 }
 
 void cpu_sync() {
-  memcpy(cpu.regs,
-         cpu.top->ysyxSoCFull->asic->cpu->cpu->registerFile->registers,
-         sizeof(cpu.regs));
-  cpu.inst = cpu.top->ysyxSoCFull->asic->cpu->cpu->ifu->io_toIDU_bits_inst;
-  cpu.check_cycle =
-      cpu.top->ysyxSoCFull->asic->cpu->cpu->ifu->iCount > cpu.iCount ||
-      npc_state == TCHE_HALT || npc_state == TCHE_ABORT;
+  memcpy(cpu.regs, cpu_symbol->registerFile->registers, sizeof(cpu.regs));
+  cpu.inst = cpu_symbol->ifu->io_toIDU_bits_inst;
+  cpu.check_cycle = cpu_symbol->ifu->iCount > cpu.iCount ||
+                    npc_state == TCHE_HALT || npc_state == TCHE_ABORT;
 
   if (cpu.check_cycle) {
     cpu.pc_prev = cpu.pc;
-    cpu.pc = cpu.top->ysyxSoCFull->asic->cpu->cpu->ifu->pc;
-    cpu.iCount = cpu.top->ysyxSoCFull->asic->cpu->cpu->ifu->iCount;
+    cpu.pc = cpu_symbol->ifu->pc;
+    cpu.iCount = cpu_symbol->ifu->iCount;
   }
 
   if (npc_state == TCHE_HALT) {
@@ -233,12 +264,12 @@ void cpu_sync() {
     cpu.pc += 0x4;
   }
 
-  axi4_interface_sync();
+  axi4_interface_sync(cpu_symbol);
 }
 
 void cpu_check() {
 
-  if (cpu.top->ysyxSoCFull->asic->cpu->cpu->idu->decodeSupport == 0) {
+  if (cpu_symbol->idu->decodeSupport == 0) {
     Log(ANSI_FMT("ERROR INST NOT SUPPORT: ", ANSI_FG_RED) ANSI_FG_BLUE
         "DECODE " ANSI_FMT("FAILED ", ANSI_FG_RED) ANSI_FG_BLUE
         "at pc = 0x%08X",
@@ -246,7 +277,11 @@ void cpu_check() {
     npc_state = TCHE_ABORT;
   }
 
-#if CONFIG_MTRACE || CONFIG_DIFFTEST
+  if (cpu_symbol->exu->haltUnit->halt) {
+    halt(cpu_symbol->exu->haltUnit->code);
+  }
+
+#if CONFIG_MTRACE || CONFIG_DIFFTEST || CONFIG_TARGET_TaoHe
   mtrace();
 #endif
 
@@ -263,14 +298,16 @@ void cpu_check() {
 #endif
 
 #if CONFIG_DIFFTEST
-  difftest_step(cpu.pc_prev, cpu.pc);
+  if (cpu_symbol->exu->difftestSkip) {
+    difftest_skip_ref();
+  } else {
+    difftest_step(cpu.pc_prev, cpu.pc);
+  }
 #endif
 
 #if CONFIG_WATCHPOINT
   check_wp();
 #endif
-
-  finish();
 
   cpu.check_cycle = false;
 
@@ -293,14 +330,8 @@ void finish() {
     return;
   }
 
-  double cpi = (double)cpu.total_cycle / (double)cpu.iCount;
-  double ipc = (double)cpu.iCount / (double)cpu.total_cycle;
-
-  Log("TCHE: " ANSI_FMT("Run Total Instructions %d for %d cycles",
-                        ANSI_FG_YELLOW) ANSI_FG_BLUE,
-      cpu.iCount, cpu.total_cycle);
-  Log("TCHE: " ANSI_FMT("CPI %.4f, IPC %.4f", ANSI_FG_YELLOW) ANSI_FG_BLUE, cpi,
-      ipc);
+  mtrace_finish();
+  perf_stat(cpu_symbol);
 }
 
 void cpu_exit() {
