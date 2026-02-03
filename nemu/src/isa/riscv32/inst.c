@@ -207,6 +207,9 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu, R,
           R(rd) = src1 % src2);
 
+  /* FENCE */
+  INSTPAT("0000 0000 0000 00000 001 00000 00011 11", fence, I, ;);
+
   /* CSR Instructions & Privileged Instructions */
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, N,
           s->dnpc = isa_raise_intr(11, s->pc));
