@@ -63,7 +63,6 @@
         stdpkgs.yosys
         stdpkgs.sby
         stdpkgs.z3
-        stdpkgs.yosys-synlig
         stdpkgs.surelog
         stdpkgs.verible
         stdpkgs.metals
