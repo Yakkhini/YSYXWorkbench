@@ -26,7 +26,14 @@
     packages.x86_64-linux.espresso = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation rec {
       pname = "espresso";
       version = "2.4";
-      nativeBuildInputs = [stdpkgs.cmake stdpkgs.ninja];
+      nativeBuildInputs = [stdpkgs.cmake];
+      env.NIX_CFLAGS_COMPILE = "-std=c99";
+      doCheck = true;
+      outputs = [
+        "out"
+        "man"
+      ];
+      passthru.updateScript = stdpkgs.nix-update-script {};
       src = stdpkgs.fetchFromGitHub {
         owner = "chipsalliance";
         repo = "espresso";
@@ -56,7 +63,6 @@
         stdpkgs.yosys
         stdpkgs.sby
         stdpkgs.z3
-        stdpkgs.yosys-synlig
         stdpkgs.surelog
         stdpkgs.verible
         stdpkgs.metals

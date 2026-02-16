@@ -7,38 +7,44 @@ import chisel3.util.{switch, is}
 
 import taohe.util.enum._
 import taohe.util.IDUBundle
-import taohe.util.PerformanceCounter
+import taohe.util.PreSiliconPerformanceCounter
 
 object IDUState extends ChiselEnum {
-  val sIdle, sSend = Value
+  val sWork, sSend, sWait = Value
 }
 
 class IDU extends Module {
   val io = IO(new IDUBundle)
 
-  val state = RegInit(IDUState.sIdle)
+  val state = RegInit(IDUState.sWait)
 
-  val pcRegister = RegInit(0.U(32.W))
-  val instRegister = RegInit(0.U(32.W))
+  val pc = RegInit(0.U(32.W))
+  val inst = RegInit(0.U(32.W))
 
-  io.fromIFU.ready := true.B
-  pcRegister := Mux(io.fromIFU.fire, io.fromIFU.bits.currentPC, pcRegister)
-  instRegister := Mux(io.fromIFU.fire, io.fromIFU.bits.inst, instRegister)
-  val pc = Mux(io.fromIFU.fire, io.fromIFU.bits.currentPC, pcRegister)
-  val inst = Mux(io.fromIFU.fire, io.fromIFU.bits.inst, instRegister)
+  pc := Mux(io.fromIFU.fire, io.fromIFU.bits.currentPC, pc)
+  inst := Mux(io.fromIFU.fire, io.fromIFU.bits.inst, inst)
 
-  io.toEXU.valid := state === IDUState.sSend
+  io.fromIFU.ready := (state === IDUState.sWork && io.toEXU.fire) || state === IDUState.sWait
+  io.toEXU.valid := state === IDUState.sWork || state === IDUState.sSend
+
   io.toRegisterFile.valid := true.B
   io.fromRegisterFile.ready := true.B
 
   switch(state) {
-    is(IDUState.sIdle) {
-      when(io.fromIFU.fire) {
-        state := IDUState.sSend
+    is(IDUState.sWork) {
+      when(!io.fromIFU.fire) {
+        state := Mux(io.toEXU.fire, IDUState.sWait, IDUState.sSend)
       }
     }
     is(IDUState.sSend) {
-      state := IDUState.sIdle
+      when(io.toEXU.fire) {
+        state := IDUState.sWait
+      }
+    }
+    is(IDUState.sWait) {
+      when(io.fromIFU.fire) {
+        state := IDUState.sWork
+      }
     }
   }
 
@@ -48,12 +54,12 @@ class IDU extends Module {
 
   io.toEXU.bits.currentPC := pc
 
-  val imm_i = inst(31) ## Fill(20, inst(31)) ## inst(30, 20)
-  val imm_s = inst(31) ## Fill(20, inst(31)) ## inst(30, 25) ## inst(11, 7)
-  val imm_b = inst(31) ## Fill(19, inst(31)) ## inst(7) ##
+  val immI = inst(31) ## Fill(20, inst(31)) ## inst(30, 20)
+  val immS = inst(31) ## Fill(20, inst(31)) ## inst(30, 25) ## inst(11, 7)
+  val immB = inst(31) ## Fill(19, inst(31)) ## inst(7) ##
     inst(30, 25) ## inst(11, 8) ## 0.U(1.W)
-  val imm_u = inst(31, 12) ## 0.U(12.W)
-  val imm_j = inst(31) ## Fill(11, inst(31)) ## inst(19, 12) ## inst(
+  val immU = inst(31, 12) ## 0.U(12.W)
+  val immJ = inst(31) ## Fill(11, inst(31)) ## inst(19, 12) ## inst(
     20
   ) ## inst(30, 21) ## 0.U(1.W)
 
@@ -61,11 +67,11 @@ class IDU extends Module {
 
   io.toEXU.bits.imm := MuxLookup(immType, 0.U)(
     Seq(
-      ImmType.I.asUInt -> imm_i,
-      ImmType.S.asUInt -> imm_s,
-      ImmType.B.asUInt -> imm_b,
-      ImmType.U.asUInt -> imm_u,
-      ImmType.J.asUInt -> imm_j
+      ImmType.I.asUInt -> immI,
+      ImmType.S.asUInt -> immS,
+      ImmType.B.asUInt -> immB,
+      ImmType.U.asUInt -> immU,
+      ImmType.J.asUInt -> immJ
     )
   )
 
@@ -89,13 +95,29 @@ class IDU extends Module {
   )
   io.toRegisterFile.bits.readAddr2 := inst(24, 20)
 
-  io.toEXU.bits.registerReadData1 := io.fromRegisterFile.bits.readData1
-  io.toEXU.bits.registerReadData2 := io.fromRegisterFile.bits.readData2
+  io.toEXU.bits.data1 := MuxLookup(
+    decodeResult(Data1Field),
+    0.U
+  )(
+    Seq(
+      Data1Type.PC.asUInt -> pc,
+      Data1Type.RS1.asUInt -> io.fromRegisterFile.bits.readData1
+    )
+  )
+
+  io.toEXU.bits.data2 := MuxLookup(
+    decodeResult(Data2Field),
+    0.U
+  )(
+    Seq(
+      Data2Type.IMM.asUInt -> io.toEXU.bits.imm,
+      Data2Type.RS2.asUInt -> io.fromRegisterFile.bits.readData2
+    )
+  )
+
   io.toEXU.bits.registerWriteAddr := inst(11, 7)
 
   io.toEXU.bits.instructionType := decodeResult(InstTypeField)
-  io.toEXU.bits.data1Type := decodeResult(Data1Field)
-  io.toEXU.bits.data2Type := decodeResult(Data2Field)
   io.toEXU.bits.registerWriteType := decodeResult(
     RegWriteDataTypeField
   )
@@ -113,7 +135,9 @@ class IDU extends Module {
   io.toEXU.bits.csrOperation := decodeResult(CSROPTypeField)
 
   val decodeSupport = Wire(Bool())
-  decodeSupport := decodeResult(DecodeSupportField) | ~io.fromIFU.valid
+  decodeSupport := decodeResult(
+    DecodeSupportField
+  ) || !io.toEXU.fire
   dontTouch(decodeSupport)
 
   // Performance Counter
@@ -128,28 +152,28 @@ class IDU extends Module {
       (decodeResult(InstTypeField) === InstType.I.asUInt ||
         decodeResult(InstTypeField) === InstType.R.asUInt)
 
-  val jumpInstCycleCounter = PerformanceCounter(isJumpInst, 32)
-  val jumpInstCounter = PerformanceCounter(
+  PreSiliconPerformanceCounter(
+    "jumpInstCounter",
     io.toEXU.fire && isJumpInst,
     32
   )
-  val branchInstCycleCounter = PerformanceCounter(isBranchInst, 32)
-  val branchInstCounter = PerformanceCounter(
+  PreSiliconPerformanceCounter(
+    "branchInstCounter",
     io.toEXU.fire && isBranchInst,
     32
   )
-  val loadInstCycleCounter = PerformanceCounter(isLoadInst, 32)
-  val loadInstCounter = PerformanceCounter(
+  PreSiliconPerformanceCounter(
+    "loadInstCounter",
     io.toEXU.fire && isLoadInst,
     32
   )
-  val storeInstCycleCounter = PerformanceCounter(isStoreInst, 32)
-  val storeInstCounter = PerformanceCounter(
+  PreSiliconPerformanceCounter(
+    "storeInstCounter",
     io.toEXU.fire && isStoreInst,
     32
   )
-  val arithInstCycleCounter = PerformanceCounter(isArithInst, 32)
-  val arithInstCounter = PerformanceCounter(
+  PreSiliconPerformanceCounter(
+    "arithInstCounter",
     io.toEXU.fire && isArithInst,
     32
   )

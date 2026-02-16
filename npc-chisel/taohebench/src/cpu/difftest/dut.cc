@@ -15,6 +15,8 @@ void (*ref_difftest_raise_intr)(uint64_t NO) = NULL;
 static bool is_skip_ref = false;
 static int skip_dut_nr_inst = 0;
 
+RegisterWriteEventBuffer register_write_event_buffer = {false, 0, 0};
+
 // this is used to let ref skip instructions which
 // can not produce consistent behavior with NEMU
 void difftest_skip_ref() {
@@ -89,7 +91,7 @@ void difftest_init(char *ref_so_file, long img_size, int port) {
 }
 
 bool isa_difftest_checkregs(CPU *ref_r, vaddr_t pc) {
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 16; i++) {
     if (ref_r->regs[i] != cpu.regs[i]) {
       return false;
     }
@@ -108,7 +110,7 @@ bool isa_difftest_checkregs(CPU *ref_r, vaddr_t pc) {
 static void diff_check(CPU *ref, vaddr_t pc) {
   if (!isa_difftest_checkregs(ref, pc)) {
     Log(ANSI_FG_RED "Warning: " ANSI_FG_BLUE "DiffTest ERROR.");
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 16; i++) {
       if (cpu.regs[i] != ref->regs[i]) {
         Log("x%i: " ANSI_FG_RED "0x%08X " ANSI_FG_BLUE
             "in CPU while " ANSI_FG_RED "0x%08X " ANSI_FG_BLUE "in REF.",
@@ -126,6 +128,10 @@ void difftest_step(vaddr_t pc, vaddr_t npc) {
   if (skip_dut_nr_inst > 0) {
     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
     ref_difftest_pccpy(&ref_r.pc, DIFFTEST_TO_DUT);
+    if (register_write_event_buffer.valid) {
+      cpu.regs[register_write_event_buffer.write_addr] =
+          register_write_event_buffer.write_data;
+    }
     if (ref_r.pc == cpu.pc) {
       skip_dut_nr_inst = 0;
       diff_check(&ref_r, cpu.pc);
