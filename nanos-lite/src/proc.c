@@ -31,10 +31,16 @@ void context_kload(PCB *pcb, void (*entry)(void *), void *arg) {
 }
 
 void context_uload(PCB *pcb, char *filename) {
-  uint8_t *stack_start = heap.end - user_stack_alloc_offset - STACK_SIZE;
+  Area area = {pcb->stack, pcb->stack + STACK_SIZE};
+
+  uint8_t *ustack_start = heap.end - user_stack_alloc_offset - STACK_SIZE;
   user_stack_alloc_offset += STACK_SIZE;
+
+  Context *c = (Context *)(area.end - sizeof(Context));
+  memset(c, 0, sizeof(Context));
+  c->GPR2 = (uintptr_t)ustack_start;
+
   void(*entry) = (void (*)())loader(pcb, filename);
-  Area area = {stack_start, stack_start + STACK_SIZE};
 
   // Currently set Address space as NULL will cause segfault on native
   pcb->cp = ucontext(NULL, area, entry);
