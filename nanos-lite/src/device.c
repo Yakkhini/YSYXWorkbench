@@ -12,6 +12,8 @@ static const char *keyname[256]
     __attribute__((used)) = {[AM_KEY_NONE] = "NONE", AM_KEYS(NAME)};
 
 size_t serial_write(const void *buf, size_t offset, size_t len) {
+  yield();
+
   for (int i = 0; i < len; i++) {
     putch(*(char *)(buf + i));
   }
@@ -19,6 +21,8 @@ size_t serial_write(const void *buf, size_t offset, size_t len) {
 }
 
 size_t events_read(void *buf, size_t offset, size_t len) {
+  yield();
+
   AM_INPUT_KEYBRD_T ev = io_read(AM_INPUT_KEYBRD);
   if (ev.keycode == AM_KEY_NONE) {
     return 0;
@@ -39,10 +43,11 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
 
 // buf[0] = x; buf[1] = y; buf[2] = w; buf[3] = h; buf[4] = (uint32_t)pixels;
 size_t fb_write(const void *buf, size_t offset, size_t len) {
+  yield();
 
   int x = ((uint32_t *)buf)[0], y = ((uint32_t *)buf)[1];
   int w = ((uint32_t *)buf)[2], h = ((uint32_t *)buf)[3];
-  uint32_t *pixels = (uint32_t *)((uint32_t *)buf)[4];
+  uint32_t *pixels = (uint32_t *)(uintptr_t)((uint32_t *)buf)[4];
 
   io_write(AM_GPU_FBDRAW, x * w, y * h, pixels, w, h, false);
   io_write(AM_GPU_FBDRAW, 0, 0, NULL, 0, 0, true);

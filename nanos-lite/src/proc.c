@@ -8,7 +8,10 @@ static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 static PCB pcb_boot = {};
 PCB *current = NULL;
 
+static uintptr_t user_stack_alloc_offset = 0;
+
 void naive_uload(PCB *pcb, const char *filename);
+uintptr_t loader(PCB *pcb, const char *filename);
 
 void switch_boot_pcb() { current = &pcb_boot; }
 
@@ -27,14 +30,22 @@ void context_kload(PCB *pcb, void (*entry)(void *), void *arg) {
   pcb->cp = kcontext(area, entry, arg);
 }
 
-void init_proc() {
-  context_kload(&pcb[0], hello_fun, (void *)1L);
-  context_kload(&pcb[1], hello_fun, (void *)2L);
-  switch_boot_pcb();
+void context_uload(PCB *pcb, char *filename) {
+  uint8_t *stack_start = heap.end - user_stack_alloc_offset - STACK_SIZE;
+  user_stack_alloc_offset += STACK_SIZE;
+  void(*entry) = (void (*)())loader(pcb, filename);
+  Area area = {stack_start, stack_start + STACK_SIZE};
 
-  // Log("Initializing processes...");
-  //
-  // naive_uload(NULL, CONFIG_LOAD_FILE_NAME);
+  // Currently set Address space as NULL will cause segfault on native
+  pcb->cp = ucontext(NULL, area, entry);
+}
+
+void init_proc() {
+  Log("Initializing processes...");
+
+  context_kload(&pcb[0], hello_fun, (void *)1L);
+  context_uload(&pcb[1], "/bin/pal");
+  switch_boot_pcb();
 }
 
 Context *schedule(Context *prev) {

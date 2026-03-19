@@ -17,7 +17,7 @@
 #define EXPECT_MACHINETYPE EM_RISCV
 #endif
 
-static uintptr_t loader(PCB *pcb, const char *filename) {
+uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
 
   fs_lseek(fd, 0, SEEK_SET);
