@@ -1,6 +1,8 @@
 #include <SDL.h>
 #include <nterm.h>
+#include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 #include <unistd.h>
 
 char handle_key(SDL_Event *ev);
@@ -21,15 +23,28 @@ static void sh_banner() {
 static void sh_prompt() { sh_printf("sh> "); }
 
 static void sh_handle_cmd(const char *cmd) {
-  char *tok = strtok((char *)cmd, " \n");
-  if (tok[0] == '/') {
-    execve(tok, 0, 0);
-    sh_printf("sh: command not found: %s\n", tok);
+  char *buf = strdup(cmd);
+  char *argv[16] = {};
+  unsigned int argc = 0;
+
+  for (char *tok = strtok(buf, " \n"); tok != NULL && argc < 15;
+       tok = strtok(NULL, " \n")) {
+    argv[argc] = tok;
+    argc++;
+  }
+
+  if (argc == 0) {
     return;
   }
 
-  execvp(tok, 0);
-  sh_printf("sh: command not found: %s\n", tok);
+  argv[argc] = NULL;
+  if (argv[0][0] == '/') {
+    execve(argv[0], argv, environ);
+  } else {
+    execvp(argv[0], argv);
+  }
+
+  sh_printf("sh: command not found: %s\n", argv[0]);
 }
 
 void builtin_sh_run() {

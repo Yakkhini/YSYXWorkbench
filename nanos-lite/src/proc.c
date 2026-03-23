@@ -30,8 +30,10 @@ void context_kload(PCB *pcb, void (*entry)(void *), void *arg) {
   pcb->cp = kcontext(area, entry, arg);
 }
 
-// Ref: Process stack initialization in LSB 5.0.0 AMD64 core refspec,
+// Ref1: Process stack initialization in LSB 5.0.0 AMD64 core refspec,
 // [https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-AMD64/LSB-Core-AMD64.html].
+// Ref2: Section 5.1.2.3.2 "Program startup" in C23 standard,
+// [https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3220.pdf]
 void context_uload(PCB *pcb, char *filename, char *argv[], char *envp[]) {
   uint32_t argc = 0;
   uint32_t envc = 0;
@@ -47,27 +49,35 @@ void context_uload(PCB *pcb, char *filename, char *argv[], char *envp[]) {
     *(uintptr_t *)(stack_pointer + (i + 1) * sizeof(uintptr_t)) =
         (uintptr_t)arg_string_pointer;
 
+    Log("Copying argument '%s' to stack at %p, pointer = %p", argv[i],
+        arg_string_pointer, stack_pointer + (i + 1) * sizeof(uintptr_t));
+
     size_t arg_len = strlen(argv[i]) + 1;
     memcpy(arg_string_pointer, argv[i], arg_len);
-    argv[i] = (char *)arg_string_pointer;
+    Log("arg_len = %d, string = '%s', pointer = %p", arg_len,
+        arg_string_pointer, arg_string_pointer);
     arg_string_pointer += arg_len;
   }
 
-  *(uintptr_t *)(stack_pointer + (argc + 2) * sizeof(uintptr_t)) =
+  *(uintptr_t *)(stack_pointer + (argc + 1) * sizeof(uintptr_t)) =
       (uintptr_t)NULL;
 
   for (int i = 0; envp[i] != NULL; i++) {
     envc++;
     *(uintptr_t *)(stack_pointer + (argc + 2 + i) * sizeof(uintptr_t)) =
         (uintptr_t)arg_string_pointer;
+    Log("Copying environment variable '%s' to stack at %p, pointer = %p",
+        envp[i], arg_string_pointer,
+        stack_pointer + (argc + 2 + i) * sizeof(uintptr_t));
 
     size_t env_len = strlen(envp[i]) + 1;
     memcpy(arg_string_pointer, envp[i], env_len);
-    envp[i] = (char *)arg_string_pointer;
+    Log("env_len = %d, string = '%s', pointer = %p", env_len,
+        arg_string_pointer, arg_string_pointer);
     arg_string_pointer += env_len;
   }
 
-  *(uintptr_t *)(stack_pointer + (argc + 2 + envc + 1) * sizeof(uintptr_t)) =
+  *(uintptr_t *)(stack_pointer + (argc + 1 + envc + 1) * sizeof(uintptr_t)) =
       (uintptr_t)NULL;
 
   *(uintptr_t *)stack_pointer = argc;

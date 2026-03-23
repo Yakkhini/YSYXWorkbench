@@ -69,7 +69,7 @@ void do_syscall(Context *c) {
     ret = 0;
     break;
   case SYS_execve:
-    context_uload(&pcb[1], (char *)a[0], (char *[]){NULL}, (char *[]){NULL});
+    context_uload(&pcb[1], (char *)a[0], (char **)a[1], (char **)a[2]);
     switch_boot_pcb();
     yield();
     ret = -1;
