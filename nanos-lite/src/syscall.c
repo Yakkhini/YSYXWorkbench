@@ -69,8 +69,10 @@ void do_syscall(Context *c) {
     ret = 0;
     break;
   case SYS_execve:
-    naive_uload(NULL, (const char *)a[0]);
-    ret = -1; // naive_uload should never return
+    context_uload(&pcb[1], (char *)a[0], (char *[]){NULL}, (char *[]){NULL});
+    switch_boot_pcb();
+    yield();
+    ret = -1;
     break;
   case SYS_gettimeofday:
     tv = (struct timeval *)a[1];

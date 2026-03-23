@@ -4,8 +4,8 @@
 
 #define MAX_NR_PROC 4
 
-static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 static PCB pcb_boot = {};
+PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 PCB *current = NULL;
 
 static uintptr_t user_stack_alloc_offset = 0;
@@ -91,8 +91,7 @@ void init_proc() {
   Log("Initializing processes...");
 
   context_kload(&pcb[0], hello_fun, (void *)1L);
-  context_uload(&pcb[1], "/bin/pal", (char *[]){"--skip", NULL},
-                (char *[]){NULL});
+  context_uload(&pcb[1], "/bin/menu", (char *[]){NULL}, (char *[]){NULL});
   switch_boot_pcb();
 }
 

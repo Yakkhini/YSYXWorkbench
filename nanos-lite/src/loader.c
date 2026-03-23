@@ -40,10 +40,10 @@ uintptr_t loader(PCB *pcb, const char *filename) {
       void *buf = malloc(filesz);
       Log("Loading [0x%08x, 0x%08x) to [0x%08x, 0x%08x)", off, off + filesz,
           addr, addr + memsz);
+      memset((void *)addr, 0, memsz);
       fs_lseek(fd, off, SEEK_SET);
       fs_read(fd, buf, filesz);
       memcpy((void *)addr, buf, filesz);
-      memset((void *)(addr + filesz), 0, memsz - filesz);
     }
   }
 
