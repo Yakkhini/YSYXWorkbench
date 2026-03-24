@@ -21,9 +21,10 @@ uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
 
   fs_lseek(fd, 0, SEEK_SET);
-  Elf_Ehdr *ehdr = (Elf_Ehdr *)malloc(sizeof(Elf_Ehdr));
+  Elf_Ehdr *ehdr = (Elf_Ehdr *)new_page(sizeof(Elf_Ehdr) / PGSIZE + 1);
   fs_read(fd, ehdr, sizeof(Elf_Ehdr));
-  Elf_Phdr *phdr_list = (Elf_Phdr *)malloc(ehdr->e_phnum * sizeof(Elf_Phdr));
+  Elf_Phdr *phdr_list =
+      (Elf_Phdr *)new_page(ehdr->e_phnum * sizeof(Elf_Phdr) / PGSIZE + 1);
   fs_lseek(fd, ehdr->e_phoff, SEEK_SET);
   fs_read(fd, phdr_list, ehdr->e_phnum * sizeof(Elf_Phdr));
 
@@ -37,7 +38,7 @@ uintptr_t loader(PCB *pcb, const char *filename) {
       uintptr_t off = phdr_list[i].p_offset;
       uintptr_t filesz = phdr_list[i].p_filesz;
       uintptr_t memsz = phdr_list[i].p_memsz;
-      void *buf = malloc(filesz);
+      void *buf = new_page(filesz / PGSIZE + 1);
       Log("Loading [0x%08x, 0x%08x) to [0x%08x, 0x%08x)", off, off + filesz,
           addr, addr + memsz);
       memset((void *)addr, 0, memsz);

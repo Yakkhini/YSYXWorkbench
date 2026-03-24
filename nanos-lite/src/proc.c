@@ -8,8 +8,6 @@ static PCB pcb_boot = {};
 PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 PCB *current = NULL;
 
-static uintptr_t user_stack_alloc_offset = 0;
-
 void naive_uload(PCB *pcb, const char *filename);
 uintptr_t loader(PCB *pcb, const char *filename);
 
@@ -38,11 +36,10 @@ void context_uload(PCB *pcb, char *filename, char *argv[], char *envp[]) {
   uint32_t argc = 0;
   uint32_t envc = 0;
 
-  uint8_t *ustack_end = heap.end - user_stack_alloc_offset;
-  user_stack_alloc_offset += STACK_SIZE;
+  uint8_t *ustack_end = new_page(8) + 8 * PGSIZE;
 
-  uint8_t *stack_pointer = ustack_end - 0x1000;
-  uint8_t *arg_string_pointer = stack_pointer + 0x500;
+  uint8_t *stack_pointer = ustack_end - 0x400;
+  uint8_t *arg_string_pointer = stack_pointer + 0x200;
 
   for (int i = 0; argv[i] != NULL; i++) {
     argc++;
