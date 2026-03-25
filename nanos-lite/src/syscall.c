@@ -18,8 +18,8 @@ void do_syscall(Context *c) {
   };
 #endif
 
-  uintptr_t type = c->GPR1;
-  uintptr_t ret = c->GPRx;
+  int type = c->GPR1;
+  int ret = c->GPRx;
 
   uintptr_t a[3];
   a[0] = c->GPR2;
@@ -71,10 +71,14 @@ void do_syscall(Context *c) {
     ret = 0;
     break;
   case SYS_execve:
-    context_uload(&pcb[1], (char *)a[0], (char **)a[1], (char **)a[2]);
-    switch_boot_pcb();
-    yield();
-    ret = -1;
+    ret = fs_open((const char *)a[0], 0, 0);
+    Log("Executing program '%s', open returned fd = %d", (char *)a[0], ret);
+    if (ret > 0) {
+      fs_close(ret);
+      context_uload(&pcb[1], (char *)a[0], (char **)a[1], (char **)a[2]);
+      switch_boot_pcb();
+      yield();
+    }
     break;
   case SYS_gettimeofday:
     tv = (struct timeval *)a[1];

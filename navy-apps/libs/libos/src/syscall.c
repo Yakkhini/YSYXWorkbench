@@ -1,9 +1,10 @@
-#include <unistd.h>
+#include "syscall.h"
+#include <assert.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <assert.h>
 #include <time.h>
-#include "syscall.h"
+#include <unistd.h>
 
 // helper macros
 #define _concat(x, y) x ## y
@@ -65,6 +66,10 @@ void _exit(int status) {
 
 int _open(const char *path, int flags, mode_t mode) {
   int ret = _syscall_(SYS_open, (intptr_t)path, 0, 0);
+  if (ret < 0) {
+    errno = -ret;
+    return -1;
+  }
   return ret;
 }
 
@@ -112,7 +117,11 @@ int _gettimeofday(struct timeval *tv, struct timezone *tz) {
 }
 
 int _execve(const char *fname, char * const argv[], char *const envp[]) {
-  _syscall_(SYS_execve, (intptr_t)fname, (intptr_t)argv, (intptr_t)envp);
+  int ret = _syscall_(SYS_execve, (intptr_t)fname, (intptr_t)argv, (intptr_t)envp);
+  if (ret < 0) {
+    errno = -ret;
+    return -1;
+  }
   return 0;
 }
 
