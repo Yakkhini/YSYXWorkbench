@@ -45,7 +45,7 @@
     devShells.x86_64-linux.default = pkgs.legacyPackages.x86_64-linux.mkShell {
       name = "osoc-shell";
 
-      hardeningDisable = ["fortify"];
+      hardeningDisable = ["format" "fortify"];
 
       packages = [
         stdpkgs.verilator
