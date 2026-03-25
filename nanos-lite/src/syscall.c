@@ -43,7 +43,9 @@ void do_syscall(Context *c) {
   struct timeval *tv;
   switch (type) {
   case SYS_exit:
-    naive_uload(NULL, "/bin/menu");
+    context_uload(&pcb[1], "/bin/nterm", (char *[]){NULL}, (char *[]){NULL});
+    switch_boot_pcb();
+    yield();
     break;
   case SYS_yield:
     yield();
