@@ -5,13 +5,16 @@ static void *pf = NULL;
 void *new_page(size_t nr_page) {
   void *p = pf;
   pf += nr_page * PGSIZE;
-  Log("new_page: allocate %d page(s) at %p, next free page = %p", nr_page, p,
-      pf);
   return p;
 }
 
 #ifdef HAS_VME
-static void *pg_alloc(int n) { return NULL; }
+static void *pg_alloc(int n) {
+  int nr_page = (n + PGSIZE - 1) / PGSIZE;
+  void *p = new_page(nr_page);
+  memset(p, 0, nr_page * PGSIZE);
+  return p;
+}
 #endif
 
 void free_page(void *p) { panic("not implement yet"); }

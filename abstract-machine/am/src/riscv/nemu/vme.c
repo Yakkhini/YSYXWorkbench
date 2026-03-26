@@ -1,15 +1,14 @@
 #include <am.h>
-#include <nemu.h>
 #include <klib.h>
+#include <nemu.h>
 
 static AddrSpace kas = {};
-static void* (*pgalloc_usr)(int) = NULL;
-static void (*pgfree_usr)(void*) = NULL;
+static void *(*pgalloc_usr)(int) = NULL;
+static void (*pgfree_usr)(void *) = NULL;
 static int vme_enable = 0;
 
-static Area segments[] = {      // Kernel memory mappings
-  NEMU_PADDR_SPACE
-};
+// Kernel memory mappings
+static Area segments[] = {NEMU_PADDR_SPACE};
 
 #define USER_SPACE RANGE(0x40000000, 0x80000000)
 
@@ -24,14 +23,14 @@ static inline uintptr_t get_satp() {
   return satp << 12;
 }
 
-bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
+bool vme_init(void *(*pgalloc_f)(int), void (*pgfree_f)(void *)) {
   pgalloc_usr = pgalloc_f;
   pgfree_usr = pgfree_f;
 
   kas.ptr = pgalloc_f(PGSIZE);
 
   int i;
-  for (i = 0; i < LENGTH(segments); i ++) {
+  for (i = 0; i < LENGTH(segments); i++) {
     void *va = segments[i].start;
     for (; va < segments[i].end; va += PGSIZE) {
       map(&kas, va, va, 0);
@@ -45,7 +44,7 @@ bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
 }
 
 void protect(AddrSpace *as) {
-  PTE *updir = (PTE*)(pgalloc_usr(PGSIZE));
+  PTE *updir = (PTE *)(pgalloc_usr(PGSIZE));
   as->ptr = updir;
   as->area = USER_SPACE;
   as->pgsize = PGSIZE;
@@ -53,8 +52,7 @@ void protect(AddrSpace *as) {
   memcpy(updir, kas.ptr, PGSIZE);
 }
 
-void unprotect(AddrSpace *as) {
-}
+void unprotect(AddrSpace *as) {}
 
 void __am_get_cur_as(Context *c) {
   c->pdir = (vme_enable ? (void *)get_satp() : NULL);
@@ -67,6 +65,18 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
+  int vpn0 = ((uintptr_t)va >> 12) & ((0x1 << 10) - 1);
+  int vpn1 = (uintptr_t)va >> 22;
+
+  uint32_t *pte1 = as->ptr + vpn1 * 4;
+  if (*pte1 == 0) {
+    *pte1 = (uint32_t)pgalloc_usr(PGSIZE) | 0b0000000001;
+  }
+
+  uint32_t *pte0 = (uint32_t *)((*pte1 & 0xFFFFFC00) + vpn0 * 4);
+  if (*pte0 == 0) {
+    *pte0 = (uint32_t)((uint32_t)pa & 0xFFFFFC00) | 0b0000001111;
+  }
 }
 
 Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
