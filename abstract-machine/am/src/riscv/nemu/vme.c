@@ -70,12 +70,12 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
 
   uint32_t *pte1 = as->ptr + vpn1 * 4;
   if (*pte1 == 0) {
-    *pte1 = (uint32_t)pgalloc_usr(PGSIZE) | 0b0000000001;
+    *pte1 = ((uint32_t)pgalloc_usr(PGSIZE) >> 2) | 0b0000000001;
   }
 
-  uint32_t *pte0 = (uint32_t *)((*pte1 & 0xFFFFFC00) + vpn0 * 4);
+  uint32_t *pte0 = (uint32_t *)(((*pte1 >> 10) << 12) + vpn0 * 4);
   if (*pte0 == 0) {
-    *pte0 = (uint32_t)((uint32_t)pa & 0xFFFFFC00) | 0b0000001111;
+    *pte0 = (((uint32_t)pa & 0xFFFFF000) >> 2) | 0b0000001111;
   }
 }
 
