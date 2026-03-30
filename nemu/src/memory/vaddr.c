@@ -17,31 +17,39 @@
 #include <memory/paddr.h>
 
 word_t vaddr_ifetch(vaddr_t addr, int len) {
+  IFDEF(CONFIG_MTRACE, Log("Read memory 0x%X for %i len.", addr, len));
   if (isa_mmu_check(addr, len, MEM_TYPE_READ) == MMU_DIRECT) {
     return paddr_read(addr, len);
   }
+  IFDEF(CONFIG_MTRACE, Log("Needs address translation."));
   paddr_t addr_translated = isa_mmu_translate(addr, len, MEM_TYPE_READ);
+  IFDEF(CONFIG_MTRACE, Log("Translated address: 0x%X", addr_translated));
 
-  // Currently all va -> pa directly mapped so use this assert.
-  Assert(addr == addr_translated, "Address translation not equall.");
   return paddr_read(addr_translated, len);
 }
 
 word_t vaddr_read(vaddr_t addr, int len) {
+  IFDEF(CONFIG_MTRACE, Log("Read memory 0x%X for %i len.", addr, len));
   if (isa_mmu_check(addr, len, MEM_TYPE_READ) == MMU_DIRECT) {
     return paddr_read(addr, len);
   }
+  IFDEF(CONFIG_MTRACE, Log("Needs address translation."));
   paddr_t addr_translated = isa_mmu_translate(addr, len, MEM_TYPE_READ);
-  Assert(addr == addr_translated, "Address translation not equall.");
+  IFDEF(CONFIG_MTRACE, Log("Translated address: 0x%X", addr_translated));
+
   return paddr_read(addr_translated, len);
 }
 
 void vaddr_write(vaddr_t addr, int len, word_t data) {
+  IFDEF(CONFIG_MTRACE,
+        Log("Write memory 0x%X for %i len. Data: 0x%X", addr, len, data));
   if (isa_mmu_check(addr, len, MEM_TYPE_WRITE) == MMU_DIRECT) {
     paddr_write(addr, len, data);
     return;
   }
+  IFDEF(CONFIG_MTRACE, Log("Needs address translation."));
   paddr_t addr_translated = isa_mmu_translate(addr, len, MEM_TYPE_WRITE);
-  Assert(addr == addr_translated, "Address translation not equall.");
+  IFDEF(CONFIG_MTRACE, Log("Translated address: 0x%X", addr_translated));
+
   paddr_write(addr_translated, len, data);
 }
