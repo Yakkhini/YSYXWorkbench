@@ -22,10 +22,10 @@ uintptr_t loader(PCB *pcb, const char *filename) {
 
   fs_lseek(fd, 0, SEEK_SET);
   Elf_Ehdr *ehdr =
-      (Elf_Ehdr *)new_page((sizeof(Elf_Ehdr) + PGSIZE - 1) / PGSIZE + 1);
+      (Elf_Ehdr *)new_page((sizeof(Elf_Ehdr) + PGSIZE - 1) / PGSIZE);
   fs_read(fd, ehdr, sizeof(Elf_Ehdr));
   Elf_Phdr *phdr_list = (Elf_Phdr *)new_page(
-      ehdr->e_phnum * (sizeof(Elf_Phdr) + PGSIZE - 1) / PGSIZE + 1);
+      ehdr->e_phnum * (sizeof(Elf_Phdr) + PGSIZE - 1) / PGSIZE);
   fs_lseek(fd, ehdr->e_phoff, SEEK_SET);
   fs_read(fd, phdr_list, ehdr->e_phnum * sizeof(Elf_Phdr));
 
@@ -39,13 +39,23 @@ uintptr_t loader(PCB *pcb, const char *filename) {
       uintptr_t off = phdr_list[i].p_offset;
       uintptr_t filesz = phdr_list[i].p_filesz;
       uintptr_t memsz = phdr_list[i].p_memsz;
-      void *buf = new_page((filesz + PGSIZE - 1) / PGSIZE + 1);
-      Log("Loading [0x%08x, 0x%08x) to [0x%08x, 0x%08x)", off, off + filesz,
-          addr, addr + memsz);
-      memset((void *)addr, 0, memsz);
+
+      uint32_t preset_zero_size = addr & 0xfff;
+      uint32_t nr_page = (preset_zero_size + memsz + PGSIZE - 1) / PGSIZE;
+      void *buf = new_page(nr_page);
+      Log("Loading [0x%08x, 0x%08x) to [0x%08x, 0x%08x) in %d page start at "
+          "0x%08x",
+          off, off + filesz, addr + preset_zero_size,
+          addr + preset_zero_size + memsz, nr_page, buf + preset_zero_size);
+
+      pcb->max_brk = addr + memsz;
+      memset(buf, 0, nr_page * PGSIZE);
       fs_lseek(fd, off, SEEK_SET);
-      fs_read(fd, buf, filesz);
-      memcpy((void *)addr, buf, filesz);
+      fs_read(fd, buf + preset_zero_size, filesz);
+      for (int i = 0; i < nr_page; i++) {
+        map(&pcb->as, (void *)(addr + i * PGSIZE),
+            buf + preset_zero_size + i * PGSIZE, 0);
+      }
     }
   }
 

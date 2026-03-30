@@ -3,8 +3,11 @@
 #include <riscv/riscv.h>
 
 static Context *(*user_handler)(Event, Context *) = NULL;
+void __am_get_cur_as(Context *c);
+void __am_switch(Context *c);
 
 Context *__am_irq_handle(Context *c) {
+  __am_get_cur_as(c);
   if (user_handler) {
     Event ev = {0};
     switch (c->GPR1) {
@@ -25,6 +28,7 @@ Context *__am_irq_handle(Context *c) {
     assert(c != NULL);
   }
 
+  __am_switch(c);
   return c;
 }
 
@@ -43,6 +47,7 @@ bool cte_init(Context *(*handler)(Event, Context *)) {
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   Context *c = (Context *)(kstack.end - sizeof(Context));
   memset(c, 0, sizeof(Context));
+  __am_get_cur_as(c);
   c->gpr[10] = (uintptr_t)arg; // Why not use a0 - a7 but only a0?
   c->mstatus = 0x1800;
   c->mepc = (uintptr_t)entry;

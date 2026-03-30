@@ -38,10 +38,15 @@ void context_kload(PCB *pcb, void (*entry)(void *), void *arg) {
 // Ref2: Section 5.1.2.3.2 "Program startup" in C23 standard,
 // [https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3220.pdf]
 void context_uload(PCB *pcb, char *filename, char *argv[], char *envp[]) {
+  protect(&pcb->as);
+
   uint32_t argc = 0;
   uint32_t envc = 0;
 
-  uint8_t *ustack_end = new_page(8) + 8 * PGSIZE;
+  uint8_t *ustack_start = new_page(8);
+  uint8_t *ustack_end = ustack_start + 8 * PGSIZE;
+
+  memset(ustack_start, 0, 8 * PGSIZE);
 
   uint8_t *stack_pointer = ustack_end - 0x400;
   uint8_t *arg_string_pointer = stack_pointer + 0x200;
@@ -84,6 +89,15 @@ void context_uload(PCB *pcb, char *filename, char *argv[], char *envp[]) {
 
   *(uintptr_t *)stack_pointer = argc;
 
+  void *virtual_ustack_start = pcb->as.area.end - 8 * PGSIZE;
+
+  for (int i = 0; i < 8; i++) {
+    map(&pcb->as, virtual_ustack_start + i * PGSIZE, ustack_start + i * PGSIZE,
+        0);
+  }
+
+  void *virtual_ustack_pointer = pcb->as.area.end - 0x400;
+
   Log("Loading program '%s' with argc = %d, envc = %d, stack_pointer = %p",
       filename, argc, envc, stack_pointer);
 
@@ -91,24 +105,24 @@ void context_uload(PCB *pcb, char *filename, char *argv[], char *envp[]) {
 
   Context *c = (Context *)(area.end - sizeof(Context));
   memset(c, 0, sizeof(Context));
-  c->GPR2 = (uintptr_t)stack_pointer;
+  c->GPR2 = (uintptr_t)virtual_ustack_pointer;
 
   void(*entry) = (void (*)())loader(pcb, filename);
 
   // Currently set Address space as NULL will cause segfault on native
-  pcb->cp = ucontext(NULL, area, entry);
+  pcb->cp = ucontext(&pcb->as, area, entry);
 }
 
 void init_proc() {
   Log("Initializing processes...");
 
   context_kload(&pcb[0], hello_fun, (void *)1L);
-  context_uload(&pcb[1], "/bin/menu", (char *[]){NULL}, (char *[]){NULL});
+  context_uload(&pcb[1], "/bin/pal", (char *[]){NULL}, (char *[]){NULL});
   switch_boot_pcb();
 }
 
 Context *schedule(Context *prev) {
   current->cp = prev;
-  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  current = (current == &pcb[0] ? &pcb[1] : &pcb[1]);
   return current->cp;
 }

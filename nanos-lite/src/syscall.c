@@ -67,7 +67,7 @@ void do_syscall(Context *c) {
     ret = fs_lseek(a[0], a[1], a[2]);
     break;
   case SYS_brk:
-    memset((void *)a[2], 0, a[1]);
+    syscall_pg_alloc_handler(a[2], a[1]);
     ret = 0;
     break;
   case SYS_execve:
