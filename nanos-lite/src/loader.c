@@ -48,7 +48,7 @@ uintptr_t loader(PCB *pcb, const char *filename) {
           off, off + filesz, addr + preset_zero_size,
           addr + preset_zero_size + memsz, nr_page, buf + preset_zero_size);
 
-      pcb->max_brk = addr + memsz;
+      pcb->max_brk = ROUNDUP(addr + memsz, PGSIZE);
       memset(buf, 0, nr_page * PGSIZE);
       fs_lseek(fd, off, SEEK_SET);
       fs_read(fd, buf + preset_zero_size, filesz);

@@ -18,15 +18,15 @@ static void *pg_alloc(int n) {
 }
 
 void syscall_pg_alloc_handler(uintptr_t start, uintptr_t offset) {
-  if ((start + offset) < current->max_brk) {
+  uintptr_t va_start = ROUNDUP(start, PGSIZE);
+  uintptr_t new_brk = ROUNDUP(start + offset, PGSIZE);
+
+  if (new_brk <= current->max_brk) {
     memset((void *)start, 0, offset);
     return;
   }
 
-  uintptr_t va_start = ROUNDUP(start, PGSIZE);
-  uintptr_t new_brk = ROUNDUP(start + offset, PGSIZE);
   uintptr_t alloc_size = new_brk - va_start;
-
   uintptr_t pa_start = (uintptr_t)pg_alloc(alloc_size);
 
   for (int i = 0; va_start + i < new_brk; i += PGSIZE) {
