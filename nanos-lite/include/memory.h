@@ -9,6 +9,7 @@
 
 #define PG_ALIGN __attribute((aligned(PGSIZE)))
 
-void* new_page(size_t);
+void *new_page(size_t);
+void syscall_pg_alloc_handler(uintptr_t start, uintptr_t offset);
 
 #endif

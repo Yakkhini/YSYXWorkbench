@@ -56,7 +56,8 @@ int fs_open(const char *pathname, int flags, int mode) {
       return i;
     }
   }
-  return -1;
+  Log("cannot find file '%s'", pathname);
+  return -ENOENT;
 };
 
 size_t fs_read(int fd, void *buf, size_t len) {

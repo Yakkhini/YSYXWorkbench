@@ -18,8 +18,8 @@ void do_syscall(Context *c) {
   };
 #endif
 
-  uintptr_t type = c->GPR1;
-  uintptr_t ret = c->GPRx;
+  int type = c->GPR1;
+  int ret = c->GPRx;
 
   uintptr_t a[3];
   a[0] = c->GPR2;
@@ -43,7 +43,9 @@ void do_syscall(Context *c) {
   struct timeval *tv;
   switch (type) {
   case SYS_exit:
-    naive_uload(NULL, "/bin/menu");
+    context_uload(current, "/bin/nterm", (char *[]){NULL}, (char *[]){NULL});
+    switch_boot_pcb();
+    yield();
     break;
   case SYS_yield:
     yield();
@@ -65,12 +67,18 @@ void do_syscall(Context *c) {
     ret = fs_lseek(a[0], a[1], a[2]);
     break;
   case SYS_brk:
-    memset((void *)a[2], 0, a[1]);
+    syscall_pg_alloc_handler(a[2], a[1]);
     ret = 0;
     break;
   case SYS_execve:
-    naive_uload(NULL, (const char *)a[0]);
-    ret = -1; // naive_uload should never return
+    ret = fs_open((const char *)a[0], 0, 0);
+    Log("Executing program '%s', open returned fd = %d", (char *)a[0], ret);
+    if (ret > 0) {
+      fs_close(ret);
+      context_uload(current, (char *)a[0], (char **)a[1], (char **)a[2]);
+      switch_boot_pcb();
+      yield();
+    }
     break;
   case SYS_gettimeofday:
     tv = (struct timeval *)a[1];
