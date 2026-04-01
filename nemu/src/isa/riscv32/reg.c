@@ -39,10 +39,10 @@ void isa_reg_display() {
   }
 
   printf("Print csr...\n");
-  printf("mstatus 0x%08X; mepc 0x%08X; mcause 0x%08X; mtvec 0x%08X; satp "
-         "0x%08X;\n",
-         cpu.csr.mstatus, cpu.csr.mepc, cpu.csr.mcause, cpu.csr.mtvec,
-         cpu.csr.satp);
+  printf("satp 0x%08X; mstatus 0x%08X; mtvec 0x%08X; mscratch 0x%08X; mepc "
+         "0x%08X; mcause 0x%08X;\n",
+         cpu.csr.satp, cpu.csr.mstatus, cpu.csr.mtvec, cpu.csr.mscratch,
+         cpu.csr.mepc, cpu.csr.mcause);
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
@@ -62,9 +62,24 @@ word_t isa_reg_str2val(const char *s, bool *success) {
     }
   }
 
+  if (strcmp(s, "satp") == 0) {
+    *success = true;
+    return cpu.csr.satp;
+  }
+
   if (strcmp(s, "mstatus") == 0) {
     *success = true;
     return cpu.csr.mstatus;
+  }
+
+  if (strcmp(s, "mtvec") == 0) {
+    *success = true;
+    return cpu.csr.mtvec;
+  }
+
+  if (strcmp(s, "mscratch") == 0) {
+    *success = true;
+    return cpu.csr.mscratch;
   }
 
   if (strcmp(s, "mepc") == 0) {
@@ -75,16 +90,6 @@ word_t isa_reg_str2val(const char *s, bool *success) {
   if (strcmp(s, "mcause") == 0) {
     *success = true;
     return cpu.csr.mcause;
-  }
-
-  if (strcmp(s, "mtvec") == 0) {
-    *success = true;
-    return cpu.csr.mtvec;
-  }
-
-  if (strcmp(s, "satp") == 0) {
-    *success = true;
-    return cpu.csr.satp;
   }
 
   return -1;
