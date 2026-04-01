@@ -1,6 +1,7 @@
 #include "config.h"
 #include <common.h>
 #include <proc.h>
+#include <stdint.h>
 
 #define MAX_NR_PROC 4
 
@@ -18,7 +19,7 @@ void hello_fun(void *arg) {
   int i = 0;
   while (1) {
     i++;
-    if (i == 100) {
+    if (i == 10) {
       Log("Hello World from Nanos-lite with arg '%p' for the %dth time!",
           (uintptr_t)arg, j);
       j++;
@@ -121,8 +122,17 @@ void init_proc() {
   switch_boot_pcb();
 }
 
+uint32_t user_proc_shedule_counter = 10;
+
 Context *schedule(Context *prev) {
   current->cp = prev;
-  current = (current == &pcb[1] ? &pcb[0] : &pcb[1]);
+  if (current == &pcb[1]) {
+    current = user_proc_shedule_counter > 0 ? &pcb[1] : &pcb[0];
+    user_proc_shedule_counter =
+        user_proc_shedule_counter > 0 ? user_proc_shedule_counter - 1 : 10;
+  } else {
+    current = &pcb[1];
+  }
+
   return current->cp;
 }
