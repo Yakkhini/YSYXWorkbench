@@ -118,21 +118,18 @@ void init_proc() {
   Log("Initializing processes...");
 
   context_kload(&pcb[0], hello_fun, (void *)1L);
-  context_uload(&pcb[1], "/bin/pal", (char *[]){NULL}, (char *[]){NULL});
+  context_uload(&pcb[1], "/bin/hello", (char *[]){NULL}, (char *[]){NULL});
+  context_uload(&pcb[2], "/bin/menu", (char *[]){NULL}, (char *[]){NULL});
   switch_boot_pcb();
 }
 
-uint32_t user_proc_shedule_counter = 10;
+uint32_t user_proc_shedule_counter = 0;
 
 Context *schedule(Context *prev) {
   current->cp = prev;
-  if (current == &pcb[1]) {
-    current = user_proc_shedule_counter > 0 ? &pcb[1] : &pcb[0];
-    user_proc_shedule_counter =
-        user_proc_shedule_counter > 0 ? user_proc_shedule_counter - 1 : 10;
-  } else {
-    current = &pcb[1];
-  }
+  current = &pcb[user_proc_shedule_counter];
+  user_proc_shedule_counter =
+      user_proc_shedule_counter == 2 ? 0 : user_proc_shedule_counter + 1;
 
   return current->cp;
 }

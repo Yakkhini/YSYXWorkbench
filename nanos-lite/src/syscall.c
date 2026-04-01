@@ -43,7 +43,7 @@ void do_syscall(Context *c) {
   struct timeval *tv;
   switch (type) {
   case SYS_exit:
-    context_uload(&pcb[1], "/bin/nterm", (char *[]){NULL}, (char *[]){NULL});
+    context_uload(current, "/bin/nterm", (char *[]){NULL}, (char *[]){NULL});
     switch_boot_pcb();
     yield();
     break;
@@ -75,7 +75,7 @@ void do_syscall(Context *c) {
     Log("Executing program '%s', open returned fd = %d", (char *)a[0], ret);
     if (ret > 0) {
       fs_close(ret);
-      context_uload(&pcb[1], (char *)a[0], (char **)a[1], (char **)a[2]);
+      context_uload(current, (char *)a[0], (char **)a[1], (char **)a[2]);
       switch_boot_pcb();
       yield();
     }
