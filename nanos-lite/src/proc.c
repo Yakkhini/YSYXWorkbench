@@ -18,7 +18,7 @@ void hello_fun(void *arg) {
   int i = 0;
   while (1) {
     i++;
-    if (i == 1000) {
+    if (i == 100) {
       Log("Hello World from Nanos-lite with arg '%p' for the %dth time!",
           (uintptr_t)arg, j);
       j++;

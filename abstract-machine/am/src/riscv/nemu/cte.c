@@ -10,18 +10,24 @@ Context *__am_irq_handle(Context *c) {
   __am_get_cur_as(c);
   if (user_handler) {
     Event ev = {0};
-    switch (c->GPR1) {
-    case -1:
-      ev.event = EVENT_YIELD;
-      c->mepc += 4;
-      break;
-    case 0 ... 19:
-      ev.event = EVENT_SYSCALL;
-      c->mepc += 4;
-      break;
-    default:
+    if (c->mcause == 0x80000007) {
+      ev.event = EVENT_IRQ_TIMER;
+    } else if (c->mcause == 0x0000000b) {
+      switch (c->GPR1) {
+      case -1:
+        ev.event = EVENT_YIELD;
+        c->mepc += 4;
+        break;
+      case 0 ... 19:
+        ev.event = EVENT_SYSCALL;
+        c->mepc += 4;
+        break;
+      default:
+        ev.event = EVENT_ERROR;
+        break;
+      }
+    } else {
       ev.event = EVENT_ERROR;
-      break;
     }
 
     c = user_handler(ev, c);
@@ -49,7 +55,7 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   memset(c, 0, sizeof(Context));
   c->pdir = NULL;
   c->gpr[10] = (uintptr_t)arg; // Why not use a0 - a7 but only a0?
-  c->mstatus = 0x1800;
+  c->mstatus = 0x1880;
   c->mepc = (uintptr_t)entry;
   return c;
 }

@@ -5,6 +5,9 @@ void do_syscall(Context *c);
 
 static Context *do_event(Event e, Context *c) {
   switch (e.event) {
+  case EVENT_IRQ_TIMER:
+    return schedule(c);
+    break;
   case EVENT_YIELD:
     return schedule(c);
     break;
@@ -12,7 +15,7 @@ static Context *do_event(Event e, Context *c) {
     do_syscall(c);
     break;
   default:
-    panic("Unhandled event ID = %d", e.event);
+    panic("Unhandled event ID = %d, mstatus = 0x%08x, mcause = 0x%08x", e.event, c->mstatus, c->mcause);
   }
 
   return c;
