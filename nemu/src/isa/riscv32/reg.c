@@ -37,6 +37,12 @@ void isa_reg_display() {
     printf("%s 0x%08X;   ", regs[i + 2], cpu.gpr[i + 2]);
     printf("%s 0x%08X;\n", regs[i + 3], cpu.gpr[i + 3]);
   }
+
+  printf("Print csr...\n");
+  printf("mstatus 0x%08X; mepc 0x%08X; mcause 0x%08X; mtvec 0x%08X; satp "
+         "0x%08X;\n",
+         cpu.csr.mstatus, cpu.csr.mepc, cpu.csr.mcause, cpu.csr.mtvec,
+         cpu.csr.satp);
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
@@ -55,5 +61,31 @@ word_t isa_reg_str2val(const char *s, bool *success) {
       return cpu.gpr[i];
     }
   }
+
+  if (strcmp(s, "mstatus") == 0) {
+    *success = true;
+    return cpu.csr.mstatus;
+  }
+
+  if (strcmp(s, "mepc") == 0) {
+    *success = true;
+    return cpu.csr.mepc;
+  }
+
+  if (strcmp(s, "mcause") == 0) {
+    *success = true;
+    return cpu.csr.mcause;
+  }
+
+  if (strcmp(s, "mtvec") == 0) {
+    *success = true;
+    return cpu.csr.mtvec;
+  }
+
+  if (strcmp(s, "satp") == 0) {
+    *success = true;
+    return cpu.csr.satp;
+  }
+
   return -1;
 }

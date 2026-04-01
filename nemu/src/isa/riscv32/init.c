@@ -35,6 +35,12 @@ static void restart() {
 
   /* Set the initial values of mstatus csr to pass difftest. */
   cpu.csr.mstatus = 0x00001800;
+  cpu.csr.mepc = 0;
+  cpu.csr.mcause = 0;
+  cpu.csr.mtvec = 0;
+  cpu.csr.satp = 0;
+
+  cpu.intr = false;
 }
 
 void init_isa() {
