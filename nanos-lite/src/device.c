@@ -1,4 +1,5 @@
 #include <common.h>
+#include <proc.h>
 
 #if defined(MULTIPROGRAM) && !defined(TIME_SHARING)
 #define MULTIPROGRAM_YIELD() yield()
@@ -21,6 +22,15 @@ size_t serial_write(const void *buf, size_t offset, size_t len) {
 size_t events_read(void *buf, size_t offset, size_t len) {
   AM_INPUT_KEYBRD_T ev = io_read(AM_INPUT_KEYBRD);
   if (ev.keycode == AM_KEY_NONE) {
+    return 0;
+  }
+
+  bool trigger_multi_schedule =
+      ev.keydown && (ev.keycode == AM_KEY_F1 || ev.keycode == AM_KEY_F2 ||
+                     ev.keycode == AM_KEY_F3 || ev.keycode == AM_KEY_F4);
+
+  if (trigger_multi_schedule) {
+    multi_schedule(ev.keycode);
     return 0;
   }
 

@@ -120,16 +120,52 @@ void init_proc() {
   context_kload(&pcb[0], hello_fun, (void *)1L);
   context_uload(&pcb[1], "/bin/hello", (char *[]){NULL}, (char *[]){NULL});
   context_uload(&pcb[2], "/bin/menu", (char *[]){NULL}, (char *[]){NULL});
+  context_uload(&pcb[3], "/bin/menu", (char *[]){NULL}, (char *[]){NULL});
   switch_boot_pcb();
 }
 
 uint32_t user_proc_shedule_counter = 0;
+uint32_t user_schedule_pattern[4] = {0, 1, 2, 1};
+
+void multi_schedule(int keycode) {
+  switch (keycode) {
+  case AM_KEY_F1:
+    user_schedule_pattern[0] = 0;
+    user_schedule_pattern[1] = 1;
+    user_schedule_pattern[2] = 2;
+    user_schedule_pattern[3] = 3;
+    break;
+  case AM_KEY_F2:
+    user_schedule_pattern[0] = 0;
+    user_schedule_pattern[1] = 2;
+    user_schedule_pattern[2] = 2;
+    user_schedule_pattern[3] = 2;
+    break;
+  case AM_KEY_F3:
+    user_schedule_pattern[0] = 1;
+    user_schedule_pattern[1] = 3;
+    user_schedule_pattern[2] = 3;
+    user_schedule_pattern[3] = 3;
+    break;
+  case AM_KEY_F4:
+    user_schedule_pattern[0] = 0;
+    user_schedule_pattern[1] = 1;
+    user_schedule_pattern[2] = 0;
+    user_schedule_pattern[3] = 1;
+    break;
+  default:
+    break;
+  }
+
+  return;
+}
 
 Context *schedule(Context *prev) {
   current->cp = prev;
-  current = &pcb[user_proc_shedule_counter];
+  uint32_t proc_index = user_schedule_pattern[user_proc_shedule_counter];
+  current = &pcb[proc_index];
   user_proc_shedule_counter =
-      user_proc_shedule_counter == 2 ? 0 : user_proc_shedule_counter + 1;
+      user_proc_shedule_counter == 3 ? 0 : user_proc_shedule_counter + 1;
 
   return current->cp;
 }

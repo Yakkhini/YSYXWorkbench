@@ -20,6 +20,8 @@ void switch_boot_pcb();
 void context_uload(PCB *pcb, char *filename, char *argv[], char *envp[]);
 Context *schedule(Context *prev);
 
+void multi_schedule(int keycode);
+
 extern PCB pcb[4];
 extern PCB *current;
 
