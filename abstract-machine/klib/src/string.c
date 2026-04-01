@@ -1,6 +1,5 @@
 #include <klib-macros.h>
 #include <klib.h>
-#include <stdint.h>
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
@@ -96,11 +95,34 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 }
 
 void *memset(void *s, int c, size_t n) {
-  char *dst = s;
-  int i = 0;
-  while (i < n) {
-    dst[i] = c;
-    i++;
+
+  unsigned char *dst = (unsigned char *)s;
+  unsigned char byte = (unsigned char)c;
+  uint32_t word = byte;
+
+  if (n == 0) {
+    return s;
+  }
+
+  while (((uintptr_t)dst & (sizeof(uint32_t) - 1)) != 0 && n > 0) {
+    *dst++ = byte;
+    n--;
+  }
+
+  for (uint32_t shift = 8; shift < sizeof(uint32_t) * 8; shift <<= 1) {
+    word |= word << shift;
+  }
+
+  uint32_t *wdst = (uint32_t *)dst;
+  while (n >= sizeof(uint32_t)) {
+    *wdst++ = word;
+    n -= sizeof(uint32_t);
+  }
+
+  dst = (unsigned char *)wdst;
+  while (n > 0) {
+    *dst++ = byte;
+    n--;
   }
 
   return s;

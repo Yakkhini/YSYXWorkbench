@@ -27,7 +27,8 @@ void syscall_pg_alloc_handler(uintptr_t start, uintptr_t offset) {
   }
 
   uintptr_t alloc_size = new_brk - va_start;
-  uintptr_t pa_start = (uintptr_t)pg_alloc(alloc_size);
+  int nr_page = (alloc_size + PGSIZE - 1) / PGSIZE;
+  uintptr_t pa_start = (uintptr_t)new_page(nr_page);
 
   for (int i = 0; va_start + i < new_brk; i += PGSIZE) {
     map(&current->as, (void *)(va_start + i), (void *)(pa_start + i), 0);
