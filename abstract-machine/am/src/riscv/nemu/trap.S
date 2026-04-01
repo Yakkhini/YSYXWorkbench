@@ -31,18 +31,25 @@ f(30) f(31)
 #define PUSH(n) STORE concat(x, n), (n * XLEN)(sp);
 #define POP(n)  LOAD  concat(x, n), (n * XLEN)(sp);
 
-#define CONTEXT_SIZE  ((NR_REGS + 3 + 1) * XLEN)
+#define CONTEXT_SIZE  ((NR_REGS + 4 + 2) * XLEN)
 #define OFFSET_SP     ( 2 * XLEN)
 #define OFFSET_CAUSE  ((NR_REGS + 0) * XLEN)
 #define OFFSET_STATUS ((NR_REGS + 1) * XLEN)
 #define OFFSET_EPC    ((NR_REGS + 2) * XLEN)
-#define OFFSET_PDIR   ((NR_REGS + 3) * XLEN)
+#define OFFSET_SCRATCH ((NR_REGS + 3) * XLEN)
+#define OFFSET_PDIR   ((NR_REGS + 4) * XLEN)
+#define OFFSET_NP  ((NR_REGS + 5) * XLEN)
 
 .align 3
 .globl __am_asm_trap
 __am_asm_trap:
-  addi sp, sp, -CONTEXT_SIZE
+  csrrw sp, mscratch, sp   // (1) atomically exchange sp and mscratch
+  bnez sp, save_context    // (2) take the branch if we trapped from user
+  csrr sp, mscratch        // (3) if we trapped from kernel, restore the original sp
+  csrw mscratch, zero      // (4) clear mscratch to keep it be zero in kernel
 
+save_context:
+  addi sp, sp, -CONTEXT_SIZE
   MAP(REGS, PUSH)
 
   csrr t0, mcause
@@ -52,24 +59,53 @@ __am_asm_trap:
   STORE t0, OFFSET_CAUSE(sp)
   STORE t1, OFFSET_STATUS(sp)
   STORE t2, OFFSET_EPC(sp)
-  STORE zero, OFFSET_PDIR(sp)
 
+  csrr t3, mscratch
+  bnez t3, trap_from_user
+
+trap_from_kernel:
+  mv t3, sp
+  addi t3, t3, CONTEXT_SIZE
+  STORE t3, OFFSET_SP(sp)
+  STORE zero, OFFSET_NP(sp)
+  j call_trap_handler
+
+trap_from_user:
+  STORE t3, OFFSET_SP(sp)
+  li t3, 1
+  STORE t3, OFFSET_NP(sp)
+  j call_trap_handler
+
+call_trap_handler:
   # set mstatus.MPRV to pass difftest
   li a0, (1 << 17)
   or t1, t1, a0
   csrw mstatus, t1
 
+  csrw mscratch, zero
+
   mv a0, sp
   jal __am_irq_handle
-
   mv sp, a0
 
+restore_context:
   LOAD t1, OFFSET_STATUS(sp)
   LOAD t2, OFFSET_EPC(sp)
   csrw mstatus, t1
   csrw mepc, t2
 
-  MAP(REGS, POP)
+  LOAD t1, OFFSET_NP(sp)
+  bnez t1, user_trap_return
 
+kernel_trap_return:
+  MAP(REGS, POP)
   addi sp, sp, CONTEXT_SIZE
   mret
+
+user_trap_return:
+  MAP(REGS, POP)
+  addi sp, sp, CONTEXT_SIZE
+  csrw mscratch, sp
+  LOAD sp, (OFFSET_SP - CONTEXT_SIZE)(sp)
+  mret
+

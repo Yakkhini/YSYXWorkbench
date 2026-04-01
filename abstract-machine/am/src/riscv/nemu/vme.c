@@ -79,10 +79,14 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   }
 }
 
+// MSCRATCH can be any value since it will be override by
+// kernel sp when first time run this process.
 Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   Context *c = (Context *)(kstack.end - sizeof(Context));
   c->pdir = as->ptr;
   c->mstatus = 0x1880;
   c->mepc = (uintptr_t)entry;
+  c->mscratch = 0xdeadbeef;
+  c->next_privilege = PRIVILEGE_USER;
   return c;
 }

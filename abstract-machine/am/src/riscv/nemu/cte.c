@@ -57,6 +57,8 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   c->gpr[10] = (uintptr_t)arg; // Why not use a0 - a7 but only a0?
   c->mstatus = 0x1880;
   c->mepc = (uintptr_t)entry;
+  c->mscratch = 0;
+  c->next_privilege = PRIVILEGE_KERNEL;
   return c;
 }
 
