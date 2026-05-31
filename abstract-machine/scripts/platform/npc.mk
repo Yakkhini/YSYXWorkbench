@@ -23,5 +23,5 @@ image: $(IMAGE).elf
 
 run: image
 	@just -f $(NPC_CHISEL)/Justfile -d $(NPC_CHISEL) core-sim
-	@taohe -f $(IMAGE).elf $(IMAGE).bin
+	@fecundmare -f $(IMAGE).elf $(IMAGE).bin
 	@just -f $(NPC_CHISEL)/Justfile -d $(NPC_CHISEL) perf
