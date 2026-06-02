@@ -23,6 +23,8 @@
   in rec {
     formatter.x86_64-linux = pkgs.legacyPackages.x86_64-linux.alejandra;
 
+    packages.x86_64-linux.riscv-gcc = riscv-toolchain.buildPackages.gcc;
+
     packages.x86_64-linux.espresso = pkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation rec {
       pname = "espresso";
       version = "2.4";
@@ -97,7 +99,7 @@
         packages.x86_64-linux.espresso
         stdpkgs.scons
         stdpkgs.bear
-        riscv-toolchain.buildPackages.gcc
+        packages.x86_64-linux.riscv-gcc
         stdpkgs.zig
         stdpkgs.SDL2
         stdpkgs.SDL2_image
