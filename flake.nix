@@ -50,6 +50,8 @@
       hardeningDisable = ["format" "fortify"];
 
       packages = [
+        stdpkgs.zsh
+        stdpkgs.nushell
         stdpkgs.verilator
         stdpkgs.gtkwave
         stdpkgs.surfer
