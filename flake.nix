@@ -52,6 +52,8 @@
       packages = [
         stdpkgs.zsh
         stdpkgs.nushell
+        stdpkgs.pre-commit
+        stdpkgs.reuse
         stdpkgs.verilator
         stdpkgs.gtkwave
         stdpkgs.surfer
